@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Code+Pro:wght@400;500&display=swap');
+
+:root {
+  --bg:              #1a1c14;
+  --bg-surface:      #22271a;
+  --bg-card:         rgba(34, 39, 26, 0.90);
+  --bg-card-hover:   rgba(42, 48, 32, 0.98);
+
+  --accent:          #7fb069;
+  --accent-dark:     #5a8a45;
+  --accent-dim:      rgba(127, 176, 105, 0.18);
+  --accent-glow:     rgba(127, 176, 105, 0.10);
+
+  --soil:            #8b5e3c;
+  --soil-light:      #a87850;
+
+  --status-healthy:  #7fb069;
+  --status-attention:#d4a843;
+  --status-critical: #c0392b;
+
+  --text:            #e8e6df;
+  --text-dim:        rgba(232, 230, 223, 0.65);
+  --text-muted:      rgba(200, 196, 185, 0.40);
+
+  --border:          rgba(127, 176, 105, 0.16);
+  --border-active:   rgba(127, 176, 105, 0.55);
+
+  --font-body:       'Nunito', system-ui, sans-serif;
+  --font-display:    'Lora', Georgia, serif;
+  --font-mono:       'Source Code Pro', monospace;
+
+  --nav-height:      60px;
+  --bottom-nav-h:    64px;
+  --radius-card:     12px;
+  --radius-btn:      8px;
+  --radius-pill:     999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  border-radius: var(--radius-btn);
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+button:active { transform: scale(0.97); }
+
+input, textarea, select {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  background: rgba(127, 176, 105, 0.05);
+  border: 1px solid rgba(127, 176, 105, 0.25);
+  border-radius: var(--radius-btn);
+  color: var(--text);
+  padding: 0.65rem 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237fb069' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(127, 176, 105, 0.25); border-radius: 2px; }

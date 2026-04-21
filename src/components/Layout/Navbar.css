@@ -1,0 +1,71 @@
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1.25rem;
+  background: rgba(26, 28, 20, 0.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.navbar-search-wrap {
+  flex: 1;
+  position: relative;
+  max-width: 280px;
+}
+
+.navbar-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.navbar-search {
+  padding-left: 2rem;
+  height: 34px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-pill);
+}
+
+.navbar-right { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+
+.navbar-bell {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border-color: rgba(255,255,255,0.08);
+  color: var(--text-dim);
+  padding: 0;
+}
+
+.navbar-bell:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+.navbar-bell-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--status-attention);
+  border: 1.5px solid rgba(26,28,20,1);
+}

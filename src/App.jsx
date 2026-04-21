@@ -1,0 +1,166 @@
+import { useState, useMemo } from 'react'
+import { Plus, LogOut } from 'lucide-react'
+import { useAuth } from './hooks/useAuth.js'
+import { usePlants } from './hooks/usePlants.js'
+import { useActivityLogs } from './hooks/useActivityLogs.js'
+import { useGardenMap } from './hooks/useGardenMap.js'
+import { useNotifications } from './hooks/useNotifications.js'
+import LoginOverlay from './components/Auth/LoginOverlay.jsx'
+import Navbar from './components/Layout/Navbar.jsx'
+import BottomNav from './components/Layout/BottomNav.jsx'
+import PlantGrid from './components/Garden/PlantGrid.jsx'
+import PlantDetailModal from './components/Garden/PlantDetailModal.jsx'
+import AddPlantModal from './components/Garden/AddPlantModal.jsx'
+import ActivityFeed from './components/Activity/ActivityFeed.jsx'
+import LogActionModal from './components/Activity/LogActionModal.jsx'
+import GardenMap from './components/Map/GardenMap.jsx'
+import DiscoverView from './components/Discover/DiscoverView.jsx'
+import ConfirmDelete from './components/Shared/ConfirmDelete.jsx'
+import './App.css'
+
+function App() {
+  const { user, loading, login, logout } = useAuth()
+  const { logs, latestLogsMap, addLog }  = useActivityLogs(user?.id)
+  const {
+    plants, healthMap, filtered, saving,
+    searchQuery, setSearchQuery,
+    categoryFilter, setCategoryFilter,
+    addPlant, editPlant, removePlant,
+  } = usePlants(user?.id, latestLogsMap)
+
+  const gardenMap = useGardenMap(user?.id)
+  const { hasOverdue } = useNotifications(user?.id, healthMap)
+
+  const [view, setView]           = useState('garden')
+  const [selected, setSelected]   = useState(null)
+  const [adding, setAdding]       = useState(false)
+  const [addingFromDiscover, setAddingFromDiscover] = useState(null) // prefill data
+  const [logTarget, setLogTarget] = useState(null) // plant to preselect in log modal
+  const [showLog, setShowLog]     = useState(false)
+  const [deleting, setDeleting]   = useState(null)
+
+  const plantsMap = useMemo(() => new Map(plants.map(p => [p.id, p])), [plants])
+
+  if (loading) return null
+  if (!user) return <LoginOverlay onLogin={login} />
+
+  const handleSavePlant = async (plant) => {
+    await addPlant(plant)
+    setAdding(false)
+    setAddingFromDiscover(null)
+  }
+
+  const handleSaveLog = async (entry) => {
+    await addLog({ ...entry, user_id: user.id })
+    setShowLog(false)
+    setLogTarget(null)
+  }
+
+  const handleDelete = async (plant) => {
+    await removePlant(plant.id)
+    setDeleting(null)
+    setSelected(null)
+  }
+
+  const logsMap = latestLogsMap()
+
+  return (
+    <>
+      <Navbar
+        searchQuery={searchQuery}
+        onSearch={setSearchQuery}
+        view={view}
+        hasOverdue={hasOverdue}
+      />
+
+      <main className="main-content">
+        {view === 'garden' && (
+          <PlantGrid
+            plants={filtered}
+            healthMap={healthMap}
+            latestLogsMap={latestLogsMap}
+            onSelect={setSelected}
+          />
+        )}
+
+        {view === 'activity' && (
+          <ActivityFeed logs={logs} plantsMap={plantsMap} />
+        )}
+
+        {view === 'map' && (
+          <GardenMap
+            {...gardenMap}
+            plants={plants}
+            onAddBed={gardenMap.addBed}
+            onAssignPlant={gardenMap.assignPlant}
+            onClearBed={gardenMap.clearBed}
+          />
+        )}
+
+        {view === 'discover' && (
+          <DiscoverView
+            profile={null}
+            onAddPlant={(prefill) => { setAddingFromDiscover(prefill); setAdding(true) }}
+          />
+        )}
+      </main>
+
+      {/* FAB — add plant (garden view) or log activity (activity view) */}
+      {view === 'garden' && (
+        <button className="fab-add" aria-label="Add plant" onClick={() => setAdding(true)}>
+          <Plus size={24} strokeWidth={2.5} />
+        </button>
+      )}
+
+      {view === 'activity' && (
+        <button className="fab-add" aria-label="Log activity" onClick={() => setShowLog(true)}>
+          <Plus size={24} strokeWidth={2.5} />
+        </button>
+      )}
+
+      <button className="fab-logout" aria-label="Logout" onClick={logout}>
+        <LogOut size={15} strokeWidth={2} />
+      </button>
+
+      <BottomNav view={view} onViewChange={setView} />
+
+      {/* Modals */}
+      {selected && (
+        <PlantDetailModal
+          plant={selected}
+          health={healthMap?.get(selected.id)}
+          plantLogs={logsMap.get(selected.id)}
+          onClose={() => setSelected(null)}
+          onEdit={(p) => { setSelected(null); /* TODO: edit modal */ }}
+          onDelete={(p) => { setSelected(null); setDeleting(p) }}
+          onLogActivity={(p) => { setSelected(null); setLogTarget(p.id); setShowLog(true) }}
+        />
+      )}
+
+      {adding && (
+        <AddPlantModal
+          prefill={addingFromDiscover}
+          onSave={handleSavePlant}
+          onClose={() => { setAdding(false); setAddingFromDiscover(null) }}
+        />
+      )}
+
+      {showLog && plants.length > 0 && (
+        <LogActionModal
+          plants={plants}
+          preselectedPlantId={logTarget}
+          onSave={handleSaveLog}
+          onClose={() => { setShowLog(false); setLogTarget(null) }}
+        />
+      )}
+
+      <ConfirmDelete item={deleting} onConfirm={handleDelete} onCancel={() => setDeleting(null)} />
+
+      {saving === 'saving' && (
+        <div className="saving-toast">Saving...</div>
+      )}
+    </>
+  )
+}
+
+export default App

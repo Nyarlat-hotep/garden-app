@@ -1,0 +1,78 @@
+.main-content {
+  padding-top: var(--nav-height);
+  min-height: 100vh;
+}
+
+/* FABs */
+.fab-add {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-h) + 1.25rem);
+  right: 1.5rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  box-shadow: 0 0 20px var(--accent-glow), 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: all 0.22s ease;
+  animation: fab-pulse 4s ease-in-out infinite;
+  padding: 0;
+}
+
+.fab-add:hover {
+  background: rgba(127, 176, 105, 0.28);
+  transform: scale(1.08);
+  border-color: var(--accent);
+}
+
+.fab-logout {
+  position: fixed;
+  top: calc(var(--nav-height) / 2 - 15px);
+  right: 1.25rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  z-index: 101;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Logout button hidden — accessible via long-press or keyboard for cleaner UI */
+/* Uncomment to show: */
+/*
+.fab-logout { opacity: 1; pointer-events: auto; }
+*/
+
+@keyframes fab-pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 4px 16px rgba(0,0,0,0.4); }
+  50%       { box-shadow: 0 0 30px rgba(127,176,105,0.25), 0 4px 16px rgba(0,0,0,0.4); }
+}
+
+.saving-toast {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-h) + 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26, 28, 20, 0.96);
+  border: 1px solid var(--border);
+  padding: 0.45rem 1.4rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  z-index: 500;
+}

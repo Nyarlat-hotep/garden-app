@@ -1,0 +1,11 @@
+.rotation-warning {
+  background: rgba(212, 168, 67, 0.10);
+  border: 1px solid rgba(212, 168, 67, 0.35);
+  border-radius: var(--radius-btn);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--status-attention);
+  line-height: 1.5;
+}
+
+.rotation-warning strong { color: var(--text); }

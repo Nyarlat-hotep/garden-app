@@ -1,0 +1,34 @@
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.activity-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.18s ease;
+}
+
+.activity-opt:hover {
+  border-color: var(--act-color, var(--accent));
+  color: var(--act-color, var(--accent));
+  background: color-mix(in srgb, var(--act-color, var(--accent)) 10%, transparent);
+}
+
+.activity-opt.active {
+  border-color: var(--act-color, var(--accent));
+  color: var(--act-color, var(--accent));
+  background: color-mix(in srgb, var(--act-color, var(--accent)) 14%, transparent);
+}
