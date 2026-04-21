@@ -52,6 +52,41 @@
 }
 .discover-search-clear:hover { color: var(--text); }
 
+/* Category tabs */
+.discover-category-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.discover-cat-tab {
+  padding: 0.25rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+.discover-cat-tab:hover,
+.discover-cat-tab.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+/* Plant card description */
+.plant-card-description {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* Popular chips */
 .discover-popular { display: flex; flex-direction: column; gap: 0.6rem; }
 

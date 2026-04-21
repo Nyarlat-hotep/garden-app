@@ -49,22 +49,6 @@
 
 .modal-search-row input { flex: 1; }
 
-.btn-search {
-  padding: 0 1rem;
-  background: var(--accent-dim);
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border-radius: var(--radius-btn);
-  white-space: nowrap;
-  height: 40px;
-}
-
-.btn-search:disabled { opacity: 0.4; cursor: not-allowed; }
-
 .modal-results {
   display: flex;
   flex-direction: column;
@@ -89,12 +73,11 @@
   background: transparent;
 }
 
-.modal-result-item img {
-  width: 32px;
-  height: 32px;
-  object-fit: cover;
-  border-radius: 4px;
+.modal-result-emoji {
+  font-size: 1.25rem;
   flex-shrink: 0;
+  width: 28px;
+  text-align: center;
 }
 
 .modal-result-item:hover { background: var(--accent-dim); }
