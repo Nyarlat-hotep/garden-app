@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MapPin, RefreshCw, Search, Pencil } from 'lucide-react'
 import { getCurrentSeason, SEASON_LABELS } from '../../utils/seasons.js'
 import { CATEGORY_COLORS } from '../../utils/format.js'
@@ -6,25 +6,121 @@ import './DiscoverView.css'
 
 const CATEGORIES = ['vegetable', 'fruit', 'herb', 'protein']
 
+function useLocationTypeahead() {
+  const [query, setQuery]           = useState('')
+  const [places, setPlaces]         = useState([])
+  const [searching, setSearching]   = useState(false)
+  const timerRef = useRef(null)
+
+  useEffect(() => {
+    clearTimeout(timerRef.current)
+    if (query.length < 3) { setPlaces([]); return }
+    timerRef.current = setTimeout(async () => {
+      setSearching(true)
+      try {
+        const res  = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6&lang=en`)
+        const data = await res.json()
+        const seen = new Set()
+        const results = (data.features ?? [])
+          .filter(f => ['city','town','village','municipality','county'].includes(f.properties.type))
+          .reduce((acc, f) => {
+            const { name, state, country, countrycode } = f.properties
+            const parts = [name, state, countrycode === 'US' ? 'USA' : country].filter(Boolean)
+            const label = parts.join(', ')
+            if (!seen.has(label)) {
+              seen.add(label)
+              acc.push({ label, lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] })
+            }
+            return acc
+          }, [])
+        setPlaces(results)
+      } catch {
+        setPlaces([])
+      } finally {
+        setSearching(false)
+      }
+    }, 300)
+    return () => clearTimeout(timerRef.current)
+  }, [query])
+
+  return { query, setQuery, places, setPlaces, searching }
+}
+
+function LocationTypeahead({ initialValue, onSelect, onCancel }) {
+  const { query, setQuery, places, setPlaces, searching } = useLocationTypeahead()
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef(null)
+
+  useEffect(() => {
+    setQuery(initialValue ?? '')
+  }, [initialValue])
+
+  useEffect(() => {
+    setOpen(places.length > 0)
+  }, [places])
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const handleSelect = (place) => {
+    setOpen(false)
+    setPlaces([])
+    onSelect(place)
+  }
+
+  return (
+    <div className="location-typeahead-wrap" ref={wrapRef}>
+      <div className="location-typeahead-input-row">
+        <MapPin size={14} className="location-typeahead-pin" />
+        <input
+          className="location-input"
+          placeholder="City, state or region..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onFocus={() => places.length > 0 && setOpen(true)}
+          autoFocus
+        />
+        {searching && <span className="location-searching-dot" />}
+        {onCancel && (
+          <button className="btn-location-cancel" onClick={onCancel}>Cancel</button>
+        )}
+      </div>
+      {open && places.length > 0 && (
+        <ul className="location-dropdown">
+          {places.map((p, i) => (
+            <li key={i} className="location-dropdown-item" onMouseDown={() => handleSelect(p)}>
+              <MapPin size={11} />
+              {p.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
-  const [category, setCategory]     = useState('vegetable')
-  const [results, setResults]       = useState([])
-  const [loading, setLoading]       = useState(false)
-  const [aiText, setAiText]         = useState('')
-  const [aiLoading, setAiLoading]   = useState(false)
-  const [showAI, setShowAI]         = useState(false)
-  const [search, setSearch]         = useState('')
+  const [category, setCategory]   = useState('vegetable')
+  const [results, setResults]     = useState([])
+  const [loading, setLoading]     = useState(false)
+  const [aiText, setAiText]       = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [showAI, setShowAI]       = useState(false)
+  const [search, setSearch]       = useState('')
   const [editingLocation, setEditingLocation] = useState(false)
-  const [locationInput, setLocationInput]     = useState('')
   const [savingLocation, setSavingLocation]   = useState(false)
 
   const season   = getCurrentSeason()
   const zone     = profile?.hardiness_zone ?? ''
   const location = profile?.location ?? ''
 
-  const fetchSuggestions = async (loc, z) => {
+  const fetchSuggestions = async (loc) => {
     const useLocation = loc ?? location
-    const useZone     = z ?? zone
     if (!useLocation) return
     setLoading(true)
     setResults([])
@@ -32,10 +128,10 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
     setShowAI(false)
     setSearch('')
     try {
-      const res = await fetch('/api/claude-discover', {
+      const res  = await fetch('/api/claude-discover', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ zone: useZone, season, category, location: useLocation }),
+        body: JSON.stringify({ zone, season, category, location: useLocation }),
       })
       const data = await res.json()
       setResults(Array.isArray(data) ? data : [])
@@ -50,11 +146,11 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
     if (location) fetchSuggestions()
   }, [category, location])
 
-  const handleSaveLocation = async () => {
-    if (!locationInput.trim() || !saveProfile) return
+  const handleSelectLocation = async (place) => {
+    if (!saveProfile) return
     setSavingLocation(true)
     try {
-      await saveProfile({ location: locationInput.trim() })
+      await saveProfile({ location: place.label, latitude: place.lat, longitude: place.lon })
       setEditingLocation(false)
     } catch {}
     setSavingLocation(false)
@@ -65,44 +161,36 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
     setShowAI(true)
     setAiLoading(true)
     try {
-      const res = await fetch('/api/claude-advice', {
+      const res  = await fetch('/api/claude-advice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plantName: `${category}s in general`, zone, season, location }),
       })
-      const text = await res.text()
-      setAiText(text)
-    } catch { setAiText('Unable to load advice.') }
-    finally { setAiLoading(false) }
+      setAiText(await res.text())
+    } catch {
+      setAiText('Unable to load advice.')
+    } finally {
+      setAiLoading(false)
+    }
   }
 
   const filtered = results.filter(r =>
-    !search || r.name.toLowerCase().includes(search.toLowerCase()) ||
-    (r.variety_suggestion || '').toLowerCase().includes(search.toLowerCase()) ||
-    (r.reason || '').toLowerCase().includes(search.toLowerCase())
+    !search ||
+    r.name.toLowerCase().includes(search.toLowerCase()) ||
+    (r.variety_suggestion ?? '').toLowerCase().includes(search.toLowerCase()) ||
+    (r.reason ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
-  // Location not set — show setup prompt
+  // No location yet — show full-page setup
   if (!location && !editingLocation) {
     return (
       <div className="discover-view">
         <div className="location-setup-card">
           <div className="location-setup-icon">🌍</div>
           <div className="location-setup-title">Where is your garden?</div>
-          <p className="location-setup-desc">Enter your city or region to get personalized plant recommendations for your climate and the current season.</p>
-          <div className="location-setup-row">
-            <input
-              className="location-input"
-              placeholder="e.g. Portland, Oregon"
-              value={locationInput}
-              onChange={e => setLocationInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSaveLocation()}
-              autoFocus
-            />
-            <button className="btn-save-location" onClick={handleSaveLocation} disabled={savingLocation || !locationInput.trim()}>
-              {savingLocation ? '...' : 'Find plants'}
-            </button>
-          </div>
+          <p className="location-setup-desc">Enter your city or region to get personalized plant recommendations for your climate and current season.</p>
+          <LocationTypeahead onSelect={handleSelectLocation} />
+          {savingLocation && <p className="location-saving-text">Saving...</p>}
         </div>
       </div>
     )
@@ -111,32 +199,23 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
   return (
     <div className="discover-view">
       <div className="discover-header">
-        <div className="discover-location">
-          <MapPin size={13} />
-          {editingLocation ? (
-            <div className="location-edit-row">
-              <input
-                className="location-input-inline"
-                value={locationInput}
-                onChange={e => setLocationInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleSaveLocation(); if (e.key === 'Escape') setEditingLocation(false) }}
-                autoFocus
-              />
-              <button className="btn-save-location-sm" onClick={handleSaveLocation} disabled={savingLocation}>
-                {savingLocation ? '...' : 'Save'}
-              </button>
-            </div>
-          ) : (
-            <>
-              <span>{location}</span>
-              <button className="btn-edit-location" onClick={() => { setLocationInput(location); setEditingLocation(true) }}>
-                <Pencil size={11} />
-              </button>
-            </>
-          )}
-          <span className="discover-season">{SEASON_LABELS[season]}</span>
-        </div>
-        {zone && <span className="discover-zone">Zone {zone}</span>}
+        {editingLocation ? (
+          <LocationTypeahead
+            initialValue={location}
+            onSelect={handleSelectLocation}
+            onCancel={() => setEditingLocation(false)}
+          />
+        ) : (
+          <div className="discover-location">
+            <MapPin size={13} />
+            <span>{location}</span>
+            <button className="btn-edit-location" onClick={() => setEditingLocation(true)}>
+              <Pencil size={11} />
+            </button>
+            <span className="discover-season">{SEASON_LABELS[season]}</span>
+          </div>
+        )}
+        {zone && !editingLocation && <span className="discover-zone">Zone {zone}</span>}
       </div>
 
       <div className="category-tabs">
@@ -194,7 +273,9 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
       ) : !loading && location ? (
         <div className="discover-empty">
           <p className="discover-empty-text">{search ? 'No matches for that search.' : 'No suggestions loaded.'}</p>
-          <button className="btn-refresh" onClick={() => fetchSuggestions()}><RefreshCw size={14} /> Try again</button>
+          <button className="btn-refresh" onClick={() => fetchSuggestions()}>
+            <RefreshCw size={14} /> Try again
+          </button>
         </div>
       ) : null}
 
