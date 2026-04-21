@@ -1,9 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const client = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY })
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
+
+  if (!process.env.CLAUDE_API_KEY) return res.status(200).json([])
+
+  const client = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY })
 
   const { zone, season, category, location } = req.body
 

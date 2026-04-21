@@ -1,9 +1,15 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const client = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY })
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
+
+  if (!process.env.CLAUDE_API_KEY) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+    res.status(200).end('AI advice unavailable — API key not configured.')
+    return
+  }
+
+  const client = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY })
 
   const { plantName, variety, zone, season, perenualData, recentActivity } = req.body
 
