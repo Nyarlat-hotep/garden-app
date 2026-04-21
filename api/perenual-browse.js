@@ -35,11 +35,11 @@ export default async function handler(req, res) {
   // Fetch from Perenual
   try {
     const q   = CATEGORY_QUERIES[category] || category
-    let url   = `https://perenual.com/api/species-list?key=${key}&q=${encodeURIComponent(q)}&page=${page}`
-    if (zone) url += `&hardiness=${zone}`
+    const url = `https://perenual.com/api/species-list?key=${key}&q=${encodeURIComponent(q)}&page=${page}`
 
     const r    = await fetch(url)
     const data = await r.json()
+    console.log('[perenual-browse] api status:', r.status, '| data keys:', Object.keys(data), '| total:', data.total, '| count:', data.data?.length)
 
     if (!r.ok) {
       console.error('Perenual error:', r.status, data)
