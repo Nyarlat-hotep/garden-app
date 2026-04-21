@@ -28,7 +28,7 @@ function emojiForPlant(plant) {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-const CELL_SIZE = 14 // px — fixed cell size, grid adapts to fill viewport
+const CELL_SIZE = 28 // px — fixed cell size, grid adapts to fill viewport
 
 export default function GardenMap({ cells = {}, paintCells, plants, saving }) {
   const [tool, setTool]                       = useState('area')
