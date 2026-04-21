@@ -4,7 +4,6 @@ import { CATEGORY_COLORS } from '../../utils/format.js'
 import './DiscoverView.css'
 
 const CATEGORIES = ['vegetable', 'fruit', 'herb', 'protein']
-const ZONES = Array.from({ length: 13 }, (_, i) => String(i + 1))
 
 function estimateZone(lat) {
   if (lat == null) return ''
@@ -109,12 +108,18 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [search, setSearch]       = useState('')
   const [editingLocation, setEditingLocation] = useState(false)
-  const [editingZone, setEditingZone]         = useState(false)
   const [savingLocation, setSavingLocation]   = useState(false)
-  const [pendingZone, setPendingZone]         = useState('')
 
   const location = profile?.location ?? ''
   const zone     = profile?.hardiness_zone ?? ''
+
+  // Auto-fix missing zone from stored lat if profile already has location but no zone
+  useEffect(() => {
+    if (location && !zone && profile?.latitude != null && saveProfile) {
+      const estimated = estimateZone(profile.latitude)
+      if (estimated) saveProfile({ hardiness_zone: estimated })
+    }
+  }, [location, zone, profile?.latitude])
 
   const fetchPlants = async (cat, z, pg, append = false) => {
     if (!z) return
@@ -150,17 +155,16 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
   }
 
   const handleSelectLocation = async (place) => {
-    const estimatedZone = estimateZone(place.lat)
-    setPendingZone(estimatedZone)
-  }
-
-  const handleSaveLocation = async (place, zoneVal) => {
     if (!saveProfile) return
     setSavingLocation(true)
     try {
-      await saveProfile({ location: place.label, latitude: place.lat, longitude: place.lon, hardiness_zone: zoneVal })
+      await saveProfile({
+        location:        place.label,
+        latitude:        place.lat,
+        longitude:       place.lon,
+        hardiness_zone:  estimateZone(place.lat),
+      })
       setEditingLocation(false)
-      setPendingZone('')
     } catch {}
     setSavingLocation(false)
   }
@@ -171,17 +175,16 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
     (r.scientific_name ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
-  // First-time setup — no location yet
   if (!location) {
     return (
       <div className="discover-view">
-        <LocationSetupFlow
-          onSave={handleSaveLocation}
-          saving={savingLocation}
-          pendingZone={pendingZone}
-          setPendingZone={setPendingZone}
-          onSelectPlace={handleSelectLocation}
-        />
+        <div className="location-setup-card">
+          <div className="location-setup-icon">🌍</div>
+          <div className="location-setup-title">Where is your garden?</div>
+          <p className="location-setup-desc">Enter your city to get plants matched to your climate.</p>
+          <LocationTypeahead onSelect={handleSelectLocation} />
+          {savingLocation && <p className="location-saving-text">Saving...</p>}
+        </div>
       </div>
     )
   }
@@ -192,7 +195,7 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
         {editingLocation ? (
           <LocationTypeahead
             initialValue={location}
-            onSelect={(p) => handleSelectLocation(p)}
+            onSelect={handleSelectLocation}
             onCancel={() => setEditingLocation(false)}
           />
         ) : (
@@ -204,34 +207,6 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
           </div>
         )}
       </div>
-
-      {!zone && !editingZone && (
-        <div className="zone-missing-banner">
-          No hardiness zone set — <button className="btn-inline-link" onClick={() => { setPendingZone(''); setEditingZone(true) }}>add your zone</button> to filter plants correctly.
-        </div>
-      )}
-
-      {editingZone && (
-        <div className="zone-picker-inline">
-          <select className="zone-select" value={pendingZone} onChange={e => setPendingZone(e.target.value)} autoFocus>
-            <option value="">Select zone...</option>
-            {ZONES.map(z => <option key={z} value={z}>Zone {z}</option>)}
-          </select>
-          <button
-            className="btn-save-location"
-            disabled={!pendingZone || savingLocation}
-            onClick={async () => {
-              setSavingLocation(true)
-              try { await saveProfile({ hardiness_zone: pendingZone }) } catch {}
-              setEditingZone(false)
-              setSavingLocation(false)
-            }}
-          >
-            {savingLocation ? '...' : 'Save'}
-          </button>
-          <button className="btn-location-cancel" onClick={() => setEditingZone(false)}>Cancel</button>
-        </div>
-      )}
 
       <div className="category-tabs">
         {CATEGORIES.map(c => (
@@ -263,7 +238,7 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
           <div className="discover-loading-dots"><span /><span /><span /></div>
           <div className="discover-loading-text">Loading plants...</div>
         </div>
-      ) : !zone ? null : filtered.length > 0 ? (
+      ) : filtered.length > 0 ? (
         <>
           <div className="suggestion-list">
             {filtered.map((r) => (
@@ -276,14 +251,14 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
             </button>
           )}
         </>
-      ) : (
+      ) : !loading && zone ? (
         <div className="discover-empty">
-          <p className="discover-empty-text">{search ? 'No matches.' : 'No plants found for this zone and category.'}</p>
+          <p className="discover-empty-text">{search ? 'No matches.' : 'No plants found.'}</p>
           <button className="btn-refresh" onClick={() => fetchPlants(category, zone, 1)}>
             <RefreshCw size={14} /> Try again
           </button>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
@@ -306,60 +281,14 @@ function PlantCard({ plant, category, onAdd }) {
               <span className="plant-tag">Zone {plant.hardiness_min}–{plant.hardiness_max}</span>}
           </div>
           <div className="plant-card-meta">
-            {plant.watering && (
-              <span className="plant-meta-item"><Droplets size={11} />{plant.watering}</span>
-            )}
-            {sunlight && (
-              <span className="plant-meta-item"><Sun size={11} />{sunlight}</span>
-            )}
+            {plant.watering && <span className="plant-meta-item"><Droplets size={11} />{plant.watering}</span>}
+            {sunlight      && <span className="plant-meta-item"><Sun size={11} />{sunlight}</span>}
           </div>
         </div>
       </div>
-      <button
-        className="btn-add-suggestion"
-        onClick={() => onAdd({ name: plant.name, variety: plant.scientific_name, category })}
-      >
+      <button className="btn-add-suggestion" onClick={() => onAdd({ name: plant.name, variety: plant.scientific_name, category })}>
         + Add to garden
       </button>
-    </div>
-  )
-}
-
-function LocationSetupFlow({ onSave, saving, pendingZone, setPendingZone, onSelectPlace }) {
-  const [selectedPlace, setSelectedPlace] = useState(null)
-
-  const handleSelect = (place) => {
-    setSelectedPlace(place)
-    onSelectPlace(place)
-  }
-
-  return (
-    <div className="location-setup-card">
-      <div className="location-setup-icon">🌍</div>
-      <div className="location-setup-title">Where is your garden?</div>
-      <p className="location-setup-desc">Enter your city to get plants matched to your climate and hardiness zone.</p>
-      <LocationTypeahead onSelect={handleSelect} />
-      {selectedPlace && (
-        <div className="zone-picker-row">
-          <label className="zone-picker-label">Hardiness zone</label>
-          <select
-            className="zone-select"
-            value={pendingZone}
-            onChange={e => setPendingZone(e.target.value)}
-          >
-            <option value="">Select zone</option>
-            {ZONES.map(z => <option key={z} value={z}>Zone {z}</option>)}
-          </select>
-          <button
-            className="btn-save-location"
-            onClick={() => onSave(selectedPlace, pendingZone)}
-            disabled={saving || !pendingZone}
-          >
-            {saving ? '...' : 'Find plants'}
-          </button>
-        </div>
-      )}
-      {saving && <p className="location-saving-text">Saving...</p>}
     </div>
   )
 }

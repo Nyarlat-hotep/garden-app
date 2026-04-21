@@ -200,61 +200,6 @@
   border-radius: var(--radius-pill);
 }
 
-.zone-missing-banner {
-  font-size: 0.8rem;
-  color: var(--status-attention);
-  background: rgba(212,168,67,0.08);
-  border: 1px solid rgba(212,168,67,0.25);
-  border-radius: var(--radius-btn);
-  padding: 0.5rem 0.85rem;
-}
-
-.btn-inline-link {
-  background: none;
-  border: none;
-  color: var(--status-attention);
-  text-decoration: underline;
-  font-size: inherit;
-  padding: 0;
-  cursor: pointer;
-}
-
-.zone-picker-inline {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.zone-picker-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  width: 100%;
-  max-width: 400px;
-}
-
-.zone-picker-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.zone-select {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-btn);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  padding: 0.45rem 0.75rem;
-  outline: none;
-  flex: 1;
-}
-.zone-select:focus { border-color: var(--accent); }
 
 .btn-load-more {
   width: 100%;
