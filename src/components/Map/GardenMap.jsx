@@ -128,7 +128,10 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
       >
         <div
           className="garden-grid"
-          style={{ gridTemplateColumns: `repeat(${gridWidth}, 1fr)` }}
+          style={{
+            gridTemplateColumns: `repeat(${gridWidth}, 1fr)`,
+            maxWidth: `${gridWidth * 30 + (gridWidth - 1)}px`,
+          }}
         >
           {Array.from({ length: gridWidth * gridHeight }, (_, i) => {
             const x = i % gridWidth
