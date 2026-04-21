@@ -176,12 +176,10 @@ export default function GardenMap({ cells = {}, paintCells, plants, saving }) {
                   if (isDrawingRef.current || !plantId) return
                   const plant = plants.find(p => p.id === plantId)
                   const rect = e.currentTarget.getBoundingClientRect()
-                  const wrapperRect = gridWrapperRef.current.getBoundingClientRect()
-                  const relTop = rect.top - wrapperRect.top
-                  const below = relTop < 90
+                  const below = rect.top < 180  // not enough space above
                   setPopover({
-                    x: rect.left - wrapperRect.left + rect.width / 2,
-                    y: below ? rect.bottom - wrapperRect.top + 8 : rect.top - wrapperRect.top,
+                    x: rect.left + rect.width / 2,
+                    y: below ? rect.bottom + 8 : rect.top - 8,
                     below,
                     plant: plant ?? null,
                     orphaned: !plant,
