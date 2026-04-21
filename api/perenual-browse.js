@@ -1,23 +1,40 @@
 import { createClient } from '@supabase/supabase-js'
 
-const CATEGORY_QUERIES = {
-  vegetable: 'vegetable',
-  fruit: 'fruit',
-  herb: 'herb',
-  protein: 'bean',
+const CATEGORY_TERMS = {
+  vegetable: ['tomato', 'carrot', 'lettuce', 'pepper', 'cucumber', 'spinach', 'broccoli', 'zucchini'],
+  fruit:     ['strawberry', 'blueberry', 'apple', 'raspberry', 'peach', 'blackberry', 'plum'],
+  herb:      ['basil', 'mint', 'rosemary', 'thyme', 'parsley', 'cilantro', 'oregano', 'chive'],
+  protein:   ['bean', 'pea', 'chickpea', 'lentil', 'soybean', 'edamame'],
+}
+
+async function fetchTerm(key, term) {
+  const url = `https://perenual.com/api/species-list?key=${key}&q=${encodeURIComponent(term)}&page=1`
+  const r = await fetch(url)
+  if (!r.ok) return []
+  const data = await r.json()
+  return (data.data ?? []).map(s => ({
+    id:              s.id,
+    name:            s.common_name || s.scientific_name?.[0] || 'Unknown',
+    scientific_name: s.scientific_name?.[0] ?? '',
+    image_url:       s.default_image?.small_url ?? s.default_image?.thumbnail ?? null,
+    watering:        s.watering,
+    sunlight:        Array.isArray(s.sunlight) ? s.sunlight : [],
+    cycle:           s.cycle,
+    hardiness_min:   s.hardiness?.min ?? null,
+    hardiness_max:   s.hardiness?.max ?? null,
+    care_level:      s.care_level,
+  }))
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const key = process.env.PERENUAL_API_KEY
-  console.log('[perenual-browse] key present:', !!key, '| body:', JSON.stringify(req.body))
   if (!key) return res.status(200).json([])
 
-  const { category = 'vegetable', zone = '', page = 1 } = req.body ?? {}
-  const cacheKey = `browse:${zone}:${category}:${page}`
+  const { category = 'vegetable', zone = '' } = req.body ?? {}
+  const cacheKey = `browse:${zone}:${category}`
 
-  // Try cache — skip silently if Supabase unavailable
   let supabase = null
   try {
     supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY)
@@ -32,39 +49,22 @@ export default async function handler(req, res) {
     }
   } catch {}
 
-  // Fetch from Perenual
   try {
-    const q   = CATEGORY_QUERIES[category] || category
-    const url = `https://perenual.com/api/species-list?key=${key}&q=${encodeURIComponent(q)}&page=${page}`
+    const terms   = CATEGORY_TERMS[category] ?? [category]
+    const batches = await Promise.all(terms.map(t => fetchTerm(key, t)))
+    const seen    = new Set()
+    const results = batches.flat().filter(p => {
+      if (seen.has(p.id)) return false
+      seen.add(p.id)
+      return true
+    })
 
-    const r    = await fetch(url)
-    const data = await r.json()
-    console.log('[perenual-browse] api status:', r.status, '| data keys:', Object.keys(data), '| total:', data.total, '| count:', data.data?.length)
+    console.log('[perenual-browse] category:', category, '| results:', results.length)
 
-    if (!r.ok) {
-      console.error('Perenual error:', r.status, data)
-      return res.status(200).json([])
-    }
-
-    const results = (data.data ?? []).map(s => ({
-      id:              s.id,
-      name:            s.common_name || s.scientific_name?.[0] || 'Unknown',
-      scientific_name: s.scientific_name?.[0] ?? '',
-      image_url:       s.default_image?.small_url ?? s.default_image?.thumbnail ?? null,
-      watering:        s.watering,
-      sunlight:        Array.isArray(s.sunlight) ? s.sunlight : [],
-      cycle:           s.cycle,
-      hardiness_min:   s.hardiness?.min ?? null,
-      hardiness_max:   s.hardiness?.max ?? null,
-      care_level:      s.care_level,
-    }))
-
-    // Cache in background — don't block response
     if (supabase) {
       supabase.from('discovery_cache').upsert({ cache_key: cacheKey, results, cached_at: new Date().toISOString() }).then(() => {})
     }
 
-    console.log('[perenual-browse] results count:', results.length)
     res.status(200).json(results)
   } catch (err) {
     console.error('perenual-browse error:', err)

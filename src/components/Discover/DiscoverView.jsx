@@ -103,9 +103,7 @@ function LocationTypeahead({ initialValue, onSelect, onCancel }) {
 export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
   const [category, setCategory]   = useState('vegetable')
   const [results, setResults]     = useState([])
-  const [page, setPage]           = useState(1)
   const [loading, setLoading]     = useState(false)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [search, setSearch]       = useState('')
   const [editingLocation, setEditingLocation] = useState(false)
   const [savingLocation, setSavingLocation]   = useState(false)
@@ -121,38 +119,29 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
     }
   }, [location, zone, profile?.latitude])
 
-  const fetchPlants = async (cat, z, pg, append = false) => {
+  const fetchPlants = async (cat, z) => {
     if (!z) return
-    if (append) setLoadingMore(true)
-    else { setLoading(true); setResults([]) }
+    setLoading(true)
+    setResults([])
     try {
       const res  = await fetch('/api/perenual-browse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: cat, zone: z, page: pg }),
+        body: JSON.stringify({ category: cat, zone: z }),
       })
       const data = await res.json()
-      if (append) setResults(prev => [...prev, ...(Array.isArray(data) ? data : [])])
-      else setResults(Array.isArray(data) ? data : [])
+      setResults(Array.isArray(data) ? data : [])
     } catch {
-      if (!append) setResults([])
+      setResults([])
     } finally {
       setLoading(false)
-      setLoadingMore(false)
     }
   }
 
   useEffect(() => {
-    setPage(1)
     setSearch('')
-    if (zone) fetchPlants(category, zone, 1)
+    if (zone) fetchPlants(category, zone)
   }, [category, zone])
-
-  const handleLoadMore = () => {
-    const next = page + 1
-    setPage(next)
-    fetchPlants(category, zone, next, true)
-  }
 
   const handleSelectLocation = async (place) => {
     if (!saveProfile) return
@@ -245,11 +234,6 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
               <PlantCard key={r.id} plant={r} category={category} onAdd={onAddPlant} />
             ))}
           </div>
-          {!search && (
-            <button className="btn-load-more" onClick={handleLoadMore} disabled={loadingMore}>
-              {loadingMore ? 'Loading...' : 'Load more'}
-            </button>
-          )}
         </>
       ) : !loading && zone ? (
         <div className="discover-empty">
