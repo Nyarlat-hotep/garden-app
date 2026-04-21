@@ -1,15 +1,28 @@
 import { useState, useEffect, useRef } from 'react'
-import { MapPin, RefreshCw, Search, Pencil } from 'lucide-react'
-import { getCurrentSeason, SEASON_LABELS } from '../../utils/seasons.js'
+import { MapPin, RefreshCw, Search, Pencil, Droplets, Sun } from 'lucide-react'
 import { CATEGORY_COLORS } from '../../utils/format.js'
 import './DiscoverView.css'
 
 const CATEGORIES = ['vegetable', 'fruit', 'herb', 'protein']
+const ZONES = Array.from({ length: 13 }, (_, i) => String(i + 1))
+
+function estimateZone(lat) {
+  if (lat == null) return ''
+  if (lat >= 50) return '3'
+  if (lat >= 47) return '4'
+  if (lat >= 43) return '5'
+  if (lat >= 38) return '6'
+  if (lat >= 34) return '7'
+  if (lat >= 30) return '8'
+  if (lat >= 26) return '9'
+  if (lat >= 22) return '10'
+  return '11'
+}
 
 function useLocationTypeahead() {
-  const [query, setQuery]           = useState('')
-  const [places, setPlaces]         = useState([])
-  const [searching, setSearching]   = useState(false)
+  const [query, setQuery]         = useState('')
+  const [places, setPlaces]       = useState([])
+  const [searching, setSearching] = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => {
@@ -51,27 +64,14 @@ function LocationTypeahead({ initialValue, onSelect, onCancel }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
 
-  useEffect(() => {
-    setQuery(initialValue ?? '')
-  }, [initialValue])
+  useEffect(() => { setQuery(initialValue ?? '') }, [initialValue])
+  useEffect(() => { setOpen(places.length > 0) }, [places])
 
   useEffect(() => {
-    setOpen(places.length > 0)
-  }, [places])
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false)
-    }
+    const handler = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
-
-  const handleSelect = (place) => {
-    setOpen(false)
-    setPlaces([])
-    onSelect(place)
-  }
 
   return (
     <div className="location-typeahead-wrap" ref={wrapRef}>
@@ -86,16 +86,13 @@ function LocationTypeahead({ initialValue, onSelect, onCancel }) {
           autoFocus
         />
         {searching && <span className="location-searching-dot" />}
-        {onCancel && (
-          <button className="btn-location-cancel" onClick={onCancel}>Cancel</button>
-        )}
+        {onCancel && <button className="btn-location-cancel" onClick={onCancel}>Cancel</button>}
       </div>
       {open && places.length > 0 && (
         <ul className="location-dropdown">
           {places.map((p, i) => (
-            <li key={i} className="location-dropdown-item" onMouseDown={() => handleSelect(p)}>
-              <MapPin size={11} />
-              {p.label}
+            <li key={i} className="location-dropdown-item" onMouseDown={() => { setOpen(false); setPlaces([]); onSelect(p) }}>
+              <MapPin size={11} />{p.label}
             </li>
           ))}
         </ul>
@@ -107,91 +104,83 @@ function LocationTypeahead({ initialValue, onSelect, onCancel }) {
 export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
   const [category, setCategory]   = useState('vegetable')
   const [results, setResults]     = useState([])
+  const [page, setPage]           = useState(1)
   const [loading, setLoading]     = useState(false)
-  const [aiText, setAiText]       = useState('')
-  const [aiLoading, setAiLoading] = useState(false)
-  const [showAI, setShowAI]       = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [search, setSearch]       = useState('')
   const [editingLocation, setEditingLocation] = useState(false)
   const [savingLocation, setSavingLocation]   = useState(false)
+  const [pendingZone, setPendingZone]         = useState('')
 
-  const season   = getCurrentSeason()
-  const zone     = profile?.hardiness_zone ?? ''
   const location = profile?.location ?? ''
+  const zone     = profile?.hardiness_zone ?? ''
 
-  const fetchSuggestions = async (loc) => {
-    const useLocation = loc ?? location
-    if (!useLocation) return
-    setLoading(true)
-    setResults([])
-    setAiText('')
-    setShowAI(false)
-    setSearch('')
+  const fetchPlants = async (cat, z, pg, append = false) => {
+    if (!z) return
+    if (append) setLoadingMore(true)
+    else { setLoading(true); setResults([]) }
     try {
-      const res  = await fetch('/api/claude-discover', {
+      const res  = await fetch('/api/perenual-browse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ zone, season, category, location: useLocation }),
+        body: JSON.stringify({ category: cat, zone: z, page: pg }),
       })
       const data = await res.json()
-      setResults(Array.isArray(data) ? data : [])
+      if (append) setResults(prev => [...prev, ...(Array.isArray(data) ? data : [])])
+      else setResults(Array.isArray(data) ? data : [])
     } catch {
-      setResults([])
+      if (!append) setResults([])
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
 
   useEffect(() => {
-    if (location) fetchSuggestions()
-  }, [category, location])
+    setPage(1)
+    setSearch('')
+    if (zone) fetchPlants(category, zone, 1)
+  }, [category, zone])
+
+  const handleLoadMore = () => {
+    const next = page + 1
+    setPage(next)
+    fetchPlants(category, zone, next, true)
+  }
 
   const handleSelectLocation = async (place) => {
+    const estimatedZone = estimateZone(place.lat)
+    setPendingZone(estimatedZone)
+  }
+
+  const handleSaveLocation = async (place, zoneVal) => {
     if (!saveProfile) return
     setSavingLocation(true)
     try {
-      await saveProfile({ location: place.label, latitude: place.lat, longitude: place.lon })
+      await saveProfile({ location: place.label, latitude: place.lat, longitude: place.lon, hardiness_zone: zoneVal })
       setEditingLocation(false)
+      setPendingZone('')
     } catch {}
     setSavingLocation(false)
-  }
-
-  const fetchAI = async () => {
-    if (aiText) { setShowAI(true); return }
-    setShowAI(true)
-    setAiLoading(true)
-    try {
-      const res  = await fetch('/api/claude-advice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plantName: `${category}s in general`, zone, season, location }),
-      })
-      setAiText(await res.text())
-    } catch {
-      setAiText('Unable to load advice.')
-    } finally {
-      setAiLoading(false)
-    }
   }
 
   const filtered = results.filter(r =>
     !search ||
     r.name.toLowerCase().includes(search.toLowerCase()) ||
-    (r.variety_suggestion ?? '').toLowerCase().includes(search.toLowerCase()) ||
-    (r.reason ?? '').toLowerCase().includes(search.toLowerCase())
+    (r.scientific_name ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
-  // No location yet — show full-page setup
-  if (!location && !editingLocation) {
+  // First-time setup — no location yet
+  if (!location) {
     return (
       <div className="discover-view">
-        <div className="location-setup-card">
-          <div className="location-setup-icon">🌍</div>
-          <div className="location-setup-title">Where is your garden?</div>
-          <p className="location-setup-desc">Enter your city or region to get personalized plant recommendations for your climate and current season.</p>
-          <LocationTypeahead onSelect={handleSelectLocation} />
-          {savingLocation && <p className="location-saving-text">Saving...</p>}
-        </div>
+        <LocationSetupFlow
+          onSave={handleSaveLocation}
+          saving={savingLocation}
+          pendingZone={pendingZone}
+          setPendingZone={setPendingZone}
+          onSelectPlace={handleSelectLocation}
+        />
       </div>
     )
   }
@@ -202,21 +191,24 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
         {editingLocation ? (
           <LocationTypeahead
             initialValue={location}
-            onSelect={handleSelectLocation}
+            onSelect={(p) => handleSelectLocation(p)}
             onCancel={() => setEditingLocation(false)}
           />
         ) : (
           <div className="discover-location">
             <MapPin size={13} />
             <span>{location}</span>
-            <button className="btn-edit-location" onClick={() => setEditingLocation(true)}>
-              <Pencil size={11} />
-            </button>
-            <span className="discover-season">{SEASON_LABELS[season]}</span>
+            <button className="btn-edit-location" onClick={() => setEditingLocation(true)}><Pencil size={11} /></button>
+            {zone && <span className="discover-zone">Zone {zone}</span>}
           </div>
         )}
-        {zone && !editingLocation && <span className="discover-zone">Zone {zone}</span>}
       </div>
+
+      {!zone && (
+        <div className="zone-missing-banner">
+          No hardiness zone set — <button className="btn-inline-link" onClick={() => setEditingLocation(true)}>add your zone</button> to filter plants correctly.
+        </div>
+      )}
 
       <div className="category-tabs">
         {CATEGORIES.map(c => (
@@ -246,51 +238,105 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
       {loading ? (
         <div className="discover-loading">
           <div className="discover-loading-dots"><span /><span /><span /></div>
-          <div className="discover-loading-text">Asking Claude...</div>
+          <div className="discover-loading-text">Loading plants...</div>
         </div>
-      ) : filtered.length > 0 ? (
-        <div className="suggestion-list">
-          {filtered.map((r, i) => (
-            <div key={i} className="suggestion-card">
-              <div className="suggestion-card-top">
-                <div>
-                  <div className="suggestion-name">{r.name}</div>
-                  {r.variety_suggestion && <div className="suggestion-variety">{r.variety_suggestion}</div>}
-                </div>
-                <div className="suggestion-meta">
-                  <span className={`suggestion-difficulty difficulty--${r.difficulty}`}>{r.difficulty}</span>
-                  {r.days_to_harvest && <span className="suggestion-days">{r.days_to_harvest}d</span>}
-                </div>
-              </div>
-              <p className="suggestion-reason">{r.reason}</p>
-              {r.tip && <p className="suggestion-tip">💡 {r.tip}</p>}
-              <button className="btn-add-suggestion" onClick={() => onAddPlant({ name: r.name, variety: r.variety_suggestion, category })}>
-                + Add to garden
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : !loading && location ? (
+      ) : !zone ? null : filtered.length > 0 ? (
+        <>
+          <div className="suggestion-list">
+            {filtered.map((r) => (
+              <PlantCard key={r.id} plant={r} category={category} onAdd={onAddPlant} />
+            ))}
+          </div>
+          {!search && (
+            <button className="btn-load-more" onClick={handleLoadMore} disabled={loadingMore}>
+              {loadingMore ? 'Loading...' : 'Load more'}
+            </button>
+          )}
+        </>
+      ) : (
         <div className="discover-empty">
-          <p className="discover-empty-text">{search ? 'No matches for that search.' : 'No suggestions loaded.'}</p>
-          <button className="btn-refresh" onClick={() => fetchSuggestions()}>
+          <p className="discover-empty-text">{search ? 'No matches.' : 'No plants found for this zone and category.'}</p>
+          <button className="btn-refresh" onClick={() => fetchPlants(category, zone, 1)}>
             <RefreshCw size={14} /> Try again
           </button>
         </div>
-      ) : null}
+      )}
+    </div>
+  )
+}
 
-      <button className="btn-ask-claude" onClick={fetchAI}>
-        🌿 {showAI ? 'Seasonal advice' : `Ask Claude for ${category} tips this ${season}`}
+function PlantCard({ plant, category, onAdd }) {
+  const sunlight = plant.sunlight?.[0] ?? ''
+  return (
+    <div className="suggestion-card">
+      <div className="plant-card-row">
+        {plant.image_url
+          ? <img className="plant-card-img" src={plant.image_url} alt={plant.name} loading="lazy" />
+          : <div className="plant-card-img plant-card-img--empty">🌱</div>
+        }
+        <div className="plant-card-info">
+          <div className="suggestion-name">{plant.name}</div>
+          {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}
+          <div className="plant-card-tags">
+            {plant.cycle && <span className="plant-tag">{plant.cycle}</span>}
+            {plant.hardiness_min && plant.hardiness_max &&
+              <span className="plant-tag">Zone {plant.hardiness_min}–{plant.hardiness_max}</span>}
+          </div>
+          <div className="plant-card-meta">
+            {plant.watering && (
+              <span className="plant-meta-item"><Droplets size={11} />{plant.watering}</span>
+            )}
+            {sunlight && (
+              <span className="plant-meta-item"><Sun size={11} />{sunlight}</span>
+            )}
+          </div>
+        </div>
+      </div>
+      <button
+        className="btn-add-suggestion"
+        onClick={() => onAdd({ name: plant.name, variety: plant.scientific_name, category })}
+      >
+        + Add to garden
       </button>
+    </div>
+  )
+}
 
-      {showAI && (
-        <div className="ai-advice-panel">
-          {aiLoading && !aiText
-            ? <div className="ai-loading">Loading advice...</div>
-            : <p className="ai-text">{aiText}</p>
-          }
+function LocationSetupFlow({ onSave, saving, pendingZone, setPendingZone, onSelectPlace }) {
+  const [selectedPlace, setSelectedPlace] = useState(null)
+
+  const handleSelect = (place) => {
+    setSelectedPlace(place)
+    onSelectPlace(place)
+  }
+
+  return (
+    <div className="location-setup-card">
+      <div className="location-setup-icon">🌍</div>
+      <div className="location-setup-title">Where is your garden?</div>
+      <p className="location-setup-desc">Enter your city to get plants matched to your climate and hardiness zone.</p>
+      <LocationTypeahead onSelect={handleSelect} />
+      {selectedPlace && (
+        <div className="zone-picker-row">
+          <label className="zone-picker-label">Hardiness zone</label>
+          <select
+            className="zone-select"
+            value={pendingZone}
+            onChange={e => setPendingZone(e.target.value)}
+          >
+            <option value="">Select zone</option>
+            {ZONES.map(z => <option key={z} value={z}>Zone {z}</option>)}
+          </select>
+          <button
+            className="btn-save-location"
+            onClick={() => onSave(selectedPlace, pendingZone)}
+            disabled={saving || !pendingZone}
+          >
+            {saving ? '...' : 'Find plants'}
+          </button>
         </div>
       )}
+      {saving && <p className="location-saving-text">Saving...</p>}
     </div>
   )
 }
