@@ -21,7 +21,7 @@ import './App.css'
 
 function App() {
   const { user, loading, login, logout } = useAuth()
-  const { profile } = useProfile(user?.id)
+  const { profile, saveProfile } = useProfile(user?.id)
   const { logs, latestLogsMap, addLog }  = useActivityLogs(user?.id)
   const {
     plants, healthMap, filtered, saving,
@@ -102,6 +102,7 @@ function App() {
         {view === 'discover' && (
           <DiscoverView
             profile={profile}
+            saveProfile={saveProfile}
             onAddPlant={(prefill) => { setAddingFromDiscover(prefill); setAdding(true) }}
           />
         )}

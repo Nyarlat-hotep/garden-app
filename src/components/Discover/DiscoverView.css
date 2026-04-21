@@ -187,11 +187,133 @@
 .ai-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; white-space: pre-wrap; }
 
 .discover-empty { text-align: center; padding: 3rem; }
+.discover-empty-text { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }
 .btn-refresh {
   display: inline-flex; align-items: center; gap: 0.4rem;
   font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
   padding: 0.5rem 1rem; border-radius: var(--radius-btn);
 }
+
+/* Location setup */
+.location-setup-card {
+  margin-top: 3rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.location-setup-icon { font-size: 2.5rem; }
+.location-setup-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; }
+.location-setup-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; max-width: 280px; }
+
+.location-setup-row {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 360px;
+}
+
+.location-input {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.55rem 0.85rem;
+  outline: none;
+}
+.location-input:focus { border-color: var(--accent); }
+
+.btn-save-location {
+  padding: 0.55rem 1.1rem;
+  background: var(--accent);
+  color: #111;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.btn-save-location:disabled { opacity: 0.5; }
+
+/* Inline location edit in header */
+.location-edit-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.location-input-inline {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius-btn);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  padding: 0.2rem 0.5rem;
+  outline: none;
+  width: 160px;
+}
+
+.btn-save-location-sm {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+.btn-edit-location {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+}
+.btn-edit-location:hover { opacity: 1; color: var(--accent); }
+
+/* Search within results */
+.discover-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.discover-search-icon {
+  position: absolute;
+  left: 0.7rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.discover-search {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.45rem 0.85rem 0.45rem 2.1rem;
+  outline: none;
+}
+.discover-search:focus { border-color: var(--accent); }
 
 @media (max-width: 480px) {
   .discover-view { padding: 0.75rem 0.75rem calc(var(--bottom-nav-h) + 5rem); }
