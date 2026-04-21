@@ -1,5 +1,5 @@
 const CACHE = 'garden-v1'
-const SHELL = ['/garden-app/', '/garden-app/index.html']
+const SHELL = ['/', '/index.html']
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(() => {})))
@@ -14,8 +14,8 @@ self.addEventListener('push', e => {
   const data = e.data?.json() ?? {}
   e.waitUntil(self.registration.showNotification(data.title ?? 'Garden Reminder', {
     body: data.body ?? 'You have plants that need attention.',
-    icon: '/garden-app/icons/icon-192.png',
-    badge: '/garden-app/icons/icon-192.png',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
     tag: data.tag ?? 'garden-reminder',
     data: { view: data.view ?? 'garden' },
   }))
@@ -23,5 +23,5 @@ self.addEventListener('push', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close()
-  e.waitUntil(clients.openWindow('/garden-app/?view=' + e.notification.data.view))
+  e.waitUntil(clients.openWindow('/?view=' + e.notification.data.view))
 })
