@@ -1,6 +1,10 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
-  if (!process.env.CLAUDE_API_KEY) return res.status(200).json([])
+  console.log('[claude-discover] key present:', !!process.env.CLAUDE_API_KEY, '| body:', JSON.stringify(req.body))
+  if (!process.env.CLAUDE_API_KEY) {
+    console.log('[claude-discover] missing CLAUDE_API_KEY')
+    return res.status(200).json([])
+  }
 
   const { zone, season, category, location } = req.body ?? {}
 
@@ -23,14 +27,17 @@ export default async function handler(req, res) {
     })
 
     if (!r.ok) {
-      console.error('Anthropic error:', r.status, await r.text())
+      const errText = await r.text()
+      console.error('[claude-discover] Anthropic error:', r.status, errText)
       return res.status(200).json([])
     }
 
     const data = await r.json()
     const text = data.content?.[0]?.text ?? '[]'
+    console.log('[claude-discover] raw response length:', text.length, '| preview:', text.slice(0, 120))
     const jsonMatch = text.match(/\[[\s\S]*\]/)
     const results = jsonMatch ? JSON.parse(jsonMatch[0]) : []
+    console.log('[claude-discover] parsed results count:', results.length)
     res.status(200).json(results)
   } catch (err) {
     console.error('claude-discover error:', err)
