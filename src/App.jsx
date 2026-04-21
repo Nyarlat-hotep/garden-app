@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Plus, LogOut } from 'lucide-react'
 import { useAuth } from './hooks/useAuth.js'
+import { useProfile } from './hooks/useProfile.js'
 import { usePlants } from './hooks/usePlants.js'
 import { useActivityLogs } from './hooks/useActivityLogs.js'
 import { useGardenMap } from './hooks/useGardenMap.js'
@@ -20,6 +21,7 @@ import './App.css'
 
 function App() {
   const { user, loading, login, logout } = useAuth()
+  const { profile } = useProfile(user?.id)
   const { logs, latestLogsMap, addLog }  = useActivityLogs(user?.id)
   const {
     plants, healthMap, filtered, saving,
@@ -99,7 +101,7 @@ function App() {
 
         {view === 'discover' && (
           <DiscoverView
-            profile={null}
+            profile={profile}
             onAddPlant={(prefill) => { setAddingFromDiscover(prefill); setAdding(true) }}
           />
         )}
