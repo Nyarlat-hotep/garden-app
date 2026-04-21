@@ -31,12 +31,30 @@ function emojiForPlant(plant) {
 export default function GardenMap({ gardenData, paintCells, plants, saving }) {
   const { gridWidth = 20, gridHeight = 15, cells = {} } = gardenData ?? {}
 
-  const [tool, setTool]                   = useState('area')
+  const [tool, setTool]                       = useState('area')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
-  const [popover, setPopover]             = useState(null) // { x, y, below, plant }
-  const isDrawingRef                      = useRef(false)
-  const pendingCellsRef                   = useRef(new Set())
-  const gridWrapperRef                    = useRef(null)
+  const [popover, setPopover]                 = useState(null)
+  const [cellSize, setCellSize]               = useState(28)
+  const isDrawingRef                          = useRef(false)
+  const pendingCellsRef                       = useRef(new Set())
+  const gridWrapperRef                        = useRef(null)
+
+  // Compute cell size to fill the wrapper with square cells
+  useEffect(() => {
+    const el = gridWrapperRef.current
+    if (!el) return
+    const PAD = 0
+    const compute = () => {
+      const w = el.clientWidth  - PAD * 2
+      const h = el.clientHeight - PAD * 2
+      const size = Math.floor(Math.min(w / gridWidth, h / gridHeight))
+      setCellSize(Math.max(size, 8))
+    }
+    compute()
+    const ro = new ResizeObserver(compute)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [gridWidth, gridHeight])
 
   // Auto-select first plant when switching to plant mode
   useEffect(() => {
@@ -113,7 +131,6 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
         </div>
       )}
 
-      {/* No-plants hint in plant mode */}
       {tool === 'plant' && plants.length === 0 && (
         <div className="map-hint-banner">
           🌱 Add plants in the Garden tab to paint them onto the map.
@@ -129,7 +146,10 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
       >
         <div
           className="garden-grid"
-          style={{ gridTemplateColumns: `repeat(${gridWidth}, var(--cell-size))` }}
+          style={{
+            gridTemplateColumns: `repeat(${gridWidth}, ${cellSize}px)`,
+            gridAutoRows: `${cellSize}px`,
+          }}
         >
           {Array.from({ length: gridWidth * gridHeight }, (_, i) => {
             const x = i % gridWidth
@@ -138,9 +158,7 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
             const cell = cells[key]
             const isGarden = cell !== undefined
             const plantId = cell?.plantId
-            const bgColor = plantId
-              ? plantColorFor(plantId) + 'cc'
-              : undefined
+            const bgColor = plantId ? plantColorFor(plantId) + 'cc' : undefined
 
             return (
               <div
@@ -160,16 +178,13 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
                 onMouseEnter={(e) => {
                   if (isDrawingRef.current || !plantId) return
                   const plant = plants.find(p => p.id === plantId)
-                  if (!plant && !plantId) return
                   const rect = e.currentTarget.getBoundingClientRect()
                   const wrapperRect = gridWrapperRef.current.getBoundingClientRect()
                   const relTop = rect.top - wrapperRect.top
                   const below = relTop < 90
                   setPopover({
                     x: rect.left - wrapperRect.left + rect.width / 2,
-                    y: below
-                      ? rect.bottom - wrapperRect.top + 8
-                      : rect.top - wrapperRect.top,
+                    y: below ? rect.bottom - wrapperRect.top + 8 : rect.top - wrapperRect.top,
                     below,
                     plant: plant ?? null,
                     orphaned: !plant,
@@ -181,7 +196,6 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
           })}
         </div>
 
-        {/* Hover popover */}
         {popover && (
           <div
             className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`}
@@ -219,7 +233,6 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
           </div>
         )}
 
-        {/* First-time hint overlay */}
         {!hasCells && (
           <div className="grid-hint-overlay">
             <Paintbrush size={22} strokeWidth={1.5} />

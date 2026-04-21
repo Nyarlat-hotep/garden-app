@@ -1,18 +1,16 @@
-:root { --cell-size: 28px; }
+/* ── View fills the viewport between nav bars ─────────────────────────────── */
 
 .garden-map-view {
-  padding: 0 0 calc(var(--bottom-nav-h) + 5rem);
+  height: calc(100dvh - var(--nav-height) - var(--bottom-nav-h));
   display: flex;
   flex-direction: column;
-  gap: 0;
+  overflow: hidden;
 }
 
 /* ── Toolbar ──────────────────────────────────────────────────────────────── */
 
 .map-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex-shrink: 0;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   padding: 0.6rem 1.25rem;
@@ -69,6 +67,7 @@
 /* ── Plant chips row ─────────────────────────────────────────────────────── */
 
 .map-plant-chips {
+  flex-shrink: 0;
   display: flex;
   gap: 0.4rem;
   padding: 0.5rem 1.25rem;
@@ -96,45 +95,55 @@
 .map-plant-chip.active { font-weight: 600; }
 
 .map-hint-banner {
+  flex-shrink: 0;
   padding: 0.65rem 1.25rem;
   font-size: 0.8rem;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border);
 }
 
-/* ── Grid wrapper + grid ─────────────────────────────────────────────────── */
+/* ── Grid wrapper — fills all remaining height ───────────────────────────── */
 
 .grid-wrapper {
+  flex: 1;
+  min-height: 0;       /* allow flex child to shrink below content size */
   position: relative;
-  overflow: auto;
+  overflow: hidden;
   overscroll-behavior: none;
   cursor: crosshair;
-  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
 }
 
 .grid-wrapper.erase-mode { cursor: cell; }
 
+/* ── The grid itself ─────────────────────────────────────────────────────── */
+
 .garden-grid {
-  display: inline-grid;
+  display: grid;
+  /* gap color acts as grid lines */
   gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.08);   /* grid line color */
+  border: 1px solid rgba(255, 255, 255, 0.08);
   user-select: none;
   touch-action: none;
 }
 
+/* ── Cells ───────────────────────────────────────────────────────────────── */
+
 .grid-cell {
-  width: var(--cell-size);
-  height: var(--cell-size);
-  background: transparent;
+  /* size set via JS / inline style on grid */
+  background: var(--bg);          /* solid bg so grid lines are visible */
   transition: background 0.06s ease;
 }
 
 .grid-cell.is-garden {
-  background: rgba(127, 176, 105, 0.22);
+  background: rgba(127, 176, 105, 0.2);
 }
 
-/* planted cells use inline backgroundColor — no extra class needed */
+/* planted cells override via inline backgroundColor */
 
 /* ── First-time hint overlay ─────────────────────────────────────────────── */
 
@@ -151,7 +160,7 @@
   font-family: var(--font-mono);
   letter-spacing: 0.5px;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 /* ── Hover popover ───────────────────────────────────────────────────────── */
@@ -226,8 +235,6 @@
 /* ── Mobile ───────────────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  :root { --cell-size: 22px; }
   .map-toolbar { padding: 0.5rem 0.75rem; }
   .map-plant-chips { padding: 0.5rem 0.75rem; }
-  .grid-wrapper { padding: 0.75rem; }
 }
