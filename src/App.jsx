@@ -30,7 +30,7 @@ function App() {
     addPlant, editPlant, removePlant,
   } = usePlants(user?.id, latestLogsMap)
 
-  const { gardenData, saving: mapSaving, paintCells } = useGardenMap(user?.id)
+  const { cells: gardenCells, saving: mapSaving, paintCells } = useGardenMap(user?.id)
   const { hasOverdue } = useNotifications(user?.id, healthMap)
 
   const [view, setView]           = useState('garden')
@@ -91,7 +91,7 @@ function App() {
 
         {view === 'map' && (
           <GardenMap
-            gardenData={gardenData}
+            cells={gardenCells}
             paintCells={paintCells}
             saving={mapSaving}
             plants={plants}

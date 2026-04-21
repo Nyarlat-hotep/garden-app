@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
 
-const DEFAULT_GARDEN = { gridWidth: 50, gridHeight: 35, cells: {} }
+// Only cells are stored — grid dimensions are always computed from viewport
+const DEFAULT_CELLS = {}
 
 export function useGardenMap(userId) {
-  const [gardenData, setGardenData] = useState(DEFAULT_GARDEN)
-  const [saving, setSaving]         = useState('idle')
-  const gardenDataRef               = useRef(gardenData)
-  const debounceRef                 = useRef(null)
+  const [cells, setCells]   = useState(DEFAULT_CELLS)
+  const [saving, setSaving] = useState('idle')
+  const cellsRef            = useRef(cells)
+  const debounceRef         = useRef(null)
 
-  // Mirror state into ref so debounce closure reads fresh data
-  useEffect(() => { gardenDataRef.current = gardenData }, [gardenData])
+  useEffect(() => { cellsRef.current = cells }, [cells])
 
   useEffect(() => {
     if (!userId) return
@@ -20,7 +20,7 @@ export function useGardenMap(userId) {
       .eq('id', userId)
       .single()
       .then(({ data }) => {
-        if (data?.garden_map) setGardenData(data.garden_map)
+        if (data?.garden_map?.cells) setCells(data.garden_map.cells)
       })
   }, [userId])
 
@@ -32,23 +32,23 @@ export function useGardenMap(userId) {
     debounceRef.current = setTimeout(async () => {
       await supabase
         .from('profiles')
-        .upsert({ id: userId, garden_map: gardenDataRef.current })
+        .upsert({ id: userId, garden_map: { cells: cellsRef.current } })
       setSaving('idle')
     }, 500)
   }, [userId])
 
   const paintCells = useCallback((cellKeys, mode, plantId) => {
-    setGardenData(prev => {
-      const cells = { ...prev.cells }
+    setCells(prev => {
+      const next = { ...prev }
       for (const key of cellKeys) {
-        if (mode === 'area')  cells[key] = cells[key] ?? {}
-        if (mode === 'plant') cells[key] = { plantId }
-        if (mode === 'erase') delete cells[key]
+        if (mode === 'area')  next[key] = next[key] ?? {}
+        if (mode === 'plant') next[key] = { plantId }
+        if (mode === 'erase') delete next[key]
       }
-      return { ...prev, cells }
+      return next
     })
     scheduleSave()
   }, [scheduleSave])
 
-  return { gardenData, saving, paintCells }
+  return { cells, saving, paintCells }
 }

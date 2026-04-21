@@ -28,15 +28,30 @@ function emojiForPlant(plant) {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export default function GardenMap({ gardenData, paintCells, plants, saving }) {
-  const { gridWidth = 20, gridHeight = 15, cells = {} } = gardenData ?? {}
+const CELL_SIZE = 14 // px — fixed cell size, grid adapts to fill viewport
 
+export default function GardenMap({ cells = {}, paintCells, plants, saving }) {
   const [tool, setTool]                       = useState('area')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
+  const [dims, setDims]                       = useState({ cols: 60, rows: 40 })
   const isDrawingRef                          = useRef(false)
   const pendingCellsRef                       = useRef(new Set())
   const gridWrapperRef                        = useRef(null)
+
+  // Compute grid dimensions from wrapper size so cells are always CELL_SIZE px
+  useEffect(() => {
+    const el = gridWrapperRef.current
+    if (!el) return
+    const compute = () => setDims({
+      cols: Math.max(Math.floor(el.clientWidth  / CELL_SIZE), 1),
+      rows: Math.max(Math.floor(el.clientHeight / CELL_SIZE), 1),
+    })
+    compute()
+    const ro = new ResizeObserver(compute)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // Auto-select first plant when switching to plant mode
   useEffect(() => {
@@ -128,11 +143,14 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
       >
         <div
           className="garden-grid"
-          style={{ gridTemplateColumns: `repeat(${gridWidth}, 1fr)` }}
+          style={{
+            gridTemplateColumns: `repeat(${dims.cols}, 1fr)`,
+            gridTemplateRows:    `repeat(${dims.rows}, 1fr)`,
+          }}
         >
-          {Array.from({ length: gridWidth * gridHeight }, (_, i) => {
-            const x = i % gridWidth
-            const y = Math.floor(i / gridWidth)
+          {Array.from({ length: dims.cols * dims.rows }, (_, i) => {
+            const x = i % dims.cols
+            const y = Math.floor(i / dims.cols)
             const key = `${x},${y}`
             const cell = cells[key]
             const isGarden = cell !== undefined
