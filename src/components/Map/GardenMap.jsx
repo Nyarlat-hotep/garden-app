@@ -34,27 +34,9 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
   const [tool, setTool]                       = useState('area')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
-  const [cellSize, setCellSize]               = useState(28)
   const isDrawingRef                          = useRef(false)
   const pendingCellsRef                       = useRef(new Set())
   const gridWrapperRef                        = useRef(null)
-
-  // Compute cell size to fill the wrapper with square cells
-  useEffect(() => {
-    const el = gridWrapperRef.current
-    if (!el) return
-    const PAD = 0
-    const compute = () => {
-      const w = el.clientWidth  - PAD * 2
-      const h = el.clientHeight - PAD * 2
-      const size = Math.floor(Math.min(w / gridWidth, h / gridHeight))
-      setCellSize(Math.max(size, 8))
-    }
-    compute()
-    const ro = new ResizeObserver(compute)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [gridWidth, gridHeight])
 
   // Auto-select first plant when switching to plant mode
   useEffect(() => {
@@ -146,10 +128,7 @@ export default function GardenMap({ gardenData, paintCells, plants, saving }) {
       >
         <div
           className="garden-grid"
-          style={{
-            gridTemplateColumns: `repeat(${gridWidth}, ${cellSize}px)`,
-            gridAutoRows: `${cellSize}px`,
-          }}
+          style={{ gridTemplateColumns: `repeat(${gridWidth}, 1fr)` }}
         >
           {Array.from({ length: gridWidth * gridHeight }, (_, i) => {
             const x = i % gridWidth
