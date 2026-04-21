@@ -246,7 +246,7 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
       {loading ? (
         <div className="discover-loading">
           <div className="discover-loading-dots"><span /><span /><span /></div>
-          <div className="discover-loading-text">Finding recommendations...</div>
+          <div className="discover-loading-text">Asking Claude...</div>
         </div>
       ) : filtered.length > 0 ? (
         <div className="suggestion-list">
