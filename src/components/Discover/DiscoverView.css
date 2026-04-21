@@ -265,31 +265,6 @@
 .btn-load-more:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .btn-load-more:disabled { opacity: 0.5; }
 
-.btn-ask-claude {
-  width: 100%;
-  padding: 0.65rem;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: rgba(127,176,105,0.07);
-  border: 1px solid var(--border);
-  color: var(--accent);
-  border-radius: var(--radius-btn);
-  margin-top: 0.25rem;
-}
-
-.btn-ask-claude:hover { background: var(--accent-dim); }
-
-.ai-advice-panel {
-  background: rgba(127,176,105,0.05);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-btn);
-  padding: 1rem;
-}
-
-.ai-loading { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); text-align: center; }
-.ai-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; white-space: pre-wrap; }
 
 .discover-empty { text-align: center; padding: 3rem; }
 .discover-empty-text { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; }

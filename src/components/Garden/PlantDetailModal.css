@@ -104,46 +104,6 @@
   letter-spacing: 0.5px;
 }
 
-.btn-ai-advice {
-  width: 100%;
-  padding: 0.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: rgba(127,176,105,0.07);
-  border: 1px solid var(--border);
-  color: var(--accent);
-  border-radius: var(--radius-btn);
-  margin-bottom: 0.75rem;
-}
-
-.btn-ai-advice:hover { background: var(--accent-dim); }
-
-.detail-ai-panel {
-  background: rgba(127,176,105,0.05);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-btn);
-  padding: 0.9rem;
-  margin-bottom: 1rem;
-}
-
-.ai-loading {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-align: center;
-  padding: 0.5rem;
-}
-
-.ai-text {
-  font-size: 0.82rem;
-  color: var(--text-dim);
-  line-height: 1.7;
-  white-space: pre-wrap;
-}
 
 .detail-actions {
   display: flex;

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Edit2, Trash2, ClipboardList } from 'lucide-react'
 import HealthBadge from './HealthBadge.jsx'
@@ -7,41 +6,6 @@ import { formatDate, formatRelative, CATEGORY_LABELS } from '../../utils/format.
 import './PlantDetailModal.css'
 
 export default function PlantDetailModal({ plant, health, plantLogs, onClose, onEdit, onDelete, onLogActivity }) {
-  const [showAI, setShowAI] = useState(false)
-  const [aiText, setAiText] = useState('')
-  const [aiLoading, setAiLoading] = useState(false)
-
-  const fetchAdvice = async () => {
-    if (aiText) { setShowAI(true); return }
-    setShowAI(true)
-    setAiLoading(true)
-    try {
-      const res = await fetch('/api/claude-advice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plantName: plant.name,
-          variety: plant.variety,
-          perenualData: plant.perenual_data,
-          recentActivity: plantLogs,
-        }),
-      })
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let text = ''
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        text += decoder.decode(value, { stream: true })
-        setAiText(text)
-      }
-    } catch {
-      setAiText('Unable to load AI advice right now.')
-    } finally {
-      setAiLoading(false)
-    }
-  }
-
   if (!plant) return null
 
   return (
@@ -110,20 +74,6 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
           {plant.fertilize_interval_days && <span>🌿 Every {plant.fertilize_interval_days}d</span>}
           {plant.prune_interval_days && <span>✂️ Every {plant.prune_interval_days}d</span>}
         </div>
-
-        {/* AI advice */}
-        <button className="btn-ai-advice" onClick={fetchAdvice}>
-          {showAI ? '🌿 Care advice' : '🌿 Get AI care advice'}
-        </button>
-
-        {showAI && (
-          <div className="detail-ai-panel">
-            {aiLoading && !aiText
-              ? <div className="ai-loading">Loading advice...</div>
-              : <p className="ai-text">{aiText}</p>
-            }
-          </div>
-        )}
 
         <div className="detail-actions">
           <button className="detail-action-btn" onClick={() => onLogActivity(plant)}>
