@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const key = process.env.PERENUAL_API_KEY
+  console.log('[perenual-browse] key present:', !!key, '| body:', JSON.stringify(req.body))
   if (!key) return res.status(200).json([])
 
   const { category = 'vegetable', zone = '', page = 1 } = req.body ?? {}
@@ -63,6 +64,7 @@ export default async function handler(req, res) {
       supabase.from('discovery_cache').upsert({ cache_key: cacheKey, results, cached_at: new Date().toISOString() }).then(() => {})
     }
 
+    console.log('[perenual-browse] results count:', results.length)
     res.status(200).json(results)
   } catch (err) {
     console.error('perenual-browse error:', err)
