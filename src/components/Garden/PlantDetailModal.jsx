@@ -65,10 +65,6 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
 
         {plant.notes && <p className="detail-notes">{plant.notes}</p>}
 
-        {plant.perenual_data?.description && (
-          <p className="detail-description">{plant.perenual_data.description}</p>
-        )}
-
         <div className="detail-care-intervals">
           {plant.water_interval_days && <span>💧 Every {plant.water_interval_days}d</span>}
           {plant.fertilize_interval_days && <span>🌿 Every {plant.fertilize_interval_days}d</span>}
