@@ -113,9 +113,6 @@
   cursor: crosshair;
   background: var(--bg);
   padding: 0 8px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
 }
 
 .grid-wrapper.erase-mode { cursor: cell; }

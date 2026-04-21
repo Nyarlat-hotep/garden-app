@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
 
-const DEFAULT_GARDEN = { gridWidth: 20, gridHeight: 15, cells: {} }
+const DEFAULT_GARDEN = { gridWidth: 50, gridHeight: 35, cells: {} }
 
 export function useGardenMap(userId) {
   const [gardenData, setGardenData] = useState(DEFAULT_GARDEN)
