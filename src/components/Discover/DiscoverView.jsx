@@ -109,6 +109,7 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [search, setSearch]       = useState('')
   const [editingLocation, setEditingLocation] = useState(false)
+  const [editingZone, setEditingZone]         = useState(false)
   const [savingLocation, setSavingLocation]   = useState(false)
   const [pendingZone, setPendingZone]         = useState('')
 
@@ -204,9 +205,31 @@ export default function DiscoverView({ profile, saveProfile, onAddPlant }) {
         )}
       </div>
 
-      {!zone && (
+      {!zone && !editingZone && (
         <div className="zone-missing-banner">
-          No hardiness zone set — <button className="btn-inline-link" onClick={() => setEditingLocation(true)}>add your zone</button> to filter plants correctly.
+          No hardiness zone set — <button className="btn-inline-link" onClick={() => { setPendingZone(''); setEditingZone(true) }}>add your zone</button> to filter plants correctly.
+        </div>
+      )}
+
+      {editingZone && (
+        <div className="zone-picker-inline">
+          <select className="zone-select" value={pendingZone} onChange={e => setPendingZone(e.target.value)} autoFocus>
+            <option value="">Select zone...</option>
+            {ZONES.map(z => <option key={z} value={z}>Zone {z}</option>)}
+          </select>
+          <button
+            className="btn-save-location"
+            disabled={!pendingZone || savingLocation}
+            onClick={async () => {
+              setSavingLocation(true)
+              try { await saveProfile({ hardiness_zone: pendingZone }) } catch {}
+              setEditingZone(false)
+              setSavingLocation(false)
+            }}
+          >
+            {savingLocation ? '...' : 'Save'}
+          </button>
+          <button className="btn-location-cancel" onClick={() => setEditingZone(false)}>Cancel</button>
         </div>
       )}
 

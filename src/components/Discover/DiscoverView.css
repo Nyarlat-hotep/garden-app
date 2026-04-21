@@ -219,6 +219,12 @@
   cursor: pointer;
 }
 
+.zone-picker-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .zone-picker-row {
   display: flex;
   align-items: center;
