@@ -240,6 +240,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   }, [moveOffset, selection, cells, dims])
 
   const paint = useCallback((key) => {
+    if (tool === 'plant' && !selectedPlantId) return
     if (pendingCellsRef.current.has(key)) return
     pendingCellsRef.current.add(key)
     paintCells([key], tool, tool === 'plant' ? selectedPlantId : undefined)
