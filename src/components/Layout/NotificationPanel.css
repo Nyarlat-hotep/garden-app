@@ -76,24 +76,6 @@
   flex-shrink: 0;
 }
 
-.notif-test-btn {
-  width: 100%;
-  padding: 0.55rem 1rem;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 1px;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 0;
-  flex-shrink: 0;
-}
-.notif-test-btn:hover { color: var(--text); background: var(--bg-surface); }
-.notif-test-btn--counting { color: var(--accent); }
-.notif-test-btn--counting:hover { color: #e06b6b; background: #e06b6b11; }
 
 .notif-empty {
   padding: 2rem 1rem;
