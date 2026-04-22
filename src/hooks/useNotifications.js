@@ -29,12 +29,13 @@ export function useNotifications(userId, healthMap, plants = []) {
 
   const overdueItems = useMemo(() => {
     if (!healthMap || !plants.length) return []
-    return plants
+    const items = plants
       .map(p => ({
         plant: p,
         overdueTypes: (healthMap.get(p.id)?.overdueTypes ?? []).filter(t => t === 'watered' || t === 'fertilized'),
       }))
       .filter(({ overdueTypes }) => overdueTypes.length > 0)
+    return items
   }, [healthMap, plants])
 
   // Fire once on load when permission already granted and plants are overdue

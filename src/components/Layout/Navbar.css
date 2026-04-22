@@ -61,11 +61,21 @@
 
 .navbar-bell:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-.navbar-bell-dot {
+.navbar-bell-badge {
   position: absolute;
-  top: 6px; right: 6px;
-  width: 7px; height: 7px;
-  border-radius: 50%;
+  top: 2px; right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 99px;
   background: var(--status-attention);
   border: 1.5px solid rgba(26,28,20,1);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #1a1c14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }

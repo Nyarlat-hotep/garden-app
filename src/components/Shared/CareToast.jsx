@@ -10,7 +10,7 @@ function emojiFor(name) {
 
 export default function CareToast({ overdueItems, onDismiss }) {
   useEffect(() => {
-    const t = setTimeout(onDismiss, 6000)
+    const t = setTimeout(onDismiss, 5000)
     return () => clearTimeout(t)
   }, [onDismiss])
 

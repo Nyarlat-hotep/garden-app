@@ -81,6 +81,7 @@ function App() {
         onSearch={setSearchQuery}
         view={view}
         hasOverdue={hasOverdue}
+        overdueCount={overdueItems.length}
         onBellClick={() => setShowNotifications(v => !v)}
       />
 

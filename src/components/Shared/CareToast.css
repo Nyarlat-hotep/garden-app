@@ -1,9 +1,8 @@
 .care-toast {
   position: fixed;
   top: calc(var(--nav-height) + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(360px, calc(100vw - 2rem));
+  right: 1rem;
+  width: min(320px, calc(100vw - 2rem));
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
