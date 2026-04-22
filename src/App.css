@@ -25,7 +25,7 @@
 }
 
 .fab-add:hover {
-  background: rgba(127, 176, 105, 0.28);
+  background: rgba(78, 122, 92, 0.2);
   transform: scale(1.08);
   border-color: var(--accent);
 }
@@ -61,8 +61,8 @@
 */
 
 @keyframes fab-pulse {
-  0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 4px 16px rgba(0,0,0,0.4); }
-  50%       { box-shadow: 0 0 30px rgba(127,176,105,0.25), 0 4px 16px rgba(0,0,0,0.4); }
+  0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 4px 12px rgba(40,38,31,0.12); }
+  50%       { box-shadow: 0 0 30px var(--accent-glow), 0 4px 12px rgba(40,38,31,0.12); }
 }
 
 .saving-toast {
@@ -70,7 +70,7 @@
   bottom: calc(var(--bottom-nav-h) + 1rem);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(26, 28, 20, 0.96);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   padding: 0.45rem 1.4rem;
   border-radius: var(--radius-pill);
@@ -79,5 +79,6 @@
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--accent);
+  box-shadow: 0 2px 12px rgba(40,38,31,0.10);
   z-index: 500;
 }

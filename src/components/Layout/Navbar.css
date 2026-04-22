@@ -7,17 +7,17 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0 1.25rem;
-  background: rgba(26, 28, 20, 0.94);
+  background: rgba(242, 237, 228, 0.94);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
 }
 
 .navbar-title {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--text);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   flex-shrink: 0;
 }
 
@@ -54,8 +54,8 @@
   justify-content: center;
   border-radius: 50%;
   background: transparent;
-  border-color: rgba(255,255,255,0.08);
-  color: var(--text-dim);
+  border-color: var(--border);
+  color: var(--text-muted);
   padding: 0;
 }
 
@@ -69,11 +69,11 @@
   padding: 0 4px;
   border-radius: 99px;
   background: var(--status-attention);
-  border: 1.5px solid rgba(26,28,20,1);
+  border: 1.5px solid var(--bg);
   font-family: var(--font-mono);
   font-size: 0.55rem;
   font-weight: 700;
-  color: #1a1c14;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;

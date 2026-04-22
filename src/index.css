@@ -1,29 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Code+Pro:wght@400;500&display=swap');
 
 :root {
-  --bg:              #1a1c14;
-  --bg-surface:      #22271a;
-  --bg-card:         rgba(34, 39, 26, 0.90);
-  --bg-card-hover:   rgba(42, 48, 32, 0.98);
+  --bg:              #f2ede4;
+  --bg-surface:      #e9e3d8;
+  --bg-card:         rgba(254, 251, 244, 0.97);
+  --bg-card-hover:   rgba(255, 253, 248, 1);
 
-  --accent:          #7fb069;
-  --accent-dark:     #5a8a45;
-  --accent-dim:      rgba(127, 176, 105, 0.18);
-  --accent-glow:     rgba(127, 176, 105, 0.10);
+  --accent:          #4e7a5c;
+  --accent-dark:     #3a5e45;
+  --accent-dim:      rgba(78, 122, 92, 0.12);
+  --accent-glow:     rgba(78, 122, 92, 0.08);
 
-  --soil:            #8b5e3c;
+  --soil:            #8b6040;
   --soil-light:      #a87850;
 
-  --status-healthy:  #7fb069;
-  --status-attention:#d4a843;
-  --status-critical: #c0392b;
+  --status-healthy:  #4e7a5c;
+  --status-attention:#b8832a;
+  --status-critical: #b83232;
 
-  --text:            #e8e6df;
-  --text-dim:        rgba(232, 230, 223, 0.65);
-  --text-muted:      rgba(232, 227, 213, 0.624);
+  --text:            #28261f;
+  --text-dim:        rgba(40, 38, 31, 0.62);
+  --text-muted:      rgba(40, 38, 31, 0.40);
 
-  --border:          rgba(127, 176, 105, 0.16);
-  --border-active:   rgba(127, 176, 105, 0.55);
+  --border:          rgba(40, 38, 31, 0.12);
+  --border-active:   rgba(78, 122, 92, 0.50);
 
   --font-body:       'Nunito', system-ui, sans-serif;
   --font-display:    'Lora', Georgia, serif;
@@ -31,7 +31,7 @@
 
   --nav-height:      60px;
   --bottom-nav-h:    64px;
-  --radius-card:     12px;
+  --radius-card:     14px;
   --radius-btn:      8px;
   --radius-pill:     999px;
 }
@@ -68,8 +68,8 @@ button:active { transform: scale(0.97); }
 input, textarea, select {
   font-family: var(--font-body);
   font-size: 0.9rem;
-  background: rgba(127, 176, 105, 0.05);
-  border: 1px solid rgba(127, 176, 105, 0.25);
+  background: rgba(255, 253, 248, 0.8);
+  border: 1px solid var(--border);
   border-radius: var(--radius-btn);
   color: var(--text);
   padding: 0.65rem 0.9rem;
@@ -89,7 +89,7 @@ input:focus, textarea:focus, select:focus {
 
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237fb069' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234e7a5c' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2rem;
@@ -97,26 +97,12 @@ select {
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(127, 176, 105, 0.25); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(40, 38, 31, 0.18); border-radius: 2px; }
 
 /* ── datetime-local / date picker ─────────────────────────────────────────── */
 
 input[type="datetime-local"],
 input[type="date"],
 input[type="time"] {
-  color-scheme: dark;
-}
-
-input[type="datetime-local"]::-webkit-calendar-picker-indicator,
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(68%) sepia(26%) saturate(450%) hue-rotate(63deg) brightness(95%);
-  opacity: 0.7;
-  cursor: pointer;
-}
-
-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
-input[type="date"]::-webkit-calendar-picker-indicator:hover,
-input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
+  color-scheme: light;
 }
