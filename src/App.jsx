@@ -60,8 +60,10 @@ function App() {
     setAddingFromDiscover(null)
   }
 
-  const handleSaveLog = async (entry) => {
-    await addLog({ ...entry, user_id: user.id })
+  const handleSaveLog = async (entries) => {
+    for (const entry of entries) {
+      await addLog({ ...entry, user_id: user.id })
+    }
     setShowLog(false)
     setLogTarget(null)
   }

@@ -13,24 +13,32 @@ const ACTIVITIES = [
 ]
 
 export default function LogActionModal({ plants, preselectedPlantId, onSave, onClose }) {
-  const [plantId, setPlantId]   = useState(preselectedPlantId ?? plants[0]?.id ?? '')
-  const [activity, setActivity] = useState('watered')
-  const [notes, setNotes]       = useState('')
-  const [quantity, setQuantity] = useState('')
-  const [loggedAt, setLoggedAt] = useState(new Date().toISOString().slice(0, 16))
+  const [plantId, setPlantId]     = useState(preselectedPlantId ?? plants[0]?.id ?? '')
+  const [activities, setActivities] = useState(new Set(['watered']))
+  const [notes, setNotes]         = useState('')
+  const [quantity, setQuantity]   = useState('')
+  const [loggedAt, setLoggedAt]   = useState(new Date().toISOString().slice(0, 16))
 
-  const handleSave = () => {
-    if (!plantId || !activity) return
-    onSave({
-      plant_id: plantId,
-      activity,
-      notes: notes.trim() || null,
-      quantity: quantity.trim() || null,
-      logged_at: new Date(loggedAt).toISOString(),
+  const toggleActivity = (type) => {
+    setActivities(prev => {
+      const next = new Set(prev)
+      next.has(type) ? next.delete(type) : next.add(type)
+      return next
     })
   }
 
-  const showQuantity = activity === 'harvested' || activity === 'fertilized'
+  const handleSave = () => {
+    if (!plantId || activities.size === 0) return
+    const base = {
+      plant_id: plantId,
+      notes: notes.trim() || null,
+      quantity: quantity.trim() || null,
+      logged_at: new Date(loggedAt).toISOString(),
+    }
+    onSave([...activities].map(activity => ({ ...base, activity })))
+  }
+
+  const showQuantity = activities.has('harvested') || activities.has('fertilized')
 
   return (
     <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -56,9 +64,9 @@ export default function LogActionModal({ plants, preselectedPlantId, onSave, onC
               {ACTIVITIES.map(({ type, label, Icon, color }) => (
                 <button
                   key={type}
-                  className={`activity-opt ${activity === type ? 'active' : ''}`}
+                  className={`activity-opt ${activities.has(type) ? 'active' : ''}`}
                   style={{ '--act-color': color }}
-                  onClick={() => setActivity(type)}
+                  onClick={() => toggleActivity(type)}
                 >
                   <Icon size={18} strokeWidth={1.8} />
                   <span>{label}</span>
@@ -70,7 +78,7 @@ export default function LogActionModal({ plants, preselectedPlantId, onSave, onC
           {showQuantity && (
             <div className="modal-field">
               <label className="modal-label">Quantity</label>
-              <input value={quantity} onChange={e => setQuantity(e.target.value)} placeholder={activity === 'harvested' ? 'e.g. 500g' : 'e.g. 10ml'} />
+              <input value={quantity} onChange={e => setQuantity(e.target.value)} placeholder={activities.has('harvested') ? 'e.g. 500g' : 'e.g. 10ml'} />
             </div>
           )}
 

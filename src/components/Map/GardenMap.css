@@ -462,6 +462,9 @@
 }
 
 .crop-item-overdue {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   font-family: var(--font-mono);
   font-size: 0.6rem;
   color: #d4a843;

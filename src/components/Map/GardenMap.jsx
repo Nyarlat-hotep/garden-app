@@ -64,7 +64,12 @@ function emojiForPlant(plant) {
   return match?.emoji ?? '🌱'
 }
 
-const OVERDUE_LABELS = { watered: '💧', pruned: '✂️', fertilized: '🌿', harvested: '🌾' }
+const OVERDUE_ICONS = {
+  watered:    { Icon: Droplets,    color: '#5b9bd5' },
+  pruned:     { Icon: Scissors,    color: '#7fb069' },
+  fertilized: { Icon: FlaskConical, color: '#8b5e3c' },
+  harvested:  { Icon: Wheat,       color: '#d4a843' },
+}
 
 // ── Crop panel item ───────────────────────────────────────────────────────────
 
@@ -79,7 +84,13 @@ function CropItem({ plant, health, onSelect }) {
         <span className="crop-item-name">{plant.name}</span>
         {overdueTypes.length > 0 && (
           <span className="crop-item-overdue">
-            {overdueTypes.map(t => OVERDUE_LABELS[t] ?? t).join(' ')} overdue
+            {overdueTypes.map(t => {
+              const cfg = OVERDUE_ICONS[t]
+              if (!cfg) return null
+              const { Icon, color } = cfg
+              return <Icon key={t} size={11} strokeWidth={2} style={{ color }} />
+            })}
+            overdue
           </span>
         )}
       </div>

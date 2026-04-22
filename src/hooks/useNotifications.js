@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 
 async function showNotification(title, body, tag = 'garden-reminder') {
   if (!('Notification' in window) || Notification.permission !== 'granted') return
@@ -38,14 +38,17 @@ export function useNotifications(userId, healthMap, plants = []) {
     return items
   }, [healthMap, plants])
 
-  // Fire once on load when permission already granted and plants are overdue
+  const notifiedRef = useRef(false)
+
+  // Fire once per session load when both permission is granted and data is ready
   useEffect(() => {
-    if (permission !== 'granted' || !overdueItems.length) return
+    if (permission !== 'granted' || !overdueItems.length || notifiedRef.current) return
+    notifiedRef.current = true
     const body = overdueItems.length === 1
       ? `${overdueItems[0].plant.name} needs care`
       : `${overdueItems.length} plants need care`
     showNotification('Garden needs attention 🌱', body, 'garden-overdue')
-  }, [permission]) // intentionally only on permission change
+  }, [permission, overdueItems.length])
 
   async function enableNotifications() {
     const result = await Notification.requestPermission()
