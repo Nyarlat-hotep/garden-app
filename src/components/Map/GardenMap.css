@@ -22,7 +22,11 @@
 .map-tool-btns {
   display: flex;
   gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
 }
+.map-tool-btns::-webkit-scrollbar { display: none; }
 
 .map-tool-btn {
   display: flex;
@@ -536,7 +540,8 @@
   .crop-panel { display: none; }
   .crop-panel-fab { display: flex; }
 
-  /* Mobile grid: fixed-size cells, wrapper scrolls in pan mode */
+  /* Mobile grid: no padding, fixed-size cells, wrapper scrolls in pan mode */
+  .grid-wrapper { padding: 0; }
   .garden-grid {
     width: auto;
     height: auto;

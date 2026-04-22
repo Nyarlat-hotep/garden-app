@@ -146,8 +146,8 @@ function floodFill(cells, startKey, plantId, cols, rows) {
 
 const CELL_SIZE        = 28
 const CELL_SIZE_MOBILE = 22
-const CANVAS_MIN_COLS  = 50
-const CANVAS_MIN_ROWS  = 35
+const CANVAS_MIN_COLS  = 80
+const CANVAS_MIN_ROWS  = 55
 
 export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, onSelectPlant }) {
   const [tool, setTool]                       = useState(() => window.innerWidth <= 480 ? 'pan' : 'select')
@@ -313,10 +313,10 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             )}
           </div>
           <button className={`map-tool-btn ${tool === 'erase' ? 'active' : ''}`} onClick={() => setTool('erase')} title="Erase cells"><Eraser size={15} /><span>Erase</span></button>
+          {hasCells && (
+            <button className="map-tool-btn map-tool-btn--clear" onClick={clearCells} title="Clear all"><Trash2 size={13} /><span>Clear</span></button>
+          )}
         </div>
-        {hasCells && (
-          <button className="map-tool-btn map-tool-btn--clear" onClick={clearCells} title="Clear all"><Trash2 size={13} />Clear all</button>
-        )}
         {saving === 'saving' && <span className="map-saving-dot">saving…</span>}
       </div>
 
@@ -329,12 +329,10 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
           onPointerUp={stopInteraction} onPointerLeave={stopInteraction}
           onMouseLeave={() => { hoveredGroupRef.current = null; setPopover(null) }}
         >
-          {(() => {
-            const cellPx = dims.isMobile ? CELL_SIZE_MOBILE : null
-            const colTemplate = cellPx ? `repeat(${dims.cols}, ${cellPx}px)` : `repeat(${dims.cols}, 1fr)`
-            const rowTemplate = cellPx ? `repeat(${dims.rows}, ${cellPx}px)` : `repeat(${dims.rows}, 1fr)`
-            return (
-          <div className="garden-grid" style={{ gridTemplateColumns: colTemplate, gridTemplateRows: rowTemplate }}>
+          <div className="garden-grid" style={{
+            gridTemplateColumns: dims.isMobile ? `repeat(${dims.cols}, ${CELL_SIZE_MOBILE}px)` : `repeat(${dims.cols}, 1fr)`,
+            gridTemplateRows:    dims.isMobile ? `repeat(${dims.rows}, ${CELL_SIZE_MOBILE}px)` : `repeat(${dims.rows}, 1fr)`,
+          }}>
             {Array.from({ length: dims.cols * dims.rows }, (_, i) => {
               const x = i % dims.cols
               const y = Math.floor(i / dims.cols)
@@ -428,8 +426,6 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               )
             })}
           </div>
-            )
-          })()}
 
           {popover && (
             <div className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`} style={{ left: popover.x, top: popover.y }}>
