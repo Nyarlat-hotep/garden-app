@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, LogOut } from 'lucide-react'
+import { Plus, LogOut, ClipboardList } from 'lucide-react'
 import { useAuth } from './hooks/useAuth.js'
 import { useProfile } from './hooks/useProfile.js'
 import { usePlants } from './hooks/usePlants.js'
@@ -116,9 +116,9 @@ function App() {
         </button>
       )}
 
-      {view === 'activity' && (
-        <button className="fab-add" aria-label="Log activity" onClick={() => setShowLog(true)}>
-          <Plus size={24} strokeWidth={2.5} />
+      {(view === 'activity' || view === 'map') && (
+        <button className={`fab-add${view === 'map' ? ' fab-add--left' : ''}`} aria-label="Log activity" onClick={() => setShowLog(true)}>
+          {view === 'map' ? <ClipboardList size={22} strokeWidth={2} /> : <Plus size={24} strokeWidth={2.5} />}
         </button>
       )}
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown } from 'lucide-react'
+import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown, Trash2, Hand } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import './GardenMap.css'
 
@@ -144,13 +144,16 @@ function floodFill(cells, startKey, plantId, cols, rows) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-const CELL_SIZE = 28
+const CELL_SIZE        = 28
+const CELL_SIZE_MOBILE = 22
+const CANVAS_MIN_COLS  = 50
+const CANVAS_MIN_ROWS  = 35
 
 export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, onSelectPlant }) {
-  const [tool, setTool]                       = useState('select')
+  const [tool, setTool]                       = useState(() => window.innerWidth <= 480 ? 'pan' : 'select')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
-  const [dims, setDims]                       = useState({ cols: 60, rows: 40 })
+  const [dims, setDims]                       = useState({ cols: CANVAS_MIN_COLS, rows: CANVAS_MIN_ROWS, isMobile: false })
   const [sheetOpen, setSheetOpen]             = useState(false)
   const [plantPickerOpen, setPlantPickerOpen] = useState(false)
   const [selection, setSelection]             = useState(null)   // Set<string> | null
@@ -168,13 +171,21 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const moveOffsetRef                         = useRef(null)
   const selectionRef                          = useRef(null)
 
+
   useEffect(() => {
     const el = gridWrapperRef.current
     if (!el) return
-    const compute = () => setDims({
-      cols: Math.max(Math.floor(el.clientWidth  / CELL_SIZE), 1),
-      rows: Math.max(Math.floor(el.clientHeight / CELL_SIZE), 1),
-    })
+    const compute = () => {
+      const isMobile = el.clientWidth <= 480
+      const cellPx   = isMobile ? CELL_SIZE_MOBILE : CELL_SIZE
+      const vpCols   = Math.max(Math.floor(el.clientWidth  / cellPx), 1)
+      const vpRows   = Math.max(Math.floor(el.clientHeight / cellPx), 1)
+      setDims({
+        cols:     isMobile ? Math.max(vpCols, CANVAS_MIN_COLS) : vpCols,
+        rows:     isMobile ? Math.max(vpRows, CANVAS_MIN_ROWS) : vpRows,
+        isMobile,
+      })
+    }
     compute()
     const ro = new ResizeObserver(compute)
     ro.observe(el)
@@ -272,6 +283,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
       {/* Toolbar */}
       <div className="map-toolbar">
         <div className="map-tool-btns">
+          <button className={`map-tool-btn map-tool-btn--pan ${tool === 'pan' ? 'active' : ''}`} onClick={() => setTool('pan')} title="Pan"><Hand size={15} /><span>Pan</span></button>
           <button className={`map-tool-btn ${tool === 'select' ? 'active' : ''}`} onClick={() => setTool('select')} title="Select and move"><MousePointer2 size={15} /><span>Select</span></button>
           <div className="plant-btn-wrap" ref={plantBtnWrapRef}>
             <button
@@ -303,7 +315,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
           <button className={`map-tool-btn ${tool === 'erase' ? 'active' : ''}`} onClick={() => setTool('erase')} title="Erase cells"><Eraser size={15} /><span>Erase</span></button>
         </div>
         {hasCells && (
-          <button className="map-tool-btn map-tool-btn--clear" onClick={clearCells} title="Clear all">Clear all</button>
+          <button className="map-tool-btn map-tool-btn--clear" onClick={clearCells} title="Clear all"><Trash2 size={13} />Clear all</button>
         )}
         {saving === 'saving' && <span className="map-saving-dot">saving…</span>}
       </div>
@@ -313,11 +325,16 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
 
         {/* Grid */}
         <div ref={gridWrapperRef}
-          className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}${tool === 'select' ? ' select-mode' : ''}`}
+          className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}${tool === 'select' ? ' select-mode' : ''}${tool === 'pan' ? ' pan-mode' : ''}`}
           onPointerUp={stopInteraction} onPointerLeave={stopInteraction}
           onMouseLeave={() => { hoveredGroupRef.current = null; setPopover(null) }}
         >
-          <div className="garden-grid" style={{ gridTemplateColumns: `repeat(${dims.cols}, 1fr)`, gridTemplateRows: `repeat(${dims.rows}, 1fr)` }}>
+          {(() => {
+            const cellPx = dims.isMobile ? CELL_SIZE_MOBILE : null
+            const colTemplate = cellPx ? `repeat(${dims.cols}, ${cellPx}px)` : `repeat(${dims.cols}, 1fr)`
+            const rowTemplate = cellPx ? `repeat(${dims.rows}, ${cellPx}px)` : `repeat(${dims.rows}, 1fr)`
+            return (
+          <div className="garden-grid" style={{ gridTemplateColumns: colTemplate, gridTemplateRows: rowTemplate }}>
             {Array.from({ length: dims.cols * dims.rows }, (_, i) => {
               const x = i % dims.cols
               const y = Math.floor(i / dims.cols)
@@ -326,6 +343,9 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               const plantId = cell?.plantId
               const plantName = plantId ? plants.find(p => p.id === plantId)?.name : undefined
               const baseColor = plantId ? plantColorFor(plantId, plantName) : null
+              const overdueTypes = plantId ? (healthMap?.get(plantId)?.overdueTypes ?? []) : []
+              const needsWater = overdueTypes.includes('watered')
+              const needsFertilize = overdueTypes.includes('fertilized')
 
               const isSelected   = (tool === 'select' || tool === 'erase') && !!selection?.has(key)
               const isMovingSrc  = isSelected && !!moveOffset
@@ -347,10 +367,18 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               if (isSelected && !moveOffset) cls += ' is-selected'
               if (inRubber) cls += ' in-rubber'
 
+              const cellIcons = plantId && (needsWater || needsFertilize) ? (
+                <span className="cell-care-icons">
+                  {needsWater && <Droplets size={9} />}
+                  {needsFertilize && <FlaskConical size={9} />}
+                </span>
+              ) : null
+
               return (
                 <div key={key} className={cls}
                   style={bg ? { backgroundColor: bg } : undefined}
                   onPointerDown={(e) => {
+                    if (tool === 'pan') return
                     e.preventDefault()
                     if (tool === 'select' || tool === 'erase') {
                       if (tool === 'select' && selectionRef.current?.has(key)) {
@@ -369,6 +397,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     }
                   }}
                   onPointerEnter={() => {
+                    if (tool === 'pan') return
                     if (tool === 'select' || tool === 'erase') {
                       if (selectPhaseRef.current === 'rubber' && rubberStartRef.current) {
                         const r = { x1: Math.min(rubberStartRef.current.x, x), y1: Math.min(rubberStartRef.current.y, y), x2: Math.max(rubberStartRef.current.x, x), y2: Math.max(rubberStartRef.current.y, y) }
@@ -395,10 +424,12 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     const below = rect.top < 180
                     setPopover({ x: rect.left + rect.width / 2, y: below ? rect.bottom + 8 : rect.top - 8, below, plant: plant ?? null, orphaned: !plant, sqFt: group.size })
                   }}
-                />
+                >{cellIcons}</div>
               )
             })}
           </div>
+            )
+          })()}
 
           {popover && (
             <div className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`} style={{ left: popover.x, top: popover.y }}>

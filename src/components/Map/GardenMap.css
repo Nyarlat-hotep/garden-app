@@ -163,6 +163,9 @@
 
 .grid-wrapper.erase-mode  { cursor: cell; }
 .grid-wrapper.select-mode { cursor: default; }
+.grid-wrapper.pan-mode    { cursor: grab; overflow: auto; }
+.grid-wrapper.pan-mode:active { cursor: grabbing; }
+.pan-mode .garden-grid    { touch-action: pan-x pan-y; }
 
 .grid-cell.is-selected {
   outline: 2px solid rgba(255,255,255,0.6);
@@ -200,6 +203,18 @@
 .grid-cell {
   background: var(--bg);          /* solid bg so grid lines are visible */
   transition: background 0.06s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell-care-icons {
+  display: flex;
+  gap: 1px;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1;
 }
 
 .grid-cell.is-garden {
@@ -520,4 +535,18 @@
   .map-plant-chips { padding: 0.5rem 0.75rem; }
   .crop-panel { display: none; }
   .crop-panel-fab { display: flex; }
+
+  /* Mobile grid: fixed-size cells, wrapper scrolls in pan mode */
+  .garden-grid {
+    width: auto;
+    height: auto;
+    min-width: 100%;
+    min-height: 100%;
+  }
+}
+
+/* Pan button: mobile-only */
+.map-tool-btn--pan { display: none; }
+@media (max-width: 480px) {
+  .map-tool-btn--pan { display: flex; }
 }

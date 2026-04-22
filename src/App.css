@@ -30,6 +30,11 @@
   border-color: var(--accent);
 }
 
+.fab-add--left {
+  right: auto;
+  left: 1.5rem;
+}
+
 .fab-logout {
   position: fixed;
   top: calc(var(--nav-height) / 2 - 15px);
