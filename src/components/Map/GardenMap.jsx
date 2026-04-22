@@ -179,6 +179,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const moveStartRef                          = useRef(null)
   const moveOffsetRef                         = useRef(null)
   const selectionRef                          = useRef(null)
+  const didCenterRef                          = useRef(false)
 
 
   useEffect(() => {
@@ -200,6 +201,24 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+
+  // On mobile, scroll grid to center the painted crop area on first load
+  useEffect(() => {
+    if (!dims.isMobile || didCenterRef.current) return
+    const keys = Object.keys(cells)
+    if (!keys.length) return
+    didCenterRef.current = true
+    const xs = keys.map(k => Number(k.split(',')[0]))
+    const ys = keys.map(k => Number(k.split(',')[1]))
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2
+    const el = gridWrapperRef.current
+    if (!el) return
+    requestAnimationFrame(() => {
+      el.scrollLeft = cx * CELL_SIZE_MOBILE - el.clientWidth  / 2
+      el.scrollTop  = cy * CELL_SIZE_MOBILE - el.clientHeight / 2
+    })
+  }, [dims.isMobile, cells])
 
   useEffect(() => { selectionRef.current = selection }, [selection])
 
