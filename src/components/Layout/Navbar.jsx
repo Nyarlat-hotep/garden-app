@@ -1,7 +1,7 @@
 import { Search, Bell } from 'lucide-react'
 import './Navbar.css'
 
-export default function Navbar({ searchQuery, onSearch, view, hasOverdue }) {
+export default function Navbar({ searchQuery, onSearch, view, hasOverdue, onBellClick }) {
   const TITLES = { map: 'Garden', inventory: 'Inventory', discover: 'Discover', activity: 'Activity' }
 
   return (
@@ -22,7 +22,7 @@ export default function Navbar({ searchQuery, onSearch, view, hasOverdue }) {
       )}
 
       <div className="navbar-right">
-        <button className="navbar-bell" aria-label="Notifications">
+        <button className="navbar-bell" aria-label="Notifications" onClick={onBellClick}>
           <Bell size={17} strokeWidth={1.8} />
           {hasOverdue && <span className="navbar-bell-dot" />}
         </button>

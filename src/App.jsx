@@ -17,6 +17,7 @@ import LogActionModal from './components/Activity/LogActionModal.jsx'
 import GardenMap from './components/Map/GardenMap.jsx'
 import DiscoverView from './components/Discover/DiscoverView.jsx'
 import ConfirmDelete from './components/Shared/ConfirmDelete.jsx'
+import NotificationPanel from './components/Layout/NotificationPanel.jsx'
 import './App.css'
 
 function App() {
@@ -31,15 +32,16 @@ function App() {
   } = usePlants(user?.id, latestLogsMap)
 
   const { cells: gardenCells, saving: mapSaving, paintCells, clearCells, moveCells } = useGardenMap(user?.id)
-  const { hasOverdue } = useNotifications(user?.id, healthMap)
+  const { hasOverdue, overdueItems, permission, enableNotifications } = useNotifications(user?.id, healthMap, plants)
 
-  const [view, setView]           = useState('map')
-  const [selected, setSelected]   = useState(null)
-  const [adding, setAdding]       = useState(false)
-  const [addingFromDiscover, setAddingFromDiscover] = useState(null) // prefill data
-  const [logTarget, setLogTarget] = useState(null) // plant to preselect in log modal
-  const [showLog, setShowLog]     = useState(false)
-  const [deleting, setDeleting]   = useState(null)
+  const [view, setView]                 = useState('map')
+  const [selected, setSelected]         = useState(null)
+  const [adding, setAdding]             = useState(false)
+  const [addingFromDiscover, setAddingFromDiscover] = useState(null)
+  const [logTarget, setLogTarget]       = useState(null)
+  const [showLog, setShowLog]           = useState(false)
+  const [deleting, setDeleting]         = useState(null)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   const plantsMap = useMemo(() => new Map(plants.map(p => [p.id, p])), [plants])
 
@@ -73,6 +75,7 @@ function App() {
         onSearch={setSearchQuery}
         view={view}
         hasOverdue={hasOverdue}
+        onBellClick={() => setShowNotifications(v => !v)}
       />
 
       <main className="main-content">
@@ -159,6 +162,15 @@ function App() {
       )}
 
       <ConfirmDelete item={deleting} onConfirm={handleDelete} onCancel={() => setDeleting(null)} />
+
+      {showNotifications && (
+        <NotificationPanel
+          overdueItems={overdueItems}
+          permission={permission}
+          onEnable={enableNotifications}
+          onClose={() => setShowNotifications(false)}
+        />
+      )}
 
       {saving === 'saving' && (
         <div className="saving-toast">Saving...</div>
