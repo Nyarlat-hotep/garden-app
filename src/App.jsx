@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Plus, LogOut, ClipboardList } from 'lucide-react'
 import { useAuth } from './hooks/useAuth.js'
 import { useProfile } from './hooks/useProfile.js'
@@ -18,6 +18,7 @@ import GardenMap from './components/Map/GardenMap.jsx'
 import DiscoverView from './components/Discover/DiscoverView.jsx'
 import ConfirmDelete from './components/Shared/ConfirmDelete.jsx'
 import NotificationPanel from './components/Layout/NotificationPanel.jsx'
+import CareToast from './components/Shared/CareToast.jsx'
 import './App.css'
 
 function App() {
@@ -42,6 +43,11 @@ function App() {
   const [showLog, setShowLog]           = useState(false)
   const [deleting, setDeleting]         = useState(null)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showToast, setShowToast]               = useState(false)
+
+  useEffect(() => {
+    if (overdueItems.length > 0) setShowToast(true)
+  }, [overdueItems.length])
 
   const plantsMap = useMemo(() => new Map(plants.map(p => [p.id, p])), [plants])
 
@@ -162,6 +168,13 @@ function App() {
       )}
 
       <ConfirmDelete item={deleting} onConfirm={handleDelete} onCancel={() => setDeleting(null)} />
+
+      {showToast && (
+        <CareToast
+          overdueItems={overdueItems}
+          onDismiss={() => setShowToast(false)}
+        />
+      )}
 
       {showNotifications && (
         <NotificationPanel

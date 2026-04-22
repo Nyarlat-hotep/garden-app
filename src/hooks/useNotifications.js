@@ -1,6 +1,19 @@
 import { useState, useEffect, useMemo } from 'react'
 
-const CARE_LABELS = { watered: 'Water', fertilized: 'Fertilize' }
+async function showNotification(title, body, tag = 'garden-reminder') {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return
+  // Use SW showNotification — new Notification() is deprecated in Chrome
+  if ('serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.ready
+    await reg.showNotification(title, {
+      body,
+      icon: '/icons/icon-192.png',
+      tag,
+    })
+  } else {
+    new Notification(title, { body, tag })
+  }
+}
 
 export function useNotifications(userId, healthMap, plants = []) {
   const [permission, setPermission] = useState(() => Notification?.permission ?? 'default')
@@ -14,7 +27,6 @@ export function useNotifications(userId, healthMap, plants = []) {
     setHasOverdue(false)
   }, [healthMap])
 
-  // Plants overdue for water or fertilize only
   const overdueItems = useMemo(() => {
     if (!healthMap || !plants.length) return []
     return plants
@@ -25,35 +37,26 @@ export function useNotifications(userId, healthMap, plants = []) {
       .filter(({ overdueTypes }) => overdueTypes.length > 0)
   }, [healthMap, plants])
 
-  // Fire a browser notification once when app loads and permission already granted
+  // Fire once on load when permission already granted and plants are overdue
   useEffect(() => {
     if (permission !== 'granted' || !overdueItems.length) return
-    const n = new Notification('Garden needs attention 🌱', {
-      body: overdueItems.length === 1
-        ? `${overdueItems[0].plant.name} needs care`
-        : `${overdueItems.length} plants need care`,
-      icon: '/favicon.ico',
-      tag: 'garden-overdue',
-      silent: true,
-    })
-    return () => n.close()
-  }, [permission]) // intentionally only on permission change, not every render
+    const body = overdueItems.length === 1
+      ? `${overdueItems[0].plant.name} needs care`
+      : `${overdueItems.length} plants need care`
+    showNotification('Garden needs attention 🌱', body, 'garden-overdue')
+  }, [permission]) // intentionally only on permission change
 
   async function enableNotifications() {
     const result = await Notification.requestPermission()
     setPermission(result)
     if (result === 'granted' && overdueItems.length) {
-      new Notification('Garden needs attention 🌱', {
-        body: overdueItems.length === 1
-          ? `${overdueItems[0].plant.name} needs care`
-          : `${overdueItems.length} plants need care`,
-        icon: '/favicon.ico',
-        tag: 'garden-overdue',
-        silent: true,
-      })
+      const body = overdueItems.length === 1
+        ? `${overdueItems[0].plant.name} needs care`
+        : `${overdueItems.length} plants need care`
+      await showNotification('Garden needs attention 🌱', body, 'garden-overdue')
     }
     return result
   }
 
-  return { permission, hasOverdue, overdueItems, enableNotifications, CARE_LABELS }
+  return { permission, hasOverdue, overdueItems, enableNotifications, showNotification }
 }

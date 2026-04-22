@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Droplets, FlaskConical, BellOff, BellRing, X } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
@@ -7,11 +8,49 @@ function emojiFor(name) {
   return FOOD_PLANTS.find(f => f.common_name.toLowerCase() === name?.toLowerCase())?.emoji ?? '🌱'
 }
 
-const ICON = { watered: Droplets, fertilized: FlaskConical }
+const ICON  = { watered: Droplets, fertilized: FlaskConical }
 const LABEL = { watered: 'Needs water', fertilized: 'Needs fertilizer' }
+
+async function fireBrowserNotification() {
+  if (Notification.permission !== 'granted') return
+  if ('serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.ready
+    await reg.showNotification('🍅 Tomato needs water', {
+      body: 'Last watered 4 days ago — overdue by 1 day',
+      icon: '/icons/icon-192.png',
+      tag: 'garden-test-' + Date.now(),
+    })
+  } else {
+    new Notification('🍅 Tomato needs water', { body: 'Last watered 4 days ago — overdue by 1 day' })
+  }
+}
 
 export default function NotificationPanel({ overdueItems, permission, onEnable, onClose }) {
   const notSupported = !('Notification' in window)
+  const [countdown, setCountdown] = useState(null)
+  const timerRef = useRef(null)
+  const intervalRef = useRef(null)
+
+  function startDelayedTest() {
+    setCountdown(10)
+    intervalRef.current = setInterval(() => {
+      setCountdown(n => {
+        if (n <= 1) {
+          clearInterval(intervalRef.current)
+          fireBrowserNotification()
+          return null
+        }
+        return n - 1
+      })
+    }, 1000)
+  }
+
+  function cancelTest() {
+    clearInterval(intervalRef.current)
+    setCountdown(null)
+  }
+
+  useEffect(() => () => clearInterval(intervalRef.current), [])
 
   return (
     <AnimatePresence>
@@ -34,7 +73,6 @@ export default function NotificationPanel({ overdueItems, permission, onEnable, 
             <button className="notif-close" onClick={onClose}><X size={15} /></button>
           </div>
 
-          {/* Enable banner */}
           {!notSupported && permission !== 'granted' && permission !== 'denied' && (
             <button className="notif-enable-btn" onClick={onEnable}>
               <BellRing size={15} />
@@ -48,7 +86,17 @@ export default function NotificationPanel({ overdueItems, permission, onEnable, 
             </div>
           )}
 
-          {/* Overdue list */}
+          {/* Test button */}
+          {permission === 'granted' && (
+            countdown === null
+              ? <button className="notif-test-btn" onClick={startDelayedTest}>
+                  Send test notification (10s delay — switch away first)
+                </button>
+              : <button className="notif-test-btn notif-test-btn--counting" onClick={cancelTest}>
+                  Firing in {countdown}s — click to cancel
+                </button>
+          )}
+
           {overdueItems.length === 0 ? (
             <div className="notif-empty">All plants are on track</div>
           ) : (
