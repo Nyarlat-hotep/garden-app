@@ -109,11 +109,6 @@ function CropList({ plants, healthMap, onSelect }) {
 
   return (
     <>
-      <div className="crop-panel-header">
-        <span className="crop-panel-title">Crops</span>
-        <span className="crop-panel-count">{plants.length}</span>
-      </div>
-
       {(critical > 0 || attention > 0) && (
         <div className="crop-panel-stats">
           {critical  > 0 && <span className="crop-stat crop-stat--critical">{critical} critical</span>}
