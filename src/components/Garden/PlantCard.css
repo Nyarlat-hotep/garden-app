@@ -16,7 +16,7 @@
   border-color: var(--category-color, var(--accent));
   background: var(--bg-card-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(40, 38, 31, 0.12);
 }
 
 .plant-card:active { transform: translateY(0) scale(0.98); }
@@ -42,18 +42,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3.5rem;
+  font-size: 3rem;
+  background: color-mix(in srgb, var(--category-color, var(--accent)) 12%, var(--bg-card));
 }
 
-.plant-card-category-dot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--category-color, var(--accent));
-  box-shadow: 0 0 6px var(--category-color, var(--accent));
+.plant-card-category-pill {
+  font-size: 0.62rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--category-color, var(--accent)) 15%, transparent);
+  color: var(--category-color, var(--accent));
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  align-self: flex-start;
+  text-transform: capitalize;
 }
 
 .plant-card-body {
@@ -66,7 +68,7 @@
 
 .plant-card-name {
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1.3;

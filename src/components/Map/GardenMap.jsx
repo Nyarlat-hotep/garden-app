@@ -451,9 +451,9 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     </div>
                   </div>
                   <div className="popover-care">
-                    {popover.plant.water_interval_days     && <span><Droplets size={13} /><b>Water</b> every {popover.plant.water_interval_days}d</span>}
-                    {popover.plant.fertilize_interval_days && <span><FlaskConical size={13} /><b>Fertilize</b> every {popover.plant.fertilize_interval_days}d</span>}
-                    {popover.plant.prune_interval_days     && <span><Scissors size={13} /><b>Prune</b> every {popover.plant.prune_interval_days}d</span>}
+                    {popover.plant.water_interval_days     && <span><Droplets size={13} /><b>Water</b> every <span className="val-mono">{popover.plant.water_interval_days}d</span></span>}
+                    {popover.plant.fertilize_interval_days && <span><FlaskConical size={13} /><b>Fertilize</b> every <span className="val-mono">{popover.plant.fertilize_interval_days}d</span></span>}
+                    {popover.plant.prune_interval_days     && <span><Scissors size={13} /><b>Prune</b> every <span className="val-mono">{popover.plant.prune_interval_days}d</span></span>}
                     {popover.plant.days_to_harvest         && <span><Wheat size={13} /><b>Harvest</b> in {popover.plant.days_to_harvest}d</span>}
                   </div>
                 </>
@@ -478,7 +478,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
 
       {/* Mobile FAB */}
       <button className="crop-panel-fab" onClick={() => setSheetOpen(true)} aria-label="View crops">
-        <Leaf size={18} strokeWidth={2} />
+        <Leaf size={16} strokeWidth={2} /><span>Crops</span>
       </button>
 
       {/* Mobile bottom sheet */}

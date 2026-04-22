@@ -29,10 +29,10 @@ export default function PlantCard({ plant, health, lastWatered, onClick, index }
           ? <img src={plant.image_url} alt={plant.name} />
           : <div className="plant-card-no-image">{emojiForPlant(plant.name)}</div>
         }
-        <div className="plant-card-category-dot" />
       </div>
 
       <div className="plant-card-body">
+        <span className="plant-card-category-pill">{plant.category}</span>
         <div className="plant-card-name">{plant.name}</div>
         {plant.variety && <div className="plant-card-variety">{plant.variety}</div>}
 
@@ -45,11 +45,6 @@ export default function PlantCard({ plant, health, lastWatered, onClick, index }
           <span className="plant-card-watered">
             <Droplets size={12} /> {formatRelative(lastWatered)}
           </span>
-          {plant.date_planted && (
-            <span className="plant-card-planted">
-              Planted {formatRelative(plant.date_planted)}
-            </span>
-          )}
         </div>
       </div>
     </motion.button>

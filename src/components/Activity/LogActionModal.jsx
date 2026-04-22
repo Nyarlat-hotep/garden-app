@@ -68,7 +68,7 @@ export default function LogActionModal({ plants, preselectedPlantId, onSave, onC
                   style={{ '--act-color': color }}
                   onClick={() => toggleActivity(type)}
                 >
-                  <Icon size={18} strokeWidth={1.8} />
+                  <Icon size={22} strokeWidth={1.8} />
                   <span>{label}</span>
                 </button>
               ))}
