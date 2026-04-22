@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown, Trash2, Hand } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
@@ -167,6 +168,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const [dims, setDims]                       = useState({ cols: CANVAS_MIN_COLS, rows: CANVAS_MIN_ROWS, isMobile: false })
   const [sheetOpen, setSheetOpen]             = useState(false)
   const [plantPickerOpen, setPlantPickerOpen] = useState(false)
+  const [plantBtnRect, setPlantBtnRect]       = useState(null)
   const [selection, setSelection]             = useState(null)   // Set<string> | null
   const [rubberRect, setRubberRect]           = useState(null)   // {x1,y1,x2,y2} | null
   const [moveOffset, setMoveOffset]           = useState(null)   // {dx,dy} | null
@@ -300,7 +302,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             <button
               className={`map-tool-btn ${tool === 'plant' ? 'active' : ''}`}
               disabled={plants.length === 0}
-              onClick={() => { setTool('plant'); setPlantPickerOpen(v => !v) }}
+              onClick={() => { setTool('plant'); const r = plantBtnWrapRef.current?.getBoundingClientRect(); setPlantBtnRect(r ?? null); setPlantPickerOpen(v => !v) }}
             >
               {selectedPlantId && plants.find(p => p.id === selectedPlantId)
                 ? <><span>{emojiForPlant(plants.find(p => p.id === selectedPlantId))}</span><span>{plants.find(p => p.id === selectedPlantId).name}</span></>
@@ -308,8 +310,8 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               }
               <ChevronDown size={11} className={plantPickerOpen ? 'rotated' : ''} />
             </button>
-            {plantPickerOpen && plants.length > 0 && (
-              <div className="plant-picker-dropdown">
+            {plantPickerOpen && plants.length > 0 && plantBtnRect && createPortal(
+              <div className="plant-picker-dropdown" style={{ position: 'fixed', top: plantBtnRect.bottom + 6, left: plantBtnRect.left, zIndex: 9999 }}>
                 {plants.map(p => (
                   <button key={p.id}
                     className={`plant-picker-item ${selectedPlantId === p.id ? 'active' : ''}`}
@@ -320,7 +322,8 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     <span>{p.name}</span>
                   </button>
                 ))}
-              </div>
+              </div>,
+              document.body
             )}
           </div>
           <button className={`map-tool-btn ${tool === 'erase' ? 'active' : ''}`} onClick={() => setTool('erase')} title="Erase cells"><Eraser size={15} /><span>Erase</span></button>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
+import AppDatePicker from '../Shared/AppDatePicker'
 import './AddPlantModal.css'
 
 const CATEGORIES = ['vegetable', 'fruit', 'herb', 'protein']
@@ -51,7 +52,7 @@ export default function AddPlantModal({ onSave, onClose, prefill }) {
 
           <div className="modal-field">
             <label className="modal-label">Date planted</label>
-            <input type="date" value={form.date_planted} onChange={e => set('date_planted', e.target.value)} />
+            <AppDatePicker value={form.date_planted} onChange={v => set('date_planted', v)} />
           </div>
 
           <div className="modal-field">

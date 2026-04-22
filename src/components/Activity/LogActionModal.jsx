@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Droplets, Scissors, Sprout, Wheat, Shield, FileText } from 'lucide-react'
+import AppDatePicker from '../Shared/AppDatePicker'
 import './LogActionModal.css'
 
 const ACTIVITIES = [
@@ -84,7 +85,7 @@ export default function LogActionModal({ plants, preselectedPlantId, onSave, onC
 
           <div className="modal-field">
             <label className="modal-label">Date & time</label>
-            <input type="datetime-local" value={loggedAt} onChange={e => setLoggedAt(e.target.value)} />
+            <AppDatePicker value={loggedAt} onChange={setLoggedAt} showTime />
           </div>
 
           <div className="modal-field">
