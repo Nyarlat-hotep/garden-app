@@ -543,8 +543,8 @@
   /* Mobile grid: no padding, fixed-size cells, wrapper scrolls in pan mode */
   .grid-wrapper { padding: 0; }
   .garden-grid {
-    width: auto;
-    height: auto;
+    width: max-content;
+    height: max-content;
     min-width: 100%;
     min-height: 100%;
   }
