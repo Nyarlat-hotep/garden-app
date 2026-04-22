@@ -91,6 +91,7 @@
   cursor: pointer;
   transition: background 0.1s;
 }
+.plant-picker-item { border-radius: 0; }
 .plant-picker-item:hover { background: var(--bg-surface); color: var(--text); }
 .plant-picker-item.active { color: var(--pc, var(--accent)); background: var(--bg-surface); font-weight: 600; }
 
