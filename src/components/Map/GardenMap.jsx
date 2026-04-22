@@ -177,6 +177,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const gridWrapperRef                        = useRef(null)
   const hoveredGroupRef                       = useRef(null)
   const plantBtnWrapRef                       = useRef(null)
+  const plantDropdownRef                      = useRef(null)
   const selectPhaseRef                        = useRef('idle')   // 'idle'|'rubber'|'moving'
   const rubberStartRef                        = useRef(null)
   const rubberRectRef                         = useRef(null)
@@ -210,7 +211,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   useEffect(() => {
     if (!plantPickerOpen) return
     const close = (e) => {
-      if (!plantBtnWrapRef.current?.contains(e.target)) setPlantPickerOpen(false)
+      if (!plantBtnWrapRef.current?.contains(e.target) && !plantDropdownRef.current?.contains(e.target)) setPlantPickerOpen(false)
     }
     document.addEventListener('mousedown', close)
     return () => document.removeEventListener('mousedown', close)
@@ -312,7 +313,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               <ChevronDown size={11} className={plantPickerOpen ? 'rotated' : ''} />
             </button>
             {plantPickerOpen && plants.length > 0 && plantBtnRect && createPortal(
-              <div className="plant-picker-dropdown" style={{ position: 'fixed', top: plantBtnRect.bottom + 6, left: plantBtnRect.left, zIndex: 9999 }}>
+              <div ref={plantDropdownRef} className="plant-picker-dropdown" style={{ position: 'fixed', top: plantBtnRect.bottom + 6, left: plantBtnRect.left, zIndex: 9999 }}>
                 {plants.map(p => (
                   <button key={p.id}
                     className={`plant-picker-item ${selectedPlantId === p.id ? 'active' : ''}`}
