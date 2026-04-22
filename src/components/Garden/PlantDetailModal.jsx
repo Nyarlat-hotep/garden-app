@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { X, Edit2, Trash2, ClipboardList } from 'lucide-react'
+import { X, Edit2, Trash2, ClipboardList, Droplets, FlaskConical, Scissors, Wheat } from 'lucide-react'
 import HealthBadge from './HealthBadge.jsx'
 import OverdueIcons from './OverdueIcons.jsx'
 import { formatDate, formatRelative, CATEGORY_LABELS } from '../../utils/format.js'
@@ -66,9 +66,10 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
         {plant.notes && <p className="detail-notes">{plant.notes}</p>}
 
         <div className="detail-care-intervals">
-          {plant.water_interval_days && <span>💧 Every {plant.water_interval_days}d</span>}
-          {plant.fertilize_interval_days && <span>🌿 Every {plant.fertilize_interval_days}d</span>}
-          {plant.prune_interval_days && <span>✂️ Every {plant.prune_interval_days}d</span>}
+          {plant.water_interval_days     && <span><Droplets size={13} /><b>Water</b> every {plant.water_interval_days}d</span>}
+          {plant.fertilize_interval_days && <span><FlaskConical size={13} /><b>Fertilize</b> every {plant.fertilize_interval_days}d</span>}
+          {plant.prune_interval_days     && <span><Scissors size={13} /><b>Prune</b> every {plant.prune_interval_days}d</span>}
+          {plant.days_to_harvest         && <span><Wheat size={13} /><b>Harvest</b> in {plant.days_to_harvest}d</span>}
         </div>
 
         <div className="detail-actions">

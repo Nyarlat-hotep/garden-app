@@ -42,8 +42,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  opacity: 0.5;
+  font-size: 3.5rem;
 }
 
 .plant-card-category-dot {
@@ -93,7 +92,16 @@
   margin-top: 0.15rem;
 }
 
-.plant-card-watered,
+.plant-card-watered {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
 .plant-card-planted {
   font-family: var(--font-mono);
   font-size: 0.6rem;

@@ -2,13 +2,13 @@ import { Search, Bell } from 'lucide-react'
 import './Navbar.css'
 
 export default function Navbar({ searchQuery, onSearch, view, hasOverdue }) {
-  const TITLES = { garden: 'My Garden', discover: 'Discover', map: 'Garden Map', activity: 'Activity' }
+  const TITLES = { map: 'Garden', inventory: 'Inventory', discover: 'Discover', activity: 'Activity' }
 
   return (
     <nav className="navbar">
       <div className="navbar-title">{TITLES[view] ?? 'Garden'}</div>
 
-      {view === 'garden' && (
+      {view === 'inventory' && (
         <div className="navbar-search-wrap">
           <Search size={14} className="navbar-search-icon" />
           <input

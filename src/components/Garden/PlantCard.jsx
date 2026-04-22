@@ -1,9 +1,16 @@
 import { motion } from 'framer-motion'
+import { Droplets } from 'lucide-react'
 import HealthBadge from './HealthBadge.jsx'
 import OverdueIcons from './OverdueIcons.jsx'
+import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import { CATEGORY_COLORS } from '../../utils/format.js'
 import { formatRelative } from '../../utils/format.js'
 import './PlantCard.css'
+
+function emojiForPlant(name) {
+  const match = FOOD_PLANTS.find(fp => fp.common_name.toLowerCase() === name.toLowerCase())
+  return match?.emoji ?? '🌱'
+}
 
 export default function PlantCard({ plant, health, lastWatered, onClick, index }) {
   const categoryColor = CATEGORY_COLORS[plant.category] ?? '#7fb069'
@@ -20,7 +27,7 @@ export default function PlantCard({ plant, health, lastWatered, onClick, index }
       <div className="plant-card-image">
         {plant.image_url
           ? <img src={plant.image_url} alt={plant.name} />
-          : <div className="plant-card-no-image">🌱</div>
+          : <div className="plant-card-no-image">{emojiForPlant(plant.name)}</div>
         }
         <div className="plant-card-category-dot" />
       </div>
@@ -36,7 +43,7 @@ export default function PlantCard({ plant, health, lastWatered, onClick, index }
 
         <div className="plant-card-meta">
           <span className="plant-card-watered">
-            💧 {formatRelative(lastWatered)}
+            <Droplets size={12} /> {formatRelative(lastWatered)}
           </span>
           {plant.date_planted && (
             <span className="plant-card-planted">

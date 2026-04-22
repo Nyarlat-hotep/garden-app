@@ -50,5 +50,26 @@ export function useGardenMap(userId) {
     scheduleSave()
   }, [scheduleSave])
 
-  return { cells, saving, paintCells }
+  const clearCells = useCallback(() => {
+    setCells({})
+    scheduleSave()
+  }, [scheduleSave])
+
+  const moveCells = useCallback((keys, dx, dy, maxCols, maxRows) => {
+    setCells(prev => {
+      const next = { ...prev }
+      const moving = {}
+      for (const key of keys) { if (prev[key] !== undefined) moving[key] = prev[key] }
+      for (const key of Object.keys(moving)) delete next[key]
+      for (const [key, cell] of Object.entries(moving)) {
+        const [x, y] = key.split(',').map(Number)
+        const nx = x + dx, ny = y + dy
+        if (nx >= 0 && ny >= 0 && nx < maxCols && ny < maxRows) next[`${nx},${ny}`] = cell
+      }
+      return next
+    })
+    scheduleSave()
+  }, [scheduleSave])
+
+  return { cells, saving, paintCells, clearCells, moveCells }
 }

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, Droplets, Sun } from 'lucide-react'
+import { Search, Droplets, Sun, Plus } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import './DiscoverView.css'
 
@@ -46,7 +46,11 @@ export default function DiscoverView({ onAddPlant }) {
           )}
         </div>
 
-        <div className="discover-category-tabs">
+      </div>
+
+      <div className="discover-filters">
+        <div className="discover-filters-label">Filter</div>
+        <div className="discover-filters-chips">
           {CATEGORIES.map(cat => (
             <button
               key={cat}
@@ -56,21 +60,13 @@ export default function DiscoverView({ onAddPlant }) {
               {cat}
             </button>
           ))}
+          {showBrowse && POPULAR.map(name => (
+            <button key={name} className="discover-chip" onClick={() => setQuery(name)}>
+              {name}
+            </button>
+          ))}
         </div>
       </div>
-
-      {showBrowse && activeCategory === 'all' && (
-        <div className="discover-popular">
-          <div className="discover-popular-label">Popular</div>
-          <div className="discover-popular-chips">
-            {POPULAR.map(name => (
-              <button key={name} className="discover-chip" onClick={() => setQuery(name)}>
-                {name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {results.length > 0 && (
         <div className="suggestion-list">
@@ -98,21 +94,22 @@ function PlantCard({ plant, onAdd }) {
           <div className="suggestion-name">{plant.common_name}</div>
           {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}
           <div className="plant-card-tags">
-            {plant.cycle  && <span className="plant-tag">{plant.cycle}</span>}
+            {plant.cycle      && <span className="plant-tag">{plant.cycle}</span>}
             {plant.difficulty && <span className="plant-tag">{plant.difficulty}</span>}
           </div>
+          {plant.description && (
+            <p className="plant-card-description">{plant.description}</p>
+          )}
           <div className="plant-card-meta">
-            {plant.watering  && <span className="plant-meta-item"><Droplets size={11} />{plant.watering}</span>}
-            {plant.sunlight  && <span className="plant-meta-item"><Sun size={11} />{plant.sunlight}</span>}
-            {plant.days_to_harvest && <span className="plant-meta-item">{plant.days_to_harvest}d to harvest</span>}
+            {plant.watering        && <span className="plant-meta-item"><Droplets size={11} />{plant.watering}</span>}
+            {plant.sunlight        && <span className="plant-meta-item"><Sun size={11} />{plant.sunlight}</span>}
+            {plant.days_to_harvest && <span className="plant-meta-item">{plant.days_to_harvest}d harvest</span>}
           </div>
         </div>
       </div>
-      {plant.description && (
-        <p className="plant-card-description">{plant.description}</p>
-      )}
       <button
         className="btn-add-suggestion"
+        aria-label="Add to garden"
         onClick={() => onAdd({
           name:                    plant.common_name,
           variety:                 plant.scientific_name,
@@ -125,7 +122,7 @@ function PlantCard({ plant, onAdd }) {
           harvest_interval_days:   plant.harvest_interval_days,
         })}
       >
-        + Add to garden
+        <Plus size={15} strokeWidth={2.5} />
       </button>
     </div>
   )

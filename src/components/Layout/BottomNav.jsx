@@ -1,11 +1,11 @@
-import { Sprout, Map, Compass, ClipboardList } from 'lucide-react'
+import { Sprout, Archive, Compass, ClipboardList } from 'lucide-react'
 import './BottomNav.css'
 
 const TABS = [
-  { id: 'garden',   label: 'Garden',   Icon: Sprout },
-  { id: 'map',      label: 'Map',      Icon: Map },
-  { id: 'discover', label: 'Discover', Icon: Compass },
-  { id: 'activity', label: 'Activity', Icon: ClipboardList },
+  { id: 'map',       label: 'Garden',    Icon: Sprout },
+  { id: 'inventory', label: 'Inventory', Icon: Archive },
+  { id: 'discover',  label: 'Discover',  Icon: Compass },
+  { id: 'activity',  label: 'Activity',  Icon: ClipboardList },
 ]
 
 export default function BottomNav({ view, onViewChange }) {

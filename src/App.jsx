@@ -30,10 +30,10 @@ function App() {
     addPlant, editPlant, removePlant,
   } = usePlants(user?.id, latestLogsMap)
 
-  const { cells: gardenCells, saving: mapSaving, paintCells } = useGardenMap(user?.id)
+  const { cells: gardenCells, saving: mapSaving, paintCells, clearCells, moveCells } = useGardenMap(user?.id)
   const { hasOverdue } = useNotifications(user?.id, healthMap)
 
-  const [view, setView]           = useState('garden')
+  const [view, setView]           = useState('map')
   const [selected, setSelected]   = useState(null)
   const [adding, setAdding]       = useState(false)
   const [addingFromDiscover, setAddingFromDiscover] = useState(null) // prefill data
@@ -76,7 +76,7 @@ function App() {
       />
 
       <main className="main-content">
-        {view === 'garden' && (
+        {view === 'inventory' && (
           <PlantGrid
             plants={filtered}
             healthMap={healthMap}
@@ -93,8 +93,12 @@ function App() {
           <GardenMap
             cells={gardenCells}
             paintCells={paintCells}
+            clearCells={clearCells}
+            moveCells={moveCells}
             saving={mapSaving}
             plants={plants}
+            healthMap={healthMap}
+            onSelectPlant={setSelected}
           />
         )}
 
@@ -106,7 +110,7 @@ function App() {
       </main>
 
       {/* FAB — add plant (garden view) or log activity (activity view) */}
-      {view === 'garden' && (
+      {view === 'inventory' && (
         <button className="fab-add" aria-label="Add plant" onClick={() => setAdding(true)}>
           <Plus size={24} strokeWidth={2.5} />
         </button>

@@ -1,9 +1,43 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { Paintbrush, Sprout, Eraser, Droplets, Scissors } from 'lucide-react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import './GardenMap.css'
 
 // ── Color helpers ────────────────────────────────────────────────────────────
+
+const PLANT_COLORS = {
+  // Reds
+  'tomato': '#a03535', 'cherry tomato': '#a03535', 'roma tomato': '#a03535',
+  'strawberry': '#a03050', 'raspberry': '#963060', 'watermelon': '#a83545',
+  'bell pepper': '#a04030', 'hot pepper': '#b04025', 'chili pepper': '#b04025',
+  'radish': '#903548',
+  // Oranges
+  'carrot': '#b06025', 'pumpkin': '#a85a18', 'butternut squash': '#a06820',
+  'sweet potato': '#9a5828', 'acorn squash': '#8a6030',
+  // Yellows
+  'corn': '#a88a20', 'summer squash': '#9a8020', 'yellow squash': '#9a8020',
+  'lemon': '#a08818', 'banana pepper': '#a08030',
+  // Deep greens
+  'cucumber': '#3d7535', 'zucchini': '#3a6c30', 'broccoli': '#3a6830',
+  'kale': '#2e5e30', 'spinach': '#306030', 'chard': '#386835',
+  'arugula': '#4a6c38', 'collard greens': '#2e5e30',
+  // Medium greens
+  'lettuce': '#5a8040', 'pea': '#4a7838', 'green bean': '#4a7035',
+  'edamame': '#4a7838', 'brussels sprouts': '#3a6830',
+  // Herbs (grey-greens)
+  'basil': '#3d6835', 'mint': '#458840', 'cilantro': '#4a7038',
+  'parsley': '#4a7035', 'rosemary': '#3d5e40', 'thyme': '#3d5838',
+  'oregano': '#4a5838', 'chive': '#4a7538', 'dill': '#4a7038',
+  'sage': '#5a6e48', 'lavender': '#6a5888',
+  // Blues / purples
+  'blueberry': '#404888', 'eggplant': '#602878', 'purple basil': '#622870',
+  'blackberry': '#503868',
+  // Browns / neutrals
+  'potato': '#7a5e30', 'sweet potato': '#8a5025', 'garlic': '#8a7850',
+  'onion': '#8a7040', 'shallot': '#8a6848', 'ginger': '#8a6030',
+  'beet': '#7a2845', 'turnip': '#7a3848',
+}
 
 const PLANT_PALETTE = [
   '#5b9bd5','#e07b39','#c47ec2','#d4a843','#5bbfb5',
@@ -17,7 +51,11 @@ function hashPlantId(id) {
   return h
 }
 
-function plantColorFor(plantId) {
+function plantColorFor(plantId, plantName) {
+  if (plantName) {
+    const lc = plantName.toLowerCase()
+    if (PLANT_COLORS[lc]) return PLANT_COLORS[lc]
+  }
   return PLANT_PALETTE[hashPlantId(plantId) % PLANT_PALETTE.length]
 }
 
@@ -26,20 +64,110 @@ function emojiForPlant(plant) {
   return match?.emoji ?? '🌱'
 }
 
-// ── Component ────────────────────────────────────────────────────────────────
+const OVERDUE_LABELS = { watered: '💧', pruned: '✂️', fertilized: '🌿', harvested: '🌾' }
 
-const CELL_SIZE = 28 // px — fixed cell size, grid adapts to fill viewport
+// ── Crop panel item ───────────────────────────────────────────────────────────
 
-export default function GardenMap({ cells = {}, paintCells, plants, saving }) {
-  const [tool, setTool]                       = useState('area')
+function CropItem({ plant, health, onSelect }) {
+  const status      = health?.status ?? 'healthy'
+  const overdueTypes = health?.overdueTypes ?? []
+
+  return (
+    <button className="crop-item" onClick={() => onSelect(plant)}>
+      <span className="crop-item-emoji">{emojiForPlant(plant)}</span>
+      <div className="crop-item-body">
+        <span className="crop-item-name">{plant.name}</span>
+        {overdueTypes.length > 0 && (
+          <span className="crop-item-overdue">
+            {overdueTypes.map(t => OVERDUE_LABELS[t] ?? t).join(' ')} overdue
+          </span>
+        )}
+      </div>
+      <span className={`crop-status-dot crop-status-dot--${status}`} />
+    </button>
+  )
+}
+
+// ── Panel content (shared by desktop panel + mobile sheet) ───────────────────
+
+function CropList({ plants, healthMap, onSelect }) {
+  const critical  = plants.filter(p => healthMap?.get(p.id)?.status === 'critical').length
+  const attention = plants.filter(p => healthMap?.get(p.id)?.status === 'attention').length
+  const overdue   = plants.filter(p => (healthMap?.get(p.id)?.overdueTypes ?? []).length > 0).length
+
+  return (
+    <>
+      <div className="crop-panel-header">
+        <span className="crop-panel-title">Crops</span>
+        <span className="crop-panel-count">{plants.length}</span>
+      </div>
+
+      {(critical > 0 || attention > 0) && (
+        <div className="crop-panel-stats">
+          {critical  > 0 && <span className="crop-stat crop-stat--critical">{critical} critical</span>}
+          {attention > 0 && <span className="crop-stat crop-stat--attention">{attention} attention</span>}
+          {overdue   > 0 && <span className="crop-stat crop-stat--overdue">{overdue} overdue</span>}
+        </div>
+      )}
+
+      <div className="crop-list">
+        {plants.length === 0
+          ? <p className="crop-list-empty">No crops yet.<br/>Add plants in the Garden tab.</p>
+          : plants.map(p => (
+              <CropItem key={p.id} plant={p} health={healthMap?.get(p.id)} onSelect={onSelect} />
+            ))
+        }
+      </div>
+    </>
+  )
+}
+
+function floodFill(cells, startKey, plantId, cols, rows) {
+  const visited = new Set()
+  const queue = [startKey]
+  visited.add(startKey)
+  while (queue.length) {
+    const key = queue.shift()
+    const [x, y] = key.split(',').map(Number)
+    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+      const nx = x + dx, ny = y + dy
+      if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue
+      const nk = `${nx},${ny}`
+      if (!visited.has(nk) && cells[nk]?.plantId === plantId) {
+        visited.add(nk)
+        queue.push(nk)
+      }
+    }
+  }
+  return visited
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+const CELL_SIZE = 28
+
+export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, onSelectPlant }) {
+  const [tool, setTool]                       = useState('select')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
   const [dims, setDims]                       = useState({ cols: 60, rows: 40 })
+  const [sheetOpen, setSheetOpen]             = useState(false)
+  const [plantPickerOpen, setPlantPickerOpen] = useState(false)
+  const [selection, setSelection]             = useState(null)   // Set<string> | null
+  const [rubberRect, setRubberRect]           = useState(null)   // {x1,y1,x2,y2} | null
+  const [moveOffset, setMoveOffset]           = useState(null)   // {dx,dy} | null
   const isDrawingRef                          = useRef(false)
   const pendingCellsRef                       = useRef(new Set())
   const gridWrapperRef                        = useRef(null)
+  const hoveredGroupRef                       = useRef(null)
+  const plantBtnWrapRef                       = useRef(null)
+  const selectPhaseRef                        = useRef('idle')   // 'idle'|'rubber'|'moving'
+  const rubberStartRef                        = useRef(null)
+  const rubberRectRef                         = useRef(null)
+  const moveStartRef                          = useRef(null)
+  const moveOffsetRef                         = useRef(null)
+  const selectionRef                          = useRef(null)
 
-  // Compute grid dimensions from wrapper size so cells are always CELL_SIZE px
   useEffect(() => {
     const el = gridWrapperRef.current
     if (!el) return
@@ -53,12 +181,39 @@ export default function GardenMap({ cells = {}, paintCells, plants, saving }) {
     return () => ro.disconnect()
   }, [])
 
-  // Auto-select first plant when switching to plant mode
+  useEffect(() => { selectionRef.current = selection }, [selection])
+
   useEffect(() => {
-    if (tool === 'plant' && !selectedPlantId && plants.length > 0) {
-      setSelectedPlantId(plants[0].id)
+    if (!plantPickerOpen) return
+    const close = (e) => {
+      if (!plantBtnWrapRef.current?.contains(e.target)) setPlantPickerOpen(false)
     }
-  }, [tool, plants, selectedPlantId])
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [plantPickerOpen])
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') { setSelection(null); setMoveOffset(null); selectPhaseRef.current = 'idle' }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectionRef.current?.size) {
+        paintCells([...selectionRef.current], 'erase')
+        setSelection(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [paintCells])
+
+  const previewMap = useMemo(() => {
+    if (!moveOffset || !selection) return null
+    const map = new Map()
+    for (const key of selection) {
+      const [kx, ky] = key.split(',').map(Number)
+      const nx = kx + moveOffset.dx, ny = ky + moveOffset.dy
+      if (nx >= 0 && ny >= 0 && nx < dims.cols && ny < dims.rows) map.set(`${nx},${ny}`, cells[key])
+    }
+    return map
+  }, [moveOffset, selection, cells, dims])
 
   const paint = useCallback((key) => {
     if (pendingCellsRef.current.has(key)) return
@@ -66,175 +221,247 @@ export default function GardenMap({ cells = {}, paintCells, plants, saving }) {
     paintCells([key], tool, tool === 'plant' ? selectedPlantId : undefined)
   }, [paintCells, tool, selectedPlantId])
 
-  const stopDrawing = useCallback(() => {
-    isDrawingRef.current = false
-    pendingCellsRef.current.clear()
-  }, [])
+  const stopInteraction = useCallback(() => {
+    if (tool === 'select' || tool === 'erase') {
+      if (selectPhaseRef.current === 'rubber' && rubberRectRef.current) {
+        const { x1, y1, x2, y2 } = rubberRectRef.current
+        const isSingleClick = x1 === x2 && y1 === y2
+        if (tool === 'erase' && isSingleClick) {
+          // Single click in erase mode → erase immediately
+          const k = `${x1},${y1}`
+          if (cells[k] !== undefined) paintCells([k], 'erase')
+        } else {
+          const keys = new Set()
+          for (let cy = y1; cy <= y2; cy++)
+            for (let cx = x1; cx <= x2; cx++) {
+              const k = `${cx},${cy}`
+              if (cells[k] !== undefined) keys.add(k)
+            }
+          setSelection(keys.size > 0 ? keys : null)
+        }
+        setRubberRect(null); rubberRectRef.current = null
+      } else if (selectPhaseRef.current === 'moving' && moveOffsetRef.current && selectionRef.current) {
+        const { dx, dy } = moveOffsetRef.current
+        moveCells([...selectionRef.current], dx, dy, dims.cols, dims.rows)
+        const newKeys = new Set()
+        for (const key of selectionRef.current) {
+          const [kx, ky] = key.split(',').map(Number)
+          const nx = kx + dx, ny = ky + dy
+          if (nx >= 0 && ny >= 0 && nx < dims.cols && ny < dims.rows) newKeys.add(`${nx},${ny}`)
+        }
+        setSelection(newKeys.size > 0 ? newKeys : null)
+        setMoveOffset(null); moveOffsetRef.current = null
+      }
+      selectPhaseRef.current = 'idle'
+    } else {
+      isDrawingRef.current = false
+      pendingCellsRef.current.clear()
+    }
+  }, [tool, cells, dims, moveCells, paintCells])
+
+  const handleSelectPlant = useCallback((plant) => {
+    setSheetOpen(false)
+    onSelectPlant?.(plant)
+  }, [onSelectPlant])
 
   const hasCells = Object.keys(cells).length > 0
 
   return (
     <div className="garden-map-view">
+
       {/* Toolbar */}
       <div className="map-toolbar">
         <div className="map-tool-btns">
-          <button
-            className={`map-tool-btn ${tool === 'area' ? 'active' : ''}`}
-            onClick={() => setTool('area')}
-            title="Paint garden area"
-          >
-            <Paintbrush size={15} />
-            <span>Area</span>
-          </button>
-          <button
-            className={`map-tool-btn ${tool === 'plant' ? 'active' : ''}`}
-            onClick={() => setTool('plant')}
-            title="Paint plant"
-            disabled={plants.length === 0}
-          >
-            <Sprout size={15} />
-            <span>Plant</span>
-          </button>
-          <button
-            className={`map-tool-btn ${tool === 'erase' ? 'active' : ''}`}
-            onClick={() => setTool('erase')}
-            title="Erase cells"
-          >
-            <Eraser size={15} />
-            <span>Erase</span>
-          </button>
+          <button className={`map-tool-btn ${tool === 'select' ? 'active' : ''}`} onClick={() => setTool('select')} title="Select and move"><MousePointer2 size={15} /><span>Select</span></button>
+          <div className="plant-btn-wrap" ref={plantBtnWrapRef}>
+            <button
+              className={`map-tool-btn ${tool === 'plant' ? 'active' : ''}`}
+              disabled={plants.length === 0}
+              onClick={() => { setTool('plant'); setPlantPickerOpen(v => !v) }}
+            >
+              {selectedPlantId && plants.find(p => p.id === selectedPlantId)
+                ? <><span>{emojiForPlant(plants.find(p => p.id === selectedPlantId))}</span><span>{plants.find(p => p.id === selectedPlantId).name}</span></>
+                : <><Sprout size={15} /><span>Plant</span></>
+              }
+              <ChevronDown size={11} className={plantPickerOpen ? 'rotated' : ''} />
+            </button>
+            {plantPickerOpen && plants.length > 0 && (
+              <div className="plant-picker-dropdown">
+                {plants.map(p => (
+                  <button key={p.id}
+                    className={`plant-picker-item ${selectedPlantId === p.id ? 'active' : ''}`}
+                    style={{ '--pc': plantColorFor(p.id, p.name) }}
+                    onClick={() => { setSelectedPlantId(p.id); setPlantPickerOpen(false) }}
+                  >
+                    <span>{emojiForPlant(p)}</span>
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <button className={`map-tool-btn ${tool === 'erase' ? 'active' : ''}`} onClick={() => setTool('erase')} title="Erase cells"><Eraser size={15} /><span>Erase</span></button>
         </div>
-
+        {hasCells && (
+          <button className="map-tool-btn map-tool-btn--clear" onClick={clearCells} title="Clear all">Clear all</button>
+        )}
         {saving === 'saving' && <span className="map-saving-dot">saving…</span>}
       </div>
 
-      {/* Plant chips — only in plant mode */}
-      {tool === 'plant' && plants.length > 0 && (
-        <div className="map-plant-chips">
-          {plants.map(p => (
-            <button
-              key={p.id}
-              className={`map-plant-chip ${selectedPlantId === p.id ? 'active' : ''}`}
-              style={selectedPlantId === p.id ? {
-                borderColor: plantColorFor(p.id),
-                background: plantColorFor(p.id) + '33',
-                color: plantColorFor(p.id),
-              } : {}}
-              onClick={() => setSelectedPlantId(p.id)}
-            >
-              {emojiForPlant(p)} {p.name}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Body: grid + right panel */}
+      <div className="map-body">
 
-      {tool === 'plant' && plants.length === 0 && (
-        <div className="map-hint-banner">
-          🌱 Add plants in the Garden tab to paint them onto the map.
-        </div>
-      )}
-
-      {/* Grid */}
-      <div
-        ref={gridWrapperRef}
-        className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}`}
-        onPointerUp={stopDrawing}
-        onPointerLeave={stopDrawing}
-      >
-        <div
-          className="garden-grid"
-          style={{
-            gridTemplateColumns: `repeat(${dims.cols}, 1fr)`,
-            gridTemplateRows:    `repeat(${dims.rows}, 1fr)`,
-          }}
+        {/* Grid */}
+        <div ref={gridWrapperRef}
+          className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}${tool === 'select' ? ' select-mode' : ''}`}
+          onPointerUp={stopInteraction} onPointerLeave={stopInteraction}
+          onMouseLeave={() => { hoveredGroupRef.current = null; setPopover(null) }}
         >
-          {Array.from({ length: dims.cols * dims.rows }, (_, i) => {
-            const x = i % dims.cols
-            const y = Math.floor(i / dims.cols)
-            const key = `${x},${y}`
-            const cell = cells[key]
-            const isGarden = cell !== undefined
-            const plantId = cell?.plantId
-            const bgColor = plantId ? plantColorFor(plantId) + 'cc' : undefined
+          <div className="garden-grid" style={{ gridTemplateColumns: `repeat(${dims.cols}, 1fr)`, gridTemplateRows: `repeat(${dims.rows}, 1fr)` }}>
+            {Array.from({ length: dims.cols * dims.rows }, (_, i) => {
+              const x = i % dims.cols
+              const y = Math.floor(i / dims.cols)
+              const key = `${x},${y}`
+              const cell = cells[key]
+              const plantId = cell?.plantId
+              const plantName = plantId ? plants.find(p => p.id === plantId)?.name : undefined
+              const baseColor = plantId ? plantColorFor(plantId, plantName) : null
 
-            return (
-              <div
-                key={key}
-                className={`grid-cell${isGarden ? ' is-garden' : ''}`}
-                style={bgColor ? { backgroundColor: bgColor } : undefined}
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  isDrawingRef.current = true
-                  pendingCellsRef.current.clear()
-                  paint(key)
-                }}
-                onPointerEnter={() => {
-                  if (!isDrawingRef.current) return
-                  paint(key)
-                }}
-                onMouseEnter={(e) => {
-                  if (isDrawingRef.current || !plantId) return
-                  const plant = plants.find(p => p.id === plantId)
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  const below = rect.top < 180  // not enough space above
-                  setPopover({
-                    x: rect.left + rect.width / 2,
-                    y: below ? rect.bottom + 8 : rect.top - 8,
-                    below,
-                    plant: plant ?? null,
-                    orphaned: !plant,
-                  })
-                }}
-                onMouseLeave={() => setPopover(null)}
-              />
-            )
-          })}
+              const isSelected   = (tool === 'select' || tool === 'erase') && !!selection?.has(key)
+              const isMovingSrc  = isSelected && !!moveOffset
+              const previewCell  = moveOffset ? previewMap?.get(key) : null
+              const inRubber     = rubberRect && x >= rubberRect.x1 && x <= rubberRect.x2 && y >= rubberRect.y1 && y <= rubberRect.y2
+
+              let bg
+              if (previewCell) {
+                const pn = previewCell.plantId ? plants.find(p => p.id === previewCell.plantId)?.name : undefined
+                bg = previewCell.plantId ? plantColorFor(previewCell.plantId, pn) + 'cc' : 'rgba(127,176,105,0.4)'
+              } else if (isMovingSrc) {
+                bg = baseColor ? baseColor + '33' : undefined
+              } else if (baseColor) {
+                bg = baseColor + 'cc'
+              }
+
+              let cls = 'grid-cell'
+              if (cell !== undefined && !isMovingSrc) cls += ' is-garden'
+              if (isSelected && !moveOffset) cls += ' is-selected'
+              if (inRubber) cls += ' in-rubber'
+
+              return (
+                <div key={key} className={cls}
+                  style={bg ? { backgroundColor: bg } : undefined}
+                  onPointerDown={(e) => {
+                    e.preventDefault()
+                    if (tool === 'select' || tool === 'erase') {
+                      if (tool === 'select' && selectionRef.current?.has(key)) {
+                        selectPhaseRef.current = 'moving'
+                        moveStartRef.current = { x, y }
+                        moveOffsetRef.current = { dx: 0, dy: 0 }
+                      } else {
+                        selectPhaseRef.current = 'rubber'
+                        rubberStartRef.current = { x, y }
+                        const r = { x1: x, y1: y, x2: x, y2: y }
+                        rubberRectRef.current = r; setRubberRect(r)
+                        setSelection(null); selectionRef.current = null; setMoveOffset(null)
+                      }
+                    } else {
+                      isDrawingRef.current = true; pendingCellsRef.current.clear(); paint(key)
+                    }
+                  }}
+                  onPointerEnter={() => {
+                    if (tool === 'select' || tool === 'erase') {
+                      if (selectPhaseRef.current === 'rubber' && rubberStartRef.current) {
+                        const r = { x1: Math.min(rubberStartRef.current.x, x), y1: Math.min(rubberStartRef.current.y, y), x2: Math.max(rubberStartRef.current.x, x), y2: Math.max(rubberStartRef.current.y, y) }
+                        rubberRectRef.current = r; setRubberRect(r)
+                      } else if (selectPhaseRef.current === 'moving' && moveStartRef.current) {
+                        const o = { dx: x - moveStartRef.current.x, dy: y - moveStartRef.current.y }
+                        moveOffsetRef.current = o; setMoveOffset(o)
+                      }
+                    } else {
+                      if (!isDrawingRef.current) return; paint(key)
+                    }
+                  }}
+                  onMouseEnter={(e) => {
+                    if (isDrawingRef.current || selectPhaseRef.current !== 'idle') return
+                    if (!plantId) {
+                      if (hoveredGroupRef.current) { hoveredGroupRef.current = null; setPopover(null) }
+                      return
+                    }
+                    if (hoveredGroupRef.current?.has(key)) return
+                    const group = floodFill(cells, key, plantId, dims.cols, dims.rows)
+                    hoveredGroupRef.current = group
+                    const plant = plants.find(p => p.id === plantId)
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    const below = rect.top < 180
+                    setPopover({ x: rect.left + rect.width / 2, y: below ? rect.bottom + 8 : rect.top - 8, below, plant: plant ?? null, orphaned: !plant, sqFt: group.size })
+                  }}
+                />
+              )
+            })}
+          </div>
+
+          {popover && (
+            <div className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`} style={{ left: popover.x, top: popover.y }}>
+              {popover.orphaned ? <div className="popover-orphan">Removed plant</div> : (
+                <>
+                  <div className="popover-header">
+                    <span className="popover-emoji">{emojiForPlant(popover.plant)}</span>
+                    <div>
+                      <div className="popover-name">{popover.plant.name}</div>
+                      {popover.plant.variety && <div className="popover-variety">{popover.plant.variety}</div>}
+                      <div className="popover-sqft">{popover.sqFt} sq ft</div>
+                    </div>
+                  </div>
+                  <div className="popover-care">
+                    {popover.plant.water_interval_days     && <span><Droplets size={13} /><b>Water</b> every {popover.plant.water_interval_days}d</span>}
+                    {popover.plant.fertilize_interval_days && <span><FlaskConical size={13} /><b>Fertilize</b> every {popover.plant.fertilize_interval_days}d</span>}
+                    {popover.plant.prune_interval_days     && <span><Scissors size={13} /><b>Prune</b> every {popover.plant.prune_interval_days}d</span>}
+                    {popover.plant.days_to_harvest         && <span><Wheat size={13} /><b>Harvest</b> in {popover.plant.days_to_harvest}d</span>}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {!hasCells && (
+            <div className="grid-hint-overlay">
+              <Sprout size={22} strokeWidth={1.5} />
+              <span>Select a plant and click to paint</span>
+            </div>
+          )}
         </div>
 
-        {popover && (
-          <div
-            className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`}
-            style={{ left: popover.x, top: popover.y }}
-          >
-            {popover.orphaned ? (
-              <div className="popover-orphan">Removed plant</div>
-            ) : (
-              <>
-                <div className="popover-header">
-                  <span className="popover-emoji">{emojiForPlant(popover.plant)}</span>
-                  <div>
-                    <div className="popover-name">{popover.plant.name}</div>
-                    {popover.plant.variety && (
-                      <div className="popover-variety">{popover.plant.variety}</div>
-                    )}
-                  </div>
-                </div>
-                <div className="popover-care">
-                  {popover.plant.water_interval_days && (
-                    <span><Droplets size={11} /> Every {popover.plant.water_interval_days}d</span>
-                  )}
-                  {popover.plant.fertilize_interval_days && (
-                    <span>🌿 Every {popover.plant.fertilize_interval_days}d</span>
-                  )}
-                  {popover.plant.prune_interval_days && (
-                    <span><Scissors size={11} /> Every {popover.plant.prune_interval_days}d</span>
-                  )}
-                  {popover.plant.days_to_harvest && (
-                    <span>🌾 {popover.plant.days_to_harvest}d harvest</span>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        )}
+        {/* Desktop right panel */}
+        <div className="crop-panel">
+          <CropList plants={plants} healthMap={healthMap} onSelect={handleSelectPlant} />
+        </div>
 
-        {!hasCells && (
-          <div className="grid-hint-overlay">
-            <Paintbrush size={22} strokeWidth={1.5} />
-            <span>Click and drag to paint your garden shape</span>
-          </div>
-        )}
       </div>
+
+      {/* Mobile FAB */}
+      <button className="crop-panel-fab" onClick={() => setSheetOpen(true)} aria-label="View crops">
+        <Leaf size={18} strokeWidth={2} />
+      </button>
+
+      {/* Mobile bottom sheet */}
+      <AnimatePresence>
+        {sheetOpen && (
+          <>
+            <motion.div className="crop-sheet-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSheetOpen(false)}
+            />
+            <motion.div className="crop-sheet"
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            >
+              <div className="crop-sheet-handle" />
+              <CropList plants={plants} healthMap={healthMap} onSelect={handleSelectPlant} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </div>
   )
 }

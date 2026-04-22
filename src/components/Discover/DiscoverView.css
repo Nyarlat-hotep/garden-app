@@ -52,24 +52,36 @@
 }
 .discover-search-clear:hover { color: var(--text); }
 
-/* Category tabs */
-.discover-category-tabs {
+/* Filter section */
+.discover-filters {
   display: flex;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discover-filters-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.discover-filters-chips {
+  display: flex;
   flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .discover-cat-tab {
-  padding: 0.25rem 0.7rem;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  padding: 0.35rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  text-transform: capitalize;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  color: var(--text-muted);
+  color: var(--text-dim);
   transition: all 0.15s;
 }
 .discover-cat-tab:hover,
@@ -87,22 +99,6 @@
   margin: 0;
 }
 
-/* Popular chips */
-.discover-popular { display: flex; flex-direction: column; gap: 0.6rem; }
-
-.discover-popular-label {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.discover-popular-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
 
 .discover-chip {
   padding: 0.35rem 0.85rem;
@@ -143,7 +139,11 @@
 }
 
 /* Results */
-.suggestion-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.suggestion-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
 
 .suggestion-card {
   background: var(--bg-card);
@@ -153,6 +153,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  position: relative;
 }
 
 .plant-card-row {
@@ -161,9 +162,10 @@
   align-items: flex-start;
 }
 
+
 .plant-card-img {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: var(--radius-btn);
   object-fit: cover;
   flex-shrink: 0;
@@ -174,7 +176,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   border: 1px solid var(--border);
 }
 
@@ -220,30 +222,40 @@
 
 .plant-card-meta {
   display: flex;
-  gap: 0.65rem;
+  flex-direction: row;
   flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
 }
 
 .plant-meta-item {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--text-dim);
+  white-space: nowrap;
 }
 .plant-meta-item svg { color: var(--text-muted); }
 
 .btn-add-suggestion {
-  align-self: flex-start;
-  padding: 0.35rem 0.9rem;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--accent-dim);
   border: 1px solid var(--accent);
   color: var(--accent);
-  border-radius: var(--radius-pill);
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-add-suggestion:hover {
+  background: var(--accent);
+  color: #fff;
 }
 
 .discover-empty {
@@ -258,4 +270,5 @@
 
 @media (max-width: 480px) {
   .discover-view { padding: 0.75rem 0.75rem calc(var(--bottom-nav-h) + 5rem); }
+  .suggestion-list { grid-template-columns: 1fr; }
 }
