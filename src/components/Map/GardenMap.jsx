@@ -372,8 +372,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               const plantId = cell?.plantId
               const plantName = plantId ? plants.find(p => p.id === plantId)?.name : undefined
               const baseColor = plantId ? plantColorFor(plantId, plantName) : null
-              const isTomato = plantName?.toLowerCase().includes('tomato')  // TEMP
-              const overdueTypes = plantId ? (healthMap?.get(plantId)?.overdueTypes ?? (isTomato ? ['watered'] : [])) : []
+              const overdueTypes = plantId ? (healthMap?.get(plantId)?.overdueTypes ?? []) : []
               const needsWater = overdueTypes.includes('watered')
               const needsFertilize = overdueTypes.includes('fertilized')
 
