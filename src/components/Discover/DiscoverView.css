@@ -284,4 +284,13 @@
 @media (max-width: 480px) {
   .discover-view { padding: 0.75rem 0.75rem calc(var(--bottom-nav-h) + 5rem); }
   .suggestion-list { grid-template-columns: 1fr; }
+
+  .discover-filters-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .discover-filters-chips::-webkit-scrollbar { display: none; }
+  .discover-cat-tab,
+  .discover-chip { flex-shrink: 0; }
 }
