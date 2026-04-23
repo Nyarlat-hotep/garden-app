@@ -492,7 +492,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
 
       {/* Mobile FAB */}
       <button className="crop-panel-fab" onClick={() => setSheetOpen(true)} aria-label="View crops">
-        <Leaf size={16} strokeWidth={2} /><span>Crops</span>
+        <Leaf size={20} strokeWidth={2} />
       </button>
 
       {/* Mobile bottom sheet */}
