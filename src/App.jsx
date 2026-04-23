@@ -117,6 +117,7 @@ function App() {
             saving={mapSaving}
             plants={plants}
             healthMap={healthMap}
+            logsMap={logsMap}
             onSelectPlant={setSelected}
           />
         )}

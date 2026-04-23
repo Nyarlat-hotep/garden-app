@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown, Trash2, Hand } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
+import { dueIn, formatDueIn } from '../../utils/careTime.js'
 import Emoji from '../Shared/Emoji.jsx'
 import './GardenMap.css'
 
@@ -157,7 +158,7 @@ const CELL_SIZE_MOBILE = 22
 const CANVAS_MIN_COLS  = 80
 const CANVAS_MIN_ROWS  = 55
 
-export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, onSelectPlant }) {
+export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, logsMap, onSelectPlant }) {
   const [tool, setTool]                       = useState(() => window.innerWidth <= 480 ? 'pan' : 'select')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
@@ -468,9 +469,18 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     </div>
                   </div>
                   <div className="popover-care">
-                    {popover.plant.water_interval_days     && <span><Droplets size={13} /><b>Water</b> every <span className="val-mono">{popover.plant.water_interval_days}d</span></span>}
-                    {popover.plant.fertilize_interval_days && <span><FlaskConical size={13} /><b>Fertilize</b> every <span className="val-mono">{popover.plant.fertilize_interval_days}d</span></span>}
-                    {popover.plant.prune_interval_days     && <span><Scissors size={13} /><b>Prune</b> every <span className="val-mono">{popover.plant.prune_interval_days}d</span></span>}
+                    {popover.plant.water_interval_days && (() => {
+                      const r = dueIn(popover.plant, logsMap?.get(popover.plant.id), 'water_interval_days', 'watered')
+                      return <span className={`care-timer care-timer--${r?.state ?? 'upcoming'}`}><Droplets size={13} /><b>Water</b> <span className="val-mono">{formatDueIn(r)}</span></span>
+                    })()}
+                    {popover.plant.fertilize_interval_days && (() => {
+                      const r = dueIn(popover.plant, logsMap?.get(popover.plant.id), 'fertilize_interval_days', 'fertilized')
+                      return <span className={`care-timer care-timer--${r?.state ?? 'upcoming'}`}><FlaskConical size={13} /><b>Fertilize</b> <span className="val-mono">{formatDueIn(r)}</span></span>
+                    })()}
+                    {popover.plant.prune_interval_days && (() => {
+                      const r = dueIn(popover.plant, logsMap?.get(popover.plant.id), 'prune_interval_days', 'pruned')
+                      return <span className={`care-timer care-timer--${r?.state ?? 'upcoming'}`}><Scissors size={13} /><b>Prune</b> <span className="val-mono">{formatDueIn(r)}</span></span>
+                    })()}
                     {popover.plant.days_to_harvest         && <span><Wheat size={13} /><b>Harvest</b> in {popover.plant.days_to_harvest}d</span>}
                   </div>
                 </>

@@ -123,6 +123,22 @@
   flex-shrink: 0;
 }
 
+.care-timer--overdue {
+  color: var(--status-critical);
+  border-color: color-mix(in srgb, var(--status-critical) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--status-critical) 8%, transparent) !important;
+}
+.care-timer--overdue svg,
+.care-timer--overdue b { color: var(--status-critical); }
+
+.care-timer--due {
+  color: var(--status-attention);
+  border-color: color-mix(in srgb, var(--status-attention) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--status-attention) 8%, transparent) !important;
+}
+.care-timer--due svg,
+.care-timer--due b { color: var(--status-attention); }
+
 
 .detail-actions {
   display: flex;
