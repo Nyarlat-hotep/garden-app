@@ -348,6 +348,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
           )}
         </div>
         {saving === 'saving' && <span className="map-saving-dot">saving…</span>}
+        {!hasCells && <span className="map-grid-hint">Select a plant and click to paint</span>}
       </div>
 
       {/* Body: grid + right panel */}
@@ -480,12 +481,6 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             </div>
           )}
 
-          {!hasCells && (
-            <div className="grid-hint-overlay">
-              <Sprout size={22} strokeWidth={1.5} />
-              <span>Select a plant and click to paint</span>
-            </div>
-          )}
         </div>
 
         {/* Desktop right panel */}
