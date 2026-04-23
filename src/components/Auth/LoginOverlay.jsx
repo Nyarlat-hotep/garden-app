@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import './LoginOverlay.css'
 
-export default function LoginOverlay({ onLogin }) {
+export default function LoginOverlay({ onLogin, onSignup, onBack }) {
+  const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
@@ -12,9 +13,13 @@ export default function LoginOverlay({ onLogin }) {
     setError('')
     setLoading(true)
     try {
-      await onLogin(email, password)
+      if (isLogin) {
+        await onLogin(email, password)
+      } else {
+        await onSignup(email, password)
+      }
     } catch (err) {
-      setError(err.message || 'Login failed')
+      setError(err.message || (isLogin ? 'Login failed' : 'Sign up failed'))
     } finally {
       setLoading(false)
     }
@@ -23,9 +28,28 @@ export default function LoginOverlay({ onLogin }) {
   return (
     <div className="login-overlay">
       <div className="login-box">
+        <button className="login-back" onClick={onBack} aria-label="Back to home">
+          ← Back
+        </button>
         <div className="login-icon">🌱</div>
         <h1 className="login-title">Garden</h1>
         <p className="login-sub">Your personal growing companion</p>
+
+        <div className="login-tabs">
+          <button
+            className={`login-tab ${isLogin ? 'active' : ''}`}
+            onClick={() => setIsLogin(true)}
+          >
+            Sign In
+          </button>
+          <button
+            className={`login-tab ${!isLogin ? 'active' : ''}`}
+            onClick={() => setIsLogin(false)}
+          >
+            Sign Up
+          </button>
+        </div>
+
         <form className="login-form" onSubmit={handleSubmit}>
           <input
             type="email"
@@ -40,12 +64,12 @@ export default function LoginOverlay({ onLogin }) {
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            autoComplete="current-password"
+            autoComplete={isLogin ? 'current-password' : 'new-password'}
             required
           />
           {error && <div className="login-error">{error}</div>}
           <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? 'Please wait...' : (isLogin ? 'Sign in' : 'Create account')}
           </button>
         </form>
       </div>
