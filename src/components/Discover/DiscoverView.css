@@ -160,7 +160,7 @@
 }
 
 .suggestion-card:hover {
-  border-color: var(--accent);
+  border-color: var(--category-color, var(--accent));
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(40, 38, 31, 0.12);
 }
@@ -178,7 +178,7 @@
   border-radius: var(--radius-card);
   object-fit: cover;
   flex-shrink: 0;
-  background: var(--bg-surface);
+  background: color-mix(in srgb, var(--category-color, var(--accent)) 12%, var(--bg-card));
 }
 
 .plant-card-img--empty {
@@ -226,6 +226,17 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.suggestion-card .suggestion-category-pill {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: color-mix(in srgb, var(--category-color, var(--accent)) 15%, transparent);
+  color: var(--category-color, var(--accent));
   padding: 2px 8px;
   border-radius: var(--radius-pill);
 }

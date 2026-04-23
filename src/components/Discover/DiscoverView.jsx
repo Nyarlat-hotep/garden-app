@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Search, Droplets, Sun, Plus } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
+import { CATEGORY_COLORS } from '../../utils/format.js'
 import './DiscoverView.css'
 
 const POPULAR = [
@@ -86,14 +87,16 @@ export default function DiscoverView({ onAddPlant }) {
 }
 
 function PlantCard({ plant, onAdd }) {
+  const categoryColor = CATEGORY_COLORS[plant.category] ?? '#7fb069'
   return (
-    <div className="suggestion-card">
+    <div className="suggestion-card" style={{ '--category-color': categoryColor }}>
       <div className="plant-card-row">
         <div className="plant-card-img plant-card-img--empty">{plant.emoji}</div>
         <div className="plant-card-info">
           <div className="suggestion-name">{plant.common_name}</div>
           {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}
           <div className="plant-card-tags">
+            {plant.category   && <span className="suggestion-category-pill">{plant.category}</span>}
             {plant.cycle      && <span className="plant-tag">{plant.cycle}</span>}
             {plant.difficulty && <span className="plant-tag">{plant.difficulty}</span>}
           </div>
