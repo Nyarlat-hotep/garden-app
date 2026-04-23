@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Droplets } from 'lucide-react'
 import HealthBadge from './HealthBadge.jsx'
 import OverdueIcons from './OverdueIcons.jsx'
+import Emoji from '../Shared/Emoji.jsx'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import { CATEGORY_COLORS } from '../../utils/format.js'
 import { formatRelative } from '../../utils/format.js'
@@ -27,7 +28,7 @@ export default function PlantCard({ plant, health, lastWatered, onClick, index }
       <div className="plant-card-image">
         {plant.image_url
           ? <img src={plant.image_url} alt={plant.name} />
-          : <div className="plant-card-no-image">{emojiForPlant(plant.name)}</div>
+          : <div className="plant-card-no-image"><Emoji>{emojiForPlant(plant.name)}</Emoji></div>
         }
       </div>
 

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown, Trash2, Hand } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
+import Emoji from '../Shared/Emoji.jsx'
 import './GardenMap.css'
 
 // ── Color helpers ────────────────────────────────────────────────────────────
@@ -80,7 +81,7 @@ function CropItem({ plant, health, onSelect }) {
 
   return (
     <button className="crop-item" onClick={() => onSelect(plant)}>
-      <span className="crop-item-emoji">{emojiForPlant(plant)}</span>
+      <span className="crop-item-emoji"><Emoji>{emojiForPlant(plant)}</Emoji></span>
       <div className="crop-item-body">
         <span className="crop-item-name">{plant.name}</span>
         {overdueTypes.length > 0 && (
@@ -321,7 +322,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               onClick={() => { setTool('plant'); const r = plantBtnWrapRef.current?.getBoundingClientRect(); setPlantBtnRect(r ?? null); setPlantPickerOpen(v => !v) }}
             >
               {selectedPlantId && plants.find(p => p.id === selectedPlantId)
-                ? <><span>{emojiForPlant(plants.find(p => p.id === selectedPlantId))}</span><span>{plants.find(p => p.id === selectedPlantId).name}</span></>
+                ? <><Emoji>{emojiForPlant(plants.find(p => p.id === selectedPlantId))}</Emoji><span>{plants.find(p => p.id === selectedPlantId).name}</span></>
                 : <><Sprout size={15} /><span>Plant</span></>
               }
               <ChevronDown size={11} className={plantPickerOpen ? 'rotated' : ''} />
@@ -334,7 +335,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     style={{ '--pc': plantColorFor(p.id, p.name) }}
                     onClick={() => { setSelectedPlantId(p.id); setPlantPickerOpen(false) }}
                   >
-                    <span>{emojiForPlant(p)}</span>
+                    <Emoji>{emojiForPlant(p)}</Emoji>
                     <span>{p.name}</span>
                   </button>
                 ))}
@@ -459,7 +460,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               {popover.orphaned ? <div className="popover-orphan">Removed plant</div> : (
                 <>
                   <div className="popover-header">
-                    <span className="popover-emoji">{emojiForPlant(popover.plant)}</span>
+                    <span className="popover-emoji"><Emoji>{emojiForPlant(popover.plant)}</Emoji></span>
                     <div>
                       <div className="popover-name">{popover.plant.name}</div>
                       {popover.plant.variety && <div className="popover-variety">{popover.plant.variety}</div>}

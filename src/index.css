@@ -106,3 +106,11 @@ input[type="date"],
 input[type="time"] {
   color-scheme: light;
 }
+
+/* Twemoji — consistent cross-platform emoji rendering */
+.twemoji img.emoji {
+  height: 1em;
+  width: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+}

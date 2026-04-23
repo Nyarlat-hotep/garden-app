@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Search, Droplets, Sun, Plus } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import { CATEGORY_COLORS } from '../../utils/format.js'
+import Emoji from '../Shared/Emoji.jsx'
 import './DiscoverView.css'
 
 const POPULAR = [
@@ -91,7 +92,7 @@ function PlantCard({ plant, onAdd }) {
   return (
     <div className="suggestion-card" style={{ '--category-color': categoryColor }}>
       <div className="plant-card-row">
-        <div className="plant-card-img plant-card-img--empty">{plant.emoji}</div>
+        <div className="plant-card-img plant-card-img--empty"><Emoji>{plant.emoji}</Emoji></div>
         <div className="plant-card-info">
           <div className="suggestion-name">{plant.common_name}</div>
           {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}

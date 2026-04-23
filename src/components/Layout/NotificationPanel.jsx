@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Droplets, FlaskConical, BellOff, BellRing, X } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
+import Emoji from '../Shared/Emoji.jsx'
 import './NotificationPanel.css'
 
 function emojiFor(name) {
@@ -53,7 +54,7 @@ export default function NotificationPanel({ overdueItems, permission, onEnable, 
             <div className="notif-list">
               {overdueItems.map(({ plant, overdueTypes }) => (
                 <div key={plant.id} className="notif-item">
-                  <span className="notif-emoji">{emojiFor(plant.name)}</span>
+                  <span className="notif-emoji"><Emoji>{emojiFor(plant.name)}</Emoji></span>
                   <div className="notif-item-body">
                     <span className="notif-plant-name">{plant.name}</span>
                     <div className="notif-tags">

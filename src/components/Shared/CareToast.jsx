@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Droplets, FlaskConical, X } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
+import Emoji from './Emoji.jsx'
 import './CareToast.css'
 
 function emojiFor(name) {
@@ -31,7 +32,7 @@ export default function CareToast({ overdueItems, onDismiss }) {
         <div className="care-toast-body">
           <div className="care-toast-plants">
             {overdueItems.slice(0, 3).map(({ plant }) => (
-              <span key={plant.id} className="care-toast-emoji">{emojiFor(plant.name)}</span>
+              <span key={plant.id} className="care-toast-emoji"><Emoji>{emojiFor(plant.name)}</Emoji></span>
             ))}
             {overdueItems.length > 3 && <span className="care-toast-more">+{overdueItems.length - 3}</span>}
           </div>
