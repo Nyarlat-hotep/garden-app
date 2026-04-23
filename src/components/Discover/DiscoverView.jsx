@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Search, Droplets, Sun, Plus } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
+import { CATEGORY_COLORS } from '../../utils/format.js'
 import './DiscoverView.css'
 
 const POPULAR = [
@@ -45,7 +46,6 @@ export default function DiscoverView({ onAddPlant }) {
             <button className="discover-search-clear" onClick={() => setQuery('')}>✕</button>
           )}
         </div>
-
       </div>
 
       <div className="discover-filters">
@@ -86,44 +86,43 @@ export default function DiscoverView({ onAddPlant }) {
 }
 
 function PlantCard({ plant, onAdd }) {
+  const categoryColor = CATEGORY_COLORS[plant.category] ?? '#7fb069'
+
+  const handleAdd = (e) => {
+    e.stopPropagation()
+    onAdd({
+      name:                    plant.common_name,
+      variety:                 plant.scientific_name,
+      category:                plant.category,
+      plant_family:            plant.plant_family,
+      days_to_harvest:         plant.days_to_harvest,
+      water_interval_days:     plant.water_interval_days,
+      fertilize_interval_days: plant.fertilize_interval_days,
+      prune_interval_days:     plant.prune_interval_days,
+      harvest_interval_days:   plant.harvest_interval_days,
+    })
+  }
+
   return (
-    <div className="suggestion-card">
-      <div className="plant-card-row">
-        <div className="plant-card-img plant-card-img--empty">{plant.emoji}</div>
-        <div className="plant-card-info">
-          <div className="suggestion-name">{plant.common_name}</div>
-          {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}
-          <div className="plant-card-tags">
-            {plant.cycle      && <span className="plant-tag">{plant.cycle}</span>}
-            {plant.difficulty && <span className="plant-tag">{plant.difficulty}</span>}
-          </div>
-          {plant.description && (
-            <p className="plant-card-description">{plant.description}</p>
-          )}
-          <div className="plant-card-meta">
-            {plant.watering        && <span className="plant-meta-item"><Droplets size={11} />{plant.watering}</span>}
-            {plant.sunlight        && <span className="plant-meta-item"><Sun size={11} />{plant.sunlight}</span>}
-            {plant.days_to_harvest && <span className="plant-meta-item">{plant.days_to_harvest}d harvest</span>}
-          </div>
+    <div className="suggestion-card" style={{ '--category-color': categoryColor }}>
+      <div className="suggestion-image">
+        <span className="suggestion-emoji">{plant.emoji}</span>
+        <button className="btn-add-suggestion" aria-label="Add to garden" onClick={handleAdd}>
+          <Plus size={14} strokeWidth={2.5} />
+        </button>
+      </div>
+
+      <div className="suggestion-body">
+        <span className="suggestion-category-pill">{plant.category}</span>
+        <div className="suggestion-name">{plant.common_name}</div>
+        {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}
+
+        <div className="suggestion-meta">
+          {plant.watering        && <span className="suggestion-meta-item"><Droplets size={11} />{plant.watering}</span>}
+          {plant.sunlight        && <span className="suggestion-meta-item"><Sun size={11} />{plant.sunlight}</span>}
+          {plant.days_to_harvest && <span className="suggestion-meta-item">{plant.days_to_harvest}d</span>}
         </div>
       </div>
-      <button
-        className="btn-add-suggestion"
-        aria-label="Add to garden"
-        onClick={() => onAdd({
-          name:                    plant.common_name,
-          variety:                 plant.scientific_name,
-          category:                plant.category,
-          plant_family:            plant.plant_family,
-          days_to_harvest:         plant.days_to_harvest,
-          water_interval_days:     plant.water_interval_days,
-          fertilize_interval_days: plant.fertilize_interval_days,
-          prune_interval_days:     plant.prune_interval_days,
-          harvest_interval_days:   plant.harvest_interval_days,
-        })}
-      >
-        <Plus size={15} strokeWidth={2.5} />
-      </button>
     </div>
   )
 }
