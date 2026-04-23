@@ -20,7 +20,7 @@
 
   --text:            #28261f;
   --text-dim:        rgba(40, 38, 31, 0.62);
-  --text-muted:      rgba(40, 38, 31, 0.40);
+  --text-muted:      #9e9890;
 
   --border:          rgba(40, 38, 31, 0.12);
   --border-active:   rgba(78, 122, 92, 0.50);
