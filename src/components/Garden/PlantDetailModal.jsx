@@ -3,7 +3,7 @@ import { X, Edit2, Trash2, ClipboardList, Droplets, FlaskConical, Scissors, Whea
 import HealthBadge from './HealthBadge.jsx'
 import OverdueIcons from './OverdueIcons.jsx'
 import { formatDate, formatRelative, CATEGORY_LABELS } from '../../utils/format.js'
-import { dueIn, formatDueIn } from '../../utils/careTime.js'
+import CareTimer from '../Shared/CareTimer.jsx'
 import './PlantDetailModal.css'
 
 export default function PlantDetailModal({ plant, health, plantLogs, onClose, onEdit, onDelete, onLogActivity }) {
@@ -67,18 +67,15 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
         {plant.notes && <p className="detail-notes">{plant.notes}</p>}
 
         <div className="detail-care-intervals">
-          {plant.water_interval_days && (() => {
-            const r = dueIn(plant, plantLogs, 'water_interval_days', 'watered')
-            return <span className={`care-timer care-timer--${r?.state ?? 'upcoming'}`}><Droplets size={13} /><b>Water</b> {formatDueIn(r)}</span>
-          })()}
-          {plant.fertilize_interval_days && (() => {
-            const r = dueIn(plant, plantLogs, 'fertilize_interval_days', 'fertilized')
-            return <span className={`care-timer care-timer--${r?.state ?? 'upcoming'}`}><FlaskConical size={13} /><b>Fertilize</b> {formatDueIn(r)}</span>
-          })()}
-          {plant.prune_interval_days && (() => {
-            const r = dueIn(plant, plantLogs, 'prune_interval_days', 'pruned')
-            return <span className={`care-timer care-timer--${r?.state ?? 'upcoming'}`}><Scissors size={13} /><b>Prune</b> {formatDueIn(r)}</span>
-          })()}
+          {plant.water_interval_days && (
+            <span><Droplets size={13} /><b>Water</b> <CareTimer plant={plant} latestLogs={plantLogs} field="water_interval_days" type="watered" /></span>
+          )}
+          {plant.fertilize_interval_days && (
+            <span><FlaskConical size={13} /><b>Fertilize</b> <CareTimer plant={plant} latestLogs={plantLogs} field="fertilize_interval_days" type="fertilized" /></span>
+          )}
+          {plant.prune_interval_days && (
+            <span><Scissors size={13} /><b>Prune</b> <CareTimer plant={plant} latestLogs={plantLogs} field="prune_interval_days" type="pruned" /></span>
+          )}
           {plant.days_to_harvest && <span><Wheat size={13} /><b>Harvest</b> in {plant.days_to_harvest}d</span>}
         </div>
 
