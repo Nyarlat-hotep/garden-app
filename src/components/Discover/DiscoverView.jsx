@@ -19,14 +19,16 @@ export default function DiscoverView({ onAddPlant }) {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return FOOD_PLANTS.filter(p => {
-      const matchCat = activeCategory === 'all' || p.category === activeCategory
-      if (!q) return matchCat
-      return matchCat && (
-        p.common_name.toLowerCase().includes(q) ||
-        p.scientific_name.toLowerCase().includes(q)
-      )
-    })
+    return FOOD_PLANTS
+      .filter(p => {
+        const matchCat = activeCategory === 'all' || p.category === activeCategory
+        if (!q) return matchCat
+        return matchCat && (
+          p.common_name.toLowerCase().includes(q) ||
+          p.scientific_name.toLowerCase().includes(q)
+        )
+      })
+      .sort((a, b) => a.common_name.localeCompare(b.common_name))
   }, [query, activeCategory])
 
   const showBrowse = !query.trim()
@@ -41,7 +43,6 @@ export default function DiscoverView({ onAddPlant }) {
             placeholder="Search plants — tomato, basil, blueberry…"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            autoFocus
           />
           {query && (
             <button className="discover-search-clear" onClick={() => setQuery('')}>✕</button>
