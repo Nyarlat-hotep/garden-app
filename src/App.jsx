@@ -124,13 +124,13 @@ function App() {
       {/* FAB — add plant (garden view) or log activity (activity view) */}
       {view === 'inventory' && (
         <button className="fab-add" aria-label="Add plant" onClick={() => setAdding(true)}>
-          <Plus size={24} strokeWidth={2.5} />
+          <Plus size={16} strokeWidth={2.5} /><span>Add Plant</span>
         </button>
       )}
 
       {(view === 'activity' || view === 'map') && (
         <button className={`fab-add${view === 'map' ? ' fab-add--left' : ''}`} aria-label="Log activity" onClick={() => setShowLog(true)}>
-          {view === 'map' ? <ClipboardList size={22} strokeWidth={2} /> : <Plus size={24} strokeWidth={2.5} />}
+          <ClipboardList size={16} strokeWidth={2} /><span>Log</span>
         </button>
       )}
 

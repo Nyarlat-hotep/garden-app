@@ -6,33 +6,36 @@
 /* FABs */
 .fab-add {
   position: fixed;
-  bottom: calc(var(--bottom-nav-h) + 1.25rem);
-  right: 1.5rem;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--accent-dim);
-  border: 1.5px solid var(--accent);
-  color: var(--accent);
+  bottom: calc(var(--bottom-nav-h) + 1rem);
+  right: 1rem;
+  width: auto;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  padding: 0 1.1rem;
+  gap: 0.4rem;
+  background: var(--accent);
+  border: none;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
   z-index: 50;
-  box-shadow: 0 0 20px var(--accent-glow), 0 4px 16px rgba(0, 0, 0, 0.4);
-  transition: all 0.22s ease;
-  animation: fab-pulse 4s ease-in-out infinite;
-  padding: 0;
+  box-shadow: 0 4px 14px rgba(40,38,31,0.18);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  cursor: pointer;
 }
 
 .fab-add:hover {
-  background: rgba(78, 122, 92, 0.2);
-  transform: scale(1.08);
-  border-color: var(--accent);
+  opacity: 0.9;
+  transform: scale(1.03);
 }
 
 .fab-add--left {
   right: auto;
-  left: 1.5rem;
+  left: 1rem;
 }
 
 .fab-logout {
@@ -60,10 +63,6 @@
 .fab-logout { opacity: 1; pointer-events: auto; }
 */
 
-@keyframes fab-pulse {
-  0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 4px 12px rgba(40,38,31,0.12); }
-  50%       { box-shadow: 0 0 30px var(--accent-glow), 0 4px 12px rgba(40,38,31,0.12); }
-}
 
 .saving-toast {
   position: fixed;
