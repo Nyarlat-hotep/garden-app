@@ -372,7 +372,8 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               const plantId = cell?.plantId
               const plantName = plantId ? plants.find(p => p.id === plantId)?.name : undefined
               const baseColor = plantId ? plantColorFor(plantId, plantName) : null
-              const overdueTypes = plantId ? (healthMap?.get(plantId)?.overdueTypes ?? []) : []
+              const isTomato = plantName?.toLowerCase().includes('tomato')  // TEMP
+              const overdueTypes = plantId ? (healthMap?.get(plantId)?.overdueTypes ?? (isTomato ? ['watered'] : [])) : []
               const needsWater = overdueTypes.includes('watered')
               const needsFertilize = overdueTypes.includes('fertilized')
 
@@ -395,13 +396,9 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               if (cell !== undefined && !isMovingSrc) cls += ' is-garden'
               if (isSelected && !moveOffset) cls += ' is-selected'
               if (inRubber) cls += ' in-rubber'
-
-              const cellIcons = plantId && (needsWater || needsFertilize) ? (
-                <span className="cell-care-icons">
-                  {needsWater && <Droplets size={9} />}
-                  {needsFertilize && <FlaskConical size={9} />}
-                </span>
-              ) : null
+              if (plantId && needsWater && !needsFertilize)    cls += ' overdue-water'
+              if (plantId && needsFertilize && !needsWater)    cls += ' overdue-fertilize'
+              if (plantId && needsWater && needsFertilize)     cls += ' overdue-both'
 
               return (
                 <div key={key} className={cls}
@@ -453,7 +450,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     const below = rect.top < 180
                     setPopover({ x: rect.left + rect.width / 2, y: below ? rect.bottom + 8 : rect.top - 8, below, plant: plant ?? null, orphaned: !plant, sqFt: group.size })
                   }}
-                >{cellIcons}</div>
+                />
               )
             })}
           </div>
