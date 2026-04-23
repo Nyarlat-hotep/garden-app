@@ -155,14 +155,6 @@
   flex-direction: column;
   gap: 0.65rem;
   position: relative;
-  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
-  cursor: pointer;
-}
-
-.suggestion-card:hover {
-  border-color: var(--category-color, var(--accent));
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(40, 38, 31, 0.12);
 }
 
 .plant-card-row {
