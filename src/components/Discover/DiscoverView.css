@@ -60,10 +60,11 @@
 }
 
 .discover-filters-label {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-muted);
 }
 
@@ -154,6 +155,14 @@
   flex-direction: column;
   gap: 0.65rem;
   position: relative;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+}
+
+.suggestion-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(40, 38, 31, 0.12);
 }
 
 .plant-card-row {
@@ -166,7 +175,7 @@
 .plant-card-img {
   width: 56px;
   height: 56px;
-  border-radius: var(--radius-btn);
+  border-radius: var(--radius-card);
   object-fit: cover;
   flex-shrink: 0;
   background: var(--bg-surface);
@@ -209,14 +218,15 @@
 }
 
 .plant-tag {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: capitalize;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   color: var(--text-muted);
-  padding: 2px 6px;
+  padding: 2px 8px;
   border-radius: var(--radius-pill);
 }
 
