@@ -61,6 +61,21 @@
 
 .navbar-bell:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
+.navbar-logout {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+  padding: 0;
+}
+
+.navbar-logout:hover { border-color: var(--status-critical); color: var(--status-critical); background: rgba(184, 50, 50, 0.08); }
+
 .navbar-bell-badge {
   position: absolute;
   top: 2px; right: 2px;

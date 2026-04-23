@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { Plus, LogOut, ClipboardList } from 'lucide-react'
+import { Plus, ClipboardList } from 'lucide-react'
 import { useAuth } from './hooks/useAuth.js'
 import { useProfile } from './hooks/useProfile.js'
 import { usePlants } from './hooks/usePlants.js'
@@ -91,6 +91,7 @@ function App() {
         hasOverdue={hasOverdue}
         overdueCount={overdueItems.length}
         onBellClick={() => setShowNotifications(v => !v)}
+        onLogout={logout}
       />
 
       <main className="main-content">
@@ -139,10 +140,6 @@ function App() {
           <ClipboardList size={20} strokeWidth={2} />
         </button>
       )}
-
-      <button className="fab-logout" aria-label="Logout" onClick={logout}>
-        <LogOut size={15} strokeWidth={2} />
-      </button>
 
       <BottomNav view={view} onViewChange={setView} />
 

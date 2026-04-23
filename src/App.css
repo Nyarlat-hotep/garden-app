@@ -40,31 +40,6 @@
   left: 1rem;
 }
 
-.fab-logout {
-  position: fixed;
-  top: calc(var(--nav-height) / 2 - 15px);
-  right: 1.25rem;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
-  z-index: 101;
-  padding: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Logout button hidden — accessible via long-press or keyboard for cleaner UI */
-/* Uncomment to show: */
-/*
-.fab-logout { opacity: 1; pointer-events: auto; }
-*/
-
 
 .saving-toast {
   position: fixed;
