@@ -10,42 +10,51 @@ import './GardenMap.css'
 // ── Color helpers ────────────────────────────────────────────────────────────
 
 const PLANT_COLORS = {
-  // Reds
-  'tomato': '#a03535', 'cherry tomato': '#a03535', 'roma tomato': '#a03535',
-  'strawberry': '#a03050', 'raspberry': '#963060', 'watermelon': '#a83545',
-  'bell pepper': '#a04030', 'hot pepper': '#b04025', 'chili pepper': '#b04025',
-  'radish': '#903548',
-  // Oranges
-  'carrot': '#b06025', 'pumpkin': '#a85a18', 'butternut squash': '#a06820',
-  'sweet potato': '#9a5828', 'acorn squash': '#8a6030',
-  // Yellows
-  'corn': '#a88a20', 'summer squash': '#9a8020', 'yellow squash': '#9a8020',
-  'lemon': '#a08818', 'banana pepper': '#a08030',
-  // Deep greens
-  'cucumber': '#3d7535', 'zucchini': '#3a6c30', 'broccoli': '#3a6830',
-  'kale': '#2e5e30', 'spinach': '#306030', 'chard': '#386835',
-  'arugula': '#4a6c38', 'collard greens': '#2e5e30',
-  // Medium greens
-  'lettuce': '#5a8040', 'pea': '#4a7838', 'green bean': '#4a7035',
-  'edamame': '#4a7838', 'brussels sprouts': '#3a6830',
-  // Herbs (grey-greens)
-  'basil': '#3d6835', 'mint': '#458840', 'cilantro': '#4a7038',
-  'parsley': '#4a7035', 'rosemary': '#3d5e40', 'thyme': '#3d5838',
-  'oregano': '#4a5838', 'chive': '#4a7538', 'dill': '#4a7038',
-  'sage': '#5a6e48', 'lavender': '#6a5888',
-  // Blues / purples
-  'blueberry': '#404888', 'eggplant': '#602878', 'purple basil': '#622870',
-  'blackberry': '#503868',
-  // Browns / neutrals
-  'potato': '#7a5e30', 'sweet potato': '#8a5025', 'garlic': '#8a7850',
-  'onion': '#8a7040', 'shallot': '#8a6848', 'ginger': '#8a6030',
-  'beet': '#7a2845', 'turnip': '#7a3848',
+  // Reds - vibrant and distinct
+  'tomato': '#dc2626', 'cherry tomato': '#ef4444', 'roma tomato': '#b91c1c',
+  'strawberry': '#e11d48', 'raspberry': '#be185d', 'watermelon': '#f43f5e',
+  'bell pepper': '#f97316', 'hot pepper': '#ea580c', 'chili pepper': '#c2410c',
+  'radish': '#db2777',
+  // Oranges - warm and bright
+  'carrot': '#f97316', 'pumpkin': '#ea580c', 'butternut squash': '#f59e0b',
+  'sweet potato': '#d97706', 'acorn squash': '#b45309',
+  // Yellows - sunny
+  'corn': '#fbbf24', 'summer squash': '#fcd34d', 'yellow squash': '#fbbf24',
+  'lemon': '#fde047', 'banana pepper': '#facc15',
+  // Greens - varied from bright to deep
+  'cucumber': '#22c55e', 'zucchini': '#16a34a', 'broccoli': '#15803d',
+  'kale': '#166534', 'spinach': '#15803d', 'chard': '#22c55e',
+  'arugula': '#4ade80', 'collard greens': '#15803d',
+  // Lighter greens - distinct from deep greens
+  'lettuce': '#86efac', 'pea': '#4ade80', 'green bean': '#22c55e',
+  'edamame': '#4ade80', 'brussels sprouts': '#16a34a',
+  // Herbs - varied greens and purple
+  'basil': '#22c55e', 'mint': '#4ade80', 'cilantro': '#4ade80',
+  'parsley': '#22c55e', 'rosemary': '#15803d', 'thyme': '#166534',
+  'oregano': '#15803d', 'chive': '#4ade80', 'dill': '#22c55e',
+  'sage': '#65a30d', 'lavender': '#a855f7',
+  // Blues / purples - cool tones
+  'blueberry': '#3b82f6', 'eggplant': '#7c3aed', 'purple basil': '#9333ea',
+  'blackberry': '#6b21a8',
+  // Browns / neutrals - earth tones
+  'potato': '#a16207', 'sweet potato': '#b45309', 'garlic': '#a16207',
+  'onion': '#92400e', 'shallot': '#b45309', 'ginger': '#a16207',
+  'beet': '#be185d', 'turnip': '#c026d3',
 }
 
 const PLANT_PALETTE = [
-  '#5b9bd5','#e07b39','#c47ec2','#d4a843','#5bbfb5',
-  '#e06b6b','#9ec4a0','#8b5e3c','#7eb8d4','#b5a05b',
-  '#d4709a','#6b8fd4',
+  '#2563eb', // bright blue
+  '#f97316', // vivid orange
+  '#a855f7', // purple
+  '#eab308', // yellow
+  '#14b8a6', // teal
+  '#ef4444', // red
+  '#84cc16', // lime green
+  '#78350f', // brown
+  '#06b6d4', // cyan
+  '#d97706', // amber
+  '#ec4899', // pink
+  '#6366f1', // indigo
 ]
 
 function hashPlantId(id) {
@@ -400,6 +409,17 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               if (plantId && needsWater && !needsFertilize)    cls += ' overdue-water'
               if (plantId && needsFertilize && !needsWater)    cls += ' overdue-fertilize'
               if (plantId && needsWater && needsFertilize)     cls += ' overdue-both'
+
+              // Hover outline for plant groups
+              const isInHoveredGroup = hoveredGroupRef.current?.has(key)
+              if (isInHoveredGroup) {
+                cls += ' in-hovered-group'
+                // Check for neighbors in each direction - add class if neighbor EXISTS (no border needed)
+                if (hoveredGroupRef.current.has(`${x},${y - 1}`))    cls += ' has-neighbor-top'
+                if (hoveredGroupRef.current.has(`${x + 1},${y}`))    cls += ' has-neighbor-right'
+                if (hoveredGroupRef.current.has(`${x},${y + 1}`))    cls += ' has-neighbor-bottom'
+                if (hoveredGroupRef.current.has(`${x - 1},${y}`))    cls += ' has-neighbor-left'
+              }
 
               return (
                 <div key={key} className={cls}
