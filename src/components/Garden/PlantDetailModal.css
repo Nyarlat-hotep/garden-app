@@ -110,7 +110,11 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 99px;
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+}
+
+.detail-care-intervals span:last-child {
+  padding-right: 0.75rem;
 }
 
 .detail-care-intervals span b {

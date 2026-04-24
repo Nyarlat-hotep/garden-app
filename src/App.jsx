@@ -23,7 +23,7 @@ import CareToast from './components/Shared/CareToast.jsx'
 import './App.css'
 
 function App() {
-  const { user, loading, login, logout, signup } = useAuth()
+  const { user, loading, login, logout, signup, loginWithGoogle } = useAuth()
   const { profile, saveProfile } = useProfile(user?.id)
   const { logs, latestLogsMap, addLog }  = useActivityLogs(user?.id)
   const {
@@ -57,7 +57,7 @@ function App() {
   if (!user) {
     return showLanding
       ? <LandingPage onGetStarted={() => setShowLanding(false)} />
-      : <LoginOverlay onLogin={login} onSignup={signup} onBack={() => setShowLanding(true)} />
+      : <LoginOverlay onLogin={login} onSignup={signup} onBack={() => setShowLanding(true)} onGoogleLogin={loginWithGoogle} />
   }
 
   const handleSavePlant = async (plant) => {
