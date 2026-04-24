@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, Droplets, Sun, Plus } from 'lucide-react'
+import { Search, Droplets, Sun, Plus, Check } from 'lucide-react'
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import { CATEGORY_COLORS } from '../../utils/format.js'
 import Emoji from '../Shared/Emoji.jsx'
@@ -13,9 +13,14 @@ const POPULAR = [
 
 const CATEGORIES = ['all', 'vegetable', 'fruit', 'herb', 'protein']
 
-export default function DiscoverView({ onAddPlant }) {
+export default function DiscoverView({ ownedPlants = [], onAddPlant }) {
   const [query, setQuery]         = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
+
+  const ownedNames = useMemo(
+    () => new Set(ownedPlants.map(p => p.name?.toLowerCase().trim())),
+    [ownedPlants]
+  )
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -74,7 +79,12 @@ export default function DiscoverView({ onAddPlant }) {
       {results.length > 0 && (
         <div className="suggestion-list">
           {results.map(p => (
-            <PlantCard key={p.id} plant={p} onAdd={onAddPlant} />
+            <PlantCard
+              key={p.id}
+              plant={p}
+              owned={ownedNames.has(p.common_name.toLowerCase().trim())}
+              onAdd={onAddPlant}
+            />
           ))}
         </div>
       )}
@@ -88,10 +98,10 @@ export default function DiscoverView({ onAddPlant }) {
   )
 }
 
-function PlantCard({ plant, onAdd }) {
+function PlantCard({ plant, owned, onAdd }) {
   const categoryColor = CATEGORY_COLORS[plant.category] ?? '#7fb069'
   return (
-    <div className="suggestion-card" style={{ '--category-color': categoryColor }}>
+    <div className={`suggestion-card${owned ? ' suggestion-card--owned' : ''}`} style={{ '--category-color': categoryColor }}>
       <div className="plant-card-row">
         <div className="plant-card-img plant-card-img--empty"><Emoji>{plant.emoji}</Emoji></div>
         <div className="plant-card-info">
@@ -114,7 +124,8 @@ function PlantCard({ plant, onAdd }) {
       </div>
       <button
         className="btn-add-suggestion"
-        aria-label="Add to garden"
+        aria-label={owned ? 'Already in garden' : 'Add to garden'}
+        disabled={owned}
         onClick={() => onAdd({
           name:                    plant.common_name,
           variety:                 plant.scientific_name,
@@ -127,7 +138,7 @@ function PlantCard({ plant, onAdd }) {
           harvest_interval_days:   plant.harvest_interval_days,
         })}
       >
-        <Plus size={15} strokeWidth={2.5} />
+        {owned ? <Check size={15} strokeWidth={2.5} /> : <Plus size={15} strokeWidth={2.5} />}
       </button>
     </div>
   )

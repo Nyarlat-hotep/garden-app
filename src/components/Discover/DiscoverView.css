@@ -266,9 +266,20 @@
   border-radius: 50%;
   transition: background 0.15s, color 0.15s;
 }
-.btn-add-suggestion:hover {
+.btn-add-suggestion:hover:not(:disabled) {
   background: var(--accent);
   color: #fff;
+}
+
+.suggestion-card--owned {
+  opacity: 0.55;
+}
+
+.suggestion-card--owned .btn-add-suggestion {
+  background: var(--accent);
+  color: #fff;
+  cursor: default;
+  opacity: 1;
 }
 
 .discover-empty {
