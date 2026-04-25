@@ -27,7 +27,6 @@
 .fab-add:hover {
   background: #3d6349;
   box-shadow: 0 6px 20px rgba(40,38,31,0.28);
-  transform: scale(1.14);
 }
 
 .fab-add:active {

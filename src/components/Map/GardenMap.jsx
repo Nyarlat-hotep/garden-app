@@ -167,7 +167,7 @@ const CELL_SIZE_MOBILE = 22
 const CANVAS_MIN_COLS  = 80
 const CANVAS_MIN_ROWS  = 55
 
-export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, logsMap, onSelectPlant }) {
+export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, logsMap, onSelectPlant, onLogActivity }) {
   const [tool, setTool]                       = useState(() => window.innerWidth <= 480 ? 'pan' : 'select')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
@@ -175,6 +175,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const [sheetOpen, setSheetOpen]             = useState(false)
   const [plantPickerOpen, setPlantPickerOpen] = useState(false)
   const [plantBtnRect, setPlantBtnRect]       = useState(null)
+  const [confirmingClear, setConfirmingClear] = useState(false)
   const [selection, setSelection]             = useState(null)   // Set<string> | null
   const [rubberRect, setRubberRect]           = useState(null)   // {x1,y1,x2,y2} | null
   const [moveOffset, setMoveOffset]           = useState(null)   // {dx,dy} | null
@@ -354,12 +355,12 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             )}
           </div>
           <button className={`map-tool-btn ${tool === 'erase' ? 'active' : ''}`} onClick={() => setTool('erase')} title="Erase cells"><Eraser size={15} /><span>Erase</span></button>
-          {hasCells && (
-            <button className="map-tool-btn map-tool-btn--clear" onClick={clearCells} title="Clear all"><Trash2 size={13} /><span>Clear</span></button>
-          )}
         </div>
         {saving === 'saving' && <span className="map-saving-dot">saving…</span>}
         {!hasCells && <span className="map-grid-hint">Select a plant and click to paint</span>}
+        {hasCells && (
+          <button className="map-tool-btn map-tool-btn--clear" onClick={() => setConfirmingClear(true)} title="Clear all"><Trash2 size={13} /><span>Clear</span></button>
+        )}
       </div>
 
       {/* Body: grid + right panel */}
@@ -459,10 +460,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                   }}
                   onMouseEnter={(e) => {
                     if (isDrawingRef.current || selectPhaseRef.current !== 'idle') return
-                    if (!plantId) {
-                      if (hoveredGroupRef.current) { hoveredGroupRef.current = null; setPopover(null) }
-                      return
-                    }
+                    if (!plantId) return
                     if (hoveredGroupRef.current?.has(key)) return
                     const group = floodFill(cells, key, plantId, dims.cols, dims.rows)
                     hoveredGroupRef.current = group
@@ -477,7 +475,11 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
           </div>
 
           {popover && (
-            <div className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`} style={{ left: popover.x, top: popover.y }}>
+            <div
+              className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`}
+              style={{ left: popover.x, top: popover.y }}
+              onMouseLeave={() => { hoveredGroupRef.current = null; setPopover(null) }}
+            >
               {popover.orphaned ? <div className="popover-orphan">Removed plant</div> : (
                 <>
                   <div className="popover-header">
@@ -490,15 +492,25 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                   </div>
                   <div className="popover-care">
                     {popover.plant.water_interval_days && (
-                      <span><Droplets size={13} /><b>Water</b> <CareTimer plant={popover.plant} latestLogs={logsMap?.get(popover.plant.id)} field="water_interval_days" type="watered" /></span>
+                      <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(popover.plant, 'watered'); setPopover(null); hoveredGroupRef.current = null }}>
+                        <Droplets size={13} /><b>Water</b> <CareTimer plant={popover.plant} latestLogs={logsMap?.get(popover.plant.id)} field="water_interval_days" type="watered" />
+                      </button>
                     )}
                     {popover.plant.fertilize_interval_days && (
-                      <span><FlaskConical size={13} /><b>Fertilize</b> <CareTimer plant={popover.plant} latestLogs={logsMap?.get(popover.plant.id)} field="fertilize_interval_days" type="fertilized" /></span>
+                      <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(popover.plant, 'fertilized'); setPopover(null); hoveredGroupRef.current = null }}>
+                        <FlaskConical size={13} /><b>Fertilize</b> <CareTimer plant={popover.plant} latestLogs={logsMap?.get(popover.plant.id)} field="fertilize_interval_days" type="fertilized" />
+                      </button>
                     )}
                     {popover.plant.prune_interval_days && (
-                      <span><Scissors size={13} /><b>Prune</b> <CareTimer plant={popover.plant} latestLogs={logsMap?.get(popover.plant.id)} field="prune_interval_days" type="pruned" /></span>
+                      <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(popover.plant, 'pruned'); setPopover(null); hoveredGroupRef.current = null }}>
+                        <Scissors size={13} /><b>Prune</b> <CareTimer plant={popover.plant} latestLogs={logsMap?.get(popover.plant.id)} field="prune_interval_days" type="pruned" />
+                      </button>
                     )}
-                    {popover.plant.days_to_harvest         && <span><Wheat size={13} /><b>Harvest</b> in {popover.plant.days_to_harvest}d</span>}
+                    {popover.plant.days_to_harvest && (
+                      <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(popover.plant, 'harvested'); setPopover(null); hoveredGroupRef.current = null }}>
+                        <Wheat size={13} /><b>Harvest</b> <span className="popover-care-meta">in {popover.plant.days_to_harvest}d</span>
+                      </button>
+                    )}
                   </div>
                 </>
               )}
@@ -537,6 +549,22 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
           </>
         )}
       </AnimatePresence>
+
+      {confirmingClear && (
+        <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && setConfirmingClear(false)}>
+          <motion.div className="modal-box confirm-box"
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}>
+            <div className="confirm-title">Clear the garden map?</div>
+            <div className="confirm-sub">This removes every painted cell. Plants and activity logs are kept. This cannot be undone.</div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setConfirmingClear(false)}>Cancel</button>
+              <button className="btn-delete" onClick={() => { clearCells(); setConfirmingClear(false) }}>Clear</button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
     </div>
   )

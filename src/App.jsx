@@ -42,10 +42,35 @@ function App() {
   const [adding, setAdding]             = useState(false)
   const [addingFromDiscover, setAddingFromDiscover] = useState(null)
   const [logTarget, setLogTarget]       = useState(null)
+  const [logPresetActivity, setLogPresetActivity] = useState(null)
   const [showLog, setShowLog]           = useState(false)
   const [deleting, setDeleting]         = useState(null)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [seenOverdueCount, setSeenOverdueCount] = useState(() => {
+    const v = Number(localStorage.getItem('garden-seen-overdue-count'))
+    return Number.isFinite(v) ? v : 0
+  })
   const [showToast, setShowToast]               = useState(false)
+
+  const unseenOverdueCount = Math.max(overdueItems.length - seenOverdueCount, 0)
+
+  const handleBellClick = () => {
+    setShowNotifications(v => {
+      const next = !v
+      if (next) {
+        setSeenOverdueCount(overdueItems.length)
+        localStorage.setItem('garden-seen-overdue-count', String(overdueItems.length))
+      }
+      return next
+    })
+  }
+
+  useEffect(() => {
+    if (overdueItems.length < seenOverdueCount) {
+      setSeenOverdueCount(overdueItems.length)
+      localStorage.setItem('garden-seen-overdue-count', String(overdueItems.length))
+    }
+  }, [overdueItems.length, seenOverdueCount])
 
   useEffect(() => {
     if (overdueItems.length > 0) setShowToast(true)
@@ -72,6 +97,7 @@ function App() {
     }
     setShowLog(false)
     setLogTarget(null)
+    setLogPresetActivity(null)
   }
 
   const handleDelete = async (plant) => {
@@ -89,8 +115,8 @@ function App() {
         onSearch={setSearchQuery}
         view={view}
         hasOverdue={hasOverdue}
-        overdueCount={overdueItems.length}
-        onBellClick={() => setShowNotifications(v => !v)}
+        overdueCount={unseenOverdueCount}
+        onBellClick={handleBellClick}
         onLogout={logout}
       />
 
@@ -119,6 +145,7 @@ function App() {
             healthMap={healthMap}
             logsMap={logsMap}
             onSelectPlant={setSelected}
+            onLogActivity={(p, type) => { setLogTarget(p.id); setLogPresetActivity(type); setShowLog(true) }}
           />
         )}
 
@@ -170,8 +197,9 @@ function App() {
         <LogActionModal
           plants={plants}
           preselectedPlantId={logTarget}
+          preselectedActivity={logPresetActivity}
           onSave={handleSaveLog}
-          onClose={() => { setShowLog(false); setLogTarget(null) }}
+          onClose={() => { setShowLog(false); setLogTarget(null); setLogPresetActivity(null) }}
         />
       )}
 

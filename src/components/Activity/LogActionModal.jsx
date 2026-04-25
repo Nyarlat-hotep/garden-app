@@ -13,9 +13,9 @@ const ACTIVITIES = [
   { type: 'noted',      label: 'Note',       Icon: FileText,  color: '#95a5a6' },
 ]
 
-export default function LogActionModal({ plants, preselectedPlantId, onSave, onClose }) {
+export default function LogActionModal({ plants, preselectedPlantId, preselectedActivity, onSave, onClose }) {
   const [plantId, setPlantId]     = useState(preselectedPlantId ?? plants[0]?.id ?? '')
-  const [activities, setActivities] = useState(new Set(['watered']))
+  const [activities, setActivities] = useState(new Set([preselectedActivity ?? 'watered']))
   const [notes, setNotes]         = useState('')
   const [quantity, setQuantity]   = useState('')
   const [loggedAt, setLoggedAt]   = useState(new Date().toISOString().slice(0, 16))

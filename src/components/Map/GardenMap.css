@@ -56,6 +56,12 @@
   color: #fff;
 }
 
+.map-tool-btn.active:hover:not(:disabled) {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #fff;
+}
+
 .map-tool-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
@@ -73,8 +79,11 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   box-shadow: 0 4px 20px rgba(40, 38, 31, 0.18);
-  min-width: 160px;
   overflow: hidden;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(4, auto);
+  grid-auto-columns: 160px;
 }
 
 .plant-picker-item {
