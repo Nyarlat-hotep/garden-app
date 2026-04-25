@@ -163,7 +163,7 @@ function floodFill(cells, startKey, plantId, cols, rows) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 const CELL_SIZE        = 28
-const CELL_SIZE_MOBILE = 22
+const CELL_SIZE_MOBILE = 36
 const CANVAS_MIN_COLS  = 80
 const CANVAS_MIN_ROWS  = 55
 
@@ -176,6 +176,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const [plantPickerOpen, setPlantPickerOpen] = useState(false)
   const [plantBtnRect, setPlantBtnRect]       = useState(null)
   const [confirmingClear, setConfirmingClear] = useState(false)
+  const [plantSheet, setPlantSheet]           = useState(null)   // { plant, sqFt } | null
   const [selection, setSelection]             = useState(null)   // Set<string> | null
   const [rubberRect, setRubberRect]           = useState(null)   // {x1,y1,x2,y2} | null
   const [moveOffset, setMoveOffset]           = useState(null)   // {dx,dy} | null
@@ -433,6 +434,13 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               return (
                 <div key={key} className={cls}
                   style={bg ? { backgroundColor: bg } : undefined}
+                  onClick={() => {
+                    if (!dims.isMobile || tool !== 'pan' || !plantId) return
+                    const plant = plants.find(p => p.id === plantId)
+                    if (!plant) return
+                    const group = floodFill(cells, key, plantId, dims.cols, dims.rows)
+                    setPlantSheet({ plant, sqFt: group.size })
+                  }}
                   onPointerDown={(e) => {
                     if (tool === 'pan') return
                     e.preventDefault()
@@ -495,7 +503,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             })}
           </div>
 
-          {popover && (
+          {popover && !dims.isMobile && (
             <div
               className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`}
               style={{ left: popover.x, top: popover.y }}
@@ -608,6 +616,53 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     <span>{p.name}</span>
                   </button>
                 ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {plantSheet && (
+          <>
+            <motion.div className="crop-sheet-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setPlantSheet(null)}
+            />
+            <motion.div className="crop-sheet plant-info-sheet"
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            >
+              <div className="crop-sheet-handle" />
+              <div className="plant-info-sheet-header">
+                <span className="plant-info-sheet-emoji"><Emoji>{emojiForPlant(plantSheet.plant)}</Emoji></span>
+                <div>
+                  <div className="plant-info-sheet-name">{plantSheet.plant.name}</div>
+                  {plantSheet.plant.variety && <div className="plant-info-sheet-variety">{plantSheet.plant.variety}</div>}
+                  <div className="plant-info-sheet-sqft">{plantSheet.sqFt} sq ft</div>
+                </div>
+              </div>
+              <div className="plant-info-sheet-care">
+                {plantSheet.plant.water_interval_days && (
+                  <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(plantSheet.plant, 'watered'); setPlantSheet(null) }}>
+                    <Droplets size={15} /><b>Water</b> <CareTimer plant={plantSheet.plant} latestLogs={logsMap?.get(plantSheet.plant.id)} field="water_interval_days" type="watered" />
+                  </button>
+                )}
+                {plantSheet.plant.fertilize_interval_days && (
+                  <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(plantSheet.plant, 'fertilized'); setPlantSheet(null) }}>
+                    <FlaskConical size={15} /><b>Fertilize</b> <CareTimer plant={plantSheet.plant} latestLogs={logsMap?.get(plantSheet.plant.id)} field="fertilize_interval_days" type="fertilized" />
+                  </button>
+                )}
+                {plantSheet.plant.prune_interval_days && (
+                  <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(plantSheet.plant, 'pruned'); setPlantSheet(null) }}>
+                    <Scissors size={15} /><b>Prune</b> <CareTimer plant={plantSheet.plant} latestLogs={logsMap?.get(plantSheet.plant.id)} field="prune_interval_days" type="pruned" />
+                  </button>
+                )}
+                {plantSheet.plant.days_to_harvest && (
+                  <button type="button" className="popover-care-btn" onClick={() => { onLogActivity?.(plantSheet.plant, 'harvested'); setPlantSheet(null) }}>
+                    <Wheat size={15} /><b>Harvest</b> <span className="popover-care-meta">in {plantSheet.plant.days_to_harvest}d</span>
+                  </button>
+                )}
               </div>
             </motion.div>
           </>

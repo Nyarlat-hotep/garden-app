@@ -639,6 +639,55 @@
 
 .plant-picker-sheet { max-height: 60dvh; }
 
+.plant-info-sheet { max-height: 75dvh; }
+
+.plant-info-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.plant-info-sheet-emoji { font-size: 2rem; line-height: 1; }
+
+.plant-info-sheet-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.plant-info-sheet-variety {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text-dim);
+}
+
+.plant-info-sheet-sqft {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-top: 0.2rem;
+}
+
+.plant-info-sheet-care {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 1rem 1.25rem;
+}
+
+.plant-info-sheet-care .popover-care-btn {
+  font-size: 0.95rem;
+  padding: 0.7rem 0.9rem;
+  margin: 0;
+  width: 100%;
+  border-color: var(--border);
+  gap: 0.55rem;
+}
+
 .plant-picker-sheet-title {
   flex-shrink: 0;
   font-family: var(--font-display);
@@ -666,8 +715,8 @@
 
 @media (max-width: 480px) {
   .map-toolbar {
-    padding: 0.5rem 0.75rem;
-    gap: 4px;
+    padding: 0.55rem 0.75rem;
+    gap: 6px;
     overflow-x: auto;
     overflow-y: hidden;
     flex-wrap: nowrap;
@@ -675,7 +724,12 @@
   }
   .map-toolbar::-webkit-scrollbar { display: none; }
   .map-toolbar > * { flex-shrink: 0; }
-  .map-tool-btns { flex: 0 0 auto; overflow-x: visible; }
+  .map-tool-btns { flex: 0 0 auto; overflow-x: visible; gap: 6px; }
+  .map-tool-btn {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.9rem;
+    gap: 0.45rem;
+  }
   .map-plant-chips { padding: 0.5rem 0.75rem; }
   .crop-panel { display: none; }
   .crop-panel-fab { display: flex; }
