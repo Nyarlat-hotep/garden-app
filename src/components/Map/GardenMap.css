@@ -637,10 +637,45 @@
   margin: 10px auto 4px;
 }
 
+.plant-picker-sheet { max-height: 60dvh; }
+
+.plant-picker-sheet-title {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  padding: 0.25rem 1rem 0.5rem;
+}
+
+.plant-picker-sheet-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.4rem 0.6rem 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.plant-picker-sheet-list .plant-picker-item {
+  border-radius: var(--radius-pill);
+}
+
 /* ── Mobile ───────────────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  .map-toolbar { padding: 0.5rem 0.75rem; }
+  .map-toolbar {
+    padding: 0.5rem 0.75rem;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .map-toolbar::-webkit-scrollbar { display: none; }
+  .map-toolbar > * { flex-shrink: 0; }
+  .map-tool-btns { flex: 0 0 auto; overflow-x: visible; }
   .map-plant-chips { padding: 0.5rem 0.75rem; }
   .crop-panel { display: none; }
   .crop-panel-fab { display: flex; }

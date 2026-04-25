@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo, memo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown, Trash2, Hand } from 'lucide-react'
@@ -85,7 +85,7 @@ const OVERDUE_ICONS = {
 
 // ── Crop panel item ───────────────────────────────────────────────────────────
 
-function CropItem({ plant, health, onSelect }) {
+const CropItem = memo(function CropItem({ plant, health, onSelect }) {
   const status      = health?.status ?? 'healthy'
   const overdueTypes = health?.overdueTypes ?? []
 
@@ -109,11 +109,11 @@ function CropItem({ plant, health, onSelect }) {
       <span className={`crop-status-dot crop-status-dot--${status}`} />
     </button>
   )
-}
+})
 
 // ── Panel content (shared by desktop panel + mobile sheet) ───────────────────
 
-function CropList({ plants, healthMap, onSelect }) {
+const CropList = memo(function CropList({ plants, healthMap, onSelect }) {
   const critical  = plants.filter(p => healthMap?.get(p.id)?.status === 'critical').length
   const attention = plants.filter(p => healthMap?.get(p.id)?.status === 'attention').length
   const overdue   = plants.filter(p => (healthMap?.get(p.id)?.overdueTypes ?? []).length > 0).length
@@ -138,7 +138,7 @@ function CropList({ plants, healthMap, onSelect }) {
       </div>
     </>
   )
-}
+})
 
 function floodFill(cells, startKey, plantId, cols, rows) {
   const visited = new Set()
@@ -183,6 +183,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   const pendingCellsRef                       = useRef(new Set())
   const gridWrapperRef                        = useRef(null)
   const hoveredGroupRef                       = useRef(null)
+  const popoverDismissTimerRef                = useRef(null)
   const plantBtnWrapRef                       = useRef(null)
   const plantDropdownRef                      = useRef(null)
   const selectPhaseRef                        = useRef('idle')   // 'idle'|'rubber'|'moving'
@@ -235,13 +236,13 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   useEffect(() => { selectionRef.current = selection }, [selection])
 
   useEffect(() => {
-    if (!plantPickerOpen) return
+    if (!plantPickerOpen || dims.isMobile) return
     const close = (e) => {
       if (!plantBtnWrapRef.current?.contains(e.target) && !plantDropdownRef.current?.contains(e.target)) setPlantPickerOpen(false)
     }
     document.addEventListener('mousedown', close)
     return () => document.removeEventListener('mousedown', close)
-  }, [plantPickerOpen])
+  }, [plantPickerOpen, dims.isMobile])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -338,7 +339,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               }
               <ChevronDown size={11} className={plantPickerOpen ? 'rotated' : ''} />
             </button>
-            {plantPickerOpen && plants.length > 0 && plantBtnRect && createPortal(
+            {plantPickerOpen && plants.length > 0 && !dims.isMobile && plantBtnRect && createPortal(
               <div ref={plantDropdownRef} className="plant-picker-dropdown" style={{ position: 'fixed', top: plantBtnRect.bottom + 6, left: plantBtnRect.left, zIndex: 9999 }}>
                 {plants.map(p => (
                   <button key={p.id}
@@ -370,7 +371,14 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
         <div ref={gridWrapperRef}
           className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}${tool === 'select' ? ' select-mode' : ''}${tool === 'pan' ? ' pan-mode' : ''}`}
           onPointerUp={stopInteraction} onPointerLeave={stopInteraction}
-          onMouseLeave={() => { hoveredGroupRef.current = null; setPopover(null) }}
+          onMouseLeave={() => {
+            if (popoverDismissTimerRef.current) {
+              clearTimeout(popoverDismissTimerRef.current)
+              popoverDismissTimerRef.current = null
+            }
+            hoveredGroupRef.current = null
+            setPopover(null)
+          }}
         >
           <div className="garden-grid" style={{
             gridTemplateColumns: dims.isMobile ? `repeat(${dims.cols}, ${CELL_SIZE_MOBILE}px)` : `repeat(${dims.cols}, 1fr)`,
@@ -460,7 +468,20 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                   }}
                   onMouseEnter={(e) => {
                     if (isDrawingRef.current || selectPhaseRef.current !== 'idle') return
-                    if (!plantId) return
+                    if (!plantId) {
+                      if (hoveredGroupRef.current && !popoverDismissTimerRef.current) {
+                        popoverDismissTimerRef.current = setTimeout(() => {
+                          hoveredGroupRef.current = null
+                          popoverDismissTimerRef.current = null
+                          setPopover(null)
+                        }, 220)
+                      }
+                      return
+                    }
+                    if (popoverDismissTimerRef.current) {
+                      clearTimeout(popoverDismissTimerRef.current)
+                      popoverDismissTimerRef.current = null
+                    }
                     if (hoveredGroupRef.current?.has(key)) return
                     const group = floodFill(cells, key, plantId, dims.cols, dims.rows)
                     hoveredGroupRef.current = group
@@ -478,7 +499,20 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             <div
               className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`}
               style={{ left: popover.x, top: popover.y }}
-              onMouseLeave={() => { hoveredGroupRef.current = null; setPopover(null) }}
+              onMouseEnter={() => {
+                if (popoverDismissTimerRef.current) {
+                  clearTimeout(popoverDismissTimerRef.current)
+                  popoverDismissTimerRef.current = null
+                }
+              }}
+              onMouseLeave={() => {
+                if (popoverDismissTimerRef.current) {
+                  clearTimeout(popoverDismissTimerRef.current)
+                  popoverDismissTimerRef.current = null
+                }
+                hoveredGroupRef.current = null
+                setPopover(null)
+              }}
             >
               {popover.orphaned ? <div className="popover-orphan">Removed plant</div> : (
                 <>
@@ -545,6 +579,36 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             >
               <div className="crop-sheet-handle" />
               <CropList plants={plants} healthMap={healthMap} onSelect={handleSelectPlant} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {plantPickerOpen && dims.isMobile && plants.length > 0 && (
+          <>
+            <motion.div className="crop-sheet-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setPlantPickerOpen(false)}
+            />
+            <motion.div className="crop-sheet plant-picker-sheet"
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            >
+              <div className="crop-sheet-handle" />
+              <div className="plant-picker-sheet-title">Pick a plant</div>
+              <div className="plant-picker-sheet-list">
+                {plants.map(p => (
+                  <button key={p.id}
+                    className={`plant-picker-item ${selectedPlantId === p.id ? 'active' : ''}`}
+                    style={{ '--pc': plantColorFor(p.id, p.name) }}
+                    onClick={() => { setSelectedPlantId(p.id); setPlantPickerOpen(false) }}
+                  >
+                    <Emoji>{emojiForPlant(p)}</Emoji>
+                    <span>{p.name}</span>
+                  </button>
+                ))}
+              </div>
             </motion.div>
           </>
         )}
