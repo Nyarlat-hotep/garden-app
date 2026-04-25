@@ -163,7 +163,7 @@ function floodFill(cells, startKey, plantId, cols, rows) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 const CELL_SIZE        = 28
-const CELL_SIZE_MOBILE = 36
+const CELL_SIZE_MOBILE = 28
 const CANVAS_MIN_COLS  = 80
 const CANVAS_MIN_ROWS  = 55
 
