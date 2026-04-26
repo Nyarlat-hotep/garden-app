@@ -152,6 +152,8 @@ function App() {
         {view === 'discover' && (
           <DiscoverView
             ownedPlants={plants}
+            profile={profile}
+            saveProfile={saveProfile}
             onAddPlant={(prefill) => { setAddingFromDiscover(prefill); setAdding(true) }}
           />
         )}

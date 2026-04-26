@@ -1,0 +1,95 @@
+.location-setter-box {
+  max-width: 420px;
+}
+
+.location-setter-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.location-setter-sub {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.location-setter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+
+.location-setter-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 0.6rem 0.9rem;
+  letter-spacing: 0.05em;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.location-setter-input:focus { border-color: var(--accent); }
+
+.location-setter-zone {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.location-setter-error {
+  font-size: 0.75rem;
+  color: var(--status-critical, #c0392b);
+  margin-top: 0.25rem;
+}
+
+.location-setter-detect {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--text-dim);
+  align-self: flex-start;
+  transition: border-color 0.15s, color 0.15s;
+}
+.location-setter-detect:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.location-setter-detect:disabled { opacity: 0.6; cursor: progress; }
+
+.location-spin {
+  animation: location-spin 1s linear infinite;
+}
+
+@keyframes location-spin {
+  to { transform: rotate(360deg); }
+}
+
+.location-setter-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.location-setter-clear {
+  margin-right: auto;
+  color: var(--status-critical, #c0392b);
+  border-color: var(--border);
+}
+.location-setter-clear:hover { color: var(--status-critical, #c0392b); border-color: var(--status-critical, #c0392b); }

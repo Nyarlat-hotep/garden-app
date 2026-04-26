@@ -18,6 +18,7 @@ export const CATEGORY_LABELS = {
   fruit: 'Fruit',
   herb: 'Herb',
   protein: 'Protein',
+  flower: 'Flower',
 }
 
 export const CATEGORY_COLORS = {
@@ -25,6 +26,7 @@ export const CATEGORY_COLORS = {
   fruit:     '#e07b39',
   herb:      '#9ec4a0',
   protein:   '#8b5e3c',
+  flower:    '#c98a9d',
 }
 
 export const ACTIVITY_LABELS = {

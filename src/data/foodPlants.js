@@ -19,6 +19,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Warm-season staple. Stake or cage as vines grow. Deep watering prevents blossom end rot.',
     zones: '3-11',
+    planting_seasons: ['spring'],
   },
   {
     id: 'cherry-tomato',
@@ -38,6 +39,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'Prolific and sweet. Great in containers. Harvest when fully colored for best flavor.',
     zones: '3-11',
+    planting_seasons: ['spring'],
   },
   {
     id: 'cucumber',
@@ -57,6 +59,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'Fast-growing vine. Harvest before seeds harden. Trellis to save space.',
     zones: '4-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'zucchini',
@@ -76,6 +79,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'One of the most productive garden plants. Harvest at 6–8 inches for best texture.',
     zones: '3-10',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'bell-pepper',
@@ -95,6 +99,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 5,
     description: 'Sweet thick-walled peppers. Slow to start — begin indoors 8 weeks before last frost.',
     zones: '4-11',
+    planting_seasons: ['spring'],
   },
   {
     id: 'jalapeno',
@@ -114,6 +119,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 4,
     description: 'Medium-heat pepper. Let turn red for maximum heat and sweetness.',
     zones: '4-11',
+    planting_seasons: ['spring'],
   },
   {
     id: 'eggplant',
@@ -133,6 +139,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 5,
     description: 'Heat-loving. Start indoors 8–10 weeks early. Mulch heavily to retain moisture.',
     zones: '5-12',
+    planting_seasons: ['spring'],
   },
   {
     id: 'lettuce',
@@ -152,6 +159,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Cool-season crop. Bolt-resistant in shade. Cut outer leaves for continuous harvest.',
     zones: '2-11',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'spinach',
@@ -171,6 +179,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Fast cool-season green. Bolt in heat — grow in spring or fall.',
     zones: '2-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'kale',
@@ -190,6 +199,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Hardy green that survives frost. Flavor improves after cold exposure.',
     zones: '2-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'swiss-chard',
@@ -209,6 +219,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Colorful and cold-tolerant. Cut-and-come-again harvesting for months of production.',
     zones: '2-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'arugula',
@@ -228,6 +239,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 5,
     description: 'Fast-growing peppery green. Succession sow every 2 weeks for continuous harvest.',
     zones: '2-11',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'cabbage',
@@ -247,6 +259,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Start indoors 6–8 weeks before transplant. Heads split if watered unevenly.',
     zones: '1-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'broccoli',
@@ -266,6 +279,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Cool-season crop. Harvest before yellow flowers appear. Side shoots continue producing.',
     zones: '2-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'cauliflower',
@@ -285,6 +299,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Finicky — needs consistent moisture and cool temps. Blanch by tying leaves over head.',
     zones: '2-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'carrot',
@@ -304,6 +319,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Direct-sow in loose, stone-free soil. Thin to 2 inches apart for straight roots.',
     zones: '3-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'radish',
@@ -323,6 +339,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'One of the fastest crops. Succession plant every 2 weeks. Harvest before they crack.',
     zones: '2-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'beet',
@@ -342,6 +359,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Both root and greens are edible. Thin seedlings to 3 inches — soaking seeds speeds germination.',
     zones: '2-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'sweet-potato',
@@ -361,6 +379,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Grows from slips. Needs long warm season. Harvest before first frost; cure at 85°F for 2 weeks.',
     zones: '8-11',
+    planting_seasons: ['spring'],
   },
   {
     id: 'potato',
@@ -380,6 +399,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Hill soil over plants as they grow to prevent greening. Harvest 2 weeks after tops die back.',
     zones: '3-10',
+    planting_seasons: ['spring'],
   },
   {
     id: 'onion',
@@ -399,6 +419,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Day-length sensitive — choose short or long-day varieties for your latitude.',
     zones: '3-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'garlic',
@@ -418,6 +439,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Plant cloves in fall. Harvest when lower leaves turn brown. Cure for 3–4 weeks before storage.',
     zones: '3-9',
+    planting_seasons: ['fall'],
   },
   {
     id: 'green-bean',
@@ -437,6 +459,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Direct sow after frost. Bush types need no support. Pick while still snappy.',
     zones: '3-10',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'snap-pea',
@@ -456,6 +479,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Edible pod and pea. Loves cool weather — sow as soon as soil can be worked.',
     zones: '2-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'corn',
@@ -475,6 +499,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Plant in blocks of 4+ rows for good pollination. Sugar peaks within hours of harvest.',
     zones: '3-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'asparagus',
@@ -494,6 +519,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'Long-term investment — takes 2 years before first harvest but produces for 20+ years.',
     zones: '3-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'bok-choy',
@@ -513,6 +539,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Fast-growing cool-season Asian green. Bolt-resistant in partial shade.',
     zones: '2-11',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'celery',
@@ -532,6 +559,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Needs consistent moisture and fertile soil. Start indoors 10 weeks before transplant.',
     zones: '2-10',
+    planting_seasons: ['spring'],
   },
   {
     id: 'fennel',
@@ -551,6 +579,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Anise-flavored bulb and fronds. Keep away from tomatoes and peppers — allelopathic.',
     zones: '4-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'okra',
@@ -570,6 +599,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'Loves heat. Harvest pods when 3–4 inches long before they toughen.',
     zones: '6-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'kohlrabi',
@@ -589,6 +619,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Crisp and mild. Harvest when bulb is 2–3 inches across before it becomes woody.',
     zones: '2-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'pumpkin',
@@ -608,6 +639,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Needs plenty of space. Harvest when rind is hard and stem dries. Cure for 10 days.',
     zones: '3-9',
+    planting_seasons: ['spring', 'summer'],
   },
 
   // ── FRUITS ───────────────────────────────────────────────────────────────────
@@ -629,6 +661,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'Day-neutral varieties fruit all season. Remove runners to keep energy in fruit.',
     zones: '3-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'blueberry',
@@ -648,6 +681,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Needs acidic soil (pH 4.5–5.5) and 2 varieties for best pollination.',
     zones: '4-7',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'raspberry',
@@ -667,6 +701,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 2,
     description: 'Ever-bearing varieties fruit twice. Cut floricanes to ground after second-year fruiting.',
     zones: '3-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'blackberry',
@@ -686,6 +721,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Vigorous and productive. Thornless varieties make harvesting much easier.',
     zones: '5-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'watermelon',
@@ -705,6 +741,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Needs long warm season. Tap the rind — a hollow thud signals ripeness.',
     zones: '3-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'cantaloupe',
@@ -724,6 +761,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Ripe when stem slips from vine easily and skin turns tan. Reduce water as fruit matures.',
     zones: '4-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'fig',
@@ -743,6 +781,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Drought-tolerant once established. Over-watering causes fruit to split.',
     zones: '7-11',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'grape',
@@ -762,6 +801,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 5,
     description: 'Train on trellis. Prune hard in late winter. First real harvest in year 3.',
     zones: '4-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'lemon',
@@ -781,6 +821,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Frost-sensitive. Grow in containers to bring indoors in cold climates.',
     zones: '9-11',
+    planting_seasons: ['spring'],
   },
   {
     id: 'apple',
@@ -800,6 +841,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Needs 2 varieties for cross-pollination. Prune annually for good airflow and fruit production.',
     zones: '3-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'peach',
@@ -819,6 +861,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Thin fruit to 6 inches apart for larger fruit. Needs 600–900 chill hours.',
     zones: '5-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'passion-fruit',
@@ -838,6 +881,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Fast-growing vine. Fruit is ripe when it falls to ground.',
     zones: '9-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'kiwi',
@@ -857,6 +901,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Vigorous vine needing strong trellis. Plant 1 male per 6 females. First fruiting in year 3–5.',
     zones: '7-9',
+    planting_seasons: ['spring', 'fall'],
   },
 
   // ── HERBS ────────────────────────────────────────────────────────────────────
@@ -878,6 +923,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Pinch flower buds to keep leaves producing. Frost-sensitive — bring in early.',
     zones: '4-10',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'mint',
@@ -897,6 +943,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Invasive spreader. Grow in containers to prevent takeover.',
     zones: '3-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'rosemary',
@@ -916,6 +963,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'Mediterranean native. Drought-tolerant once established. Excellent in containers.',
     zones: '7-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'thyme',
@@ -935,6 +983,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'Drought-tolerant culinary staple. Harvest just before flowering for strongest flavor.',
     zones: '4-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'oregano',
@@ -954,6 +1003,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'Flavor is strongest just before blooming. Divide every 3 years to keep vigorous.',
     zones: '4-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'parsley',
@@ -973,6 +1023,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Slow to germinate — soak seeds 24 hours before planting. Grows through mild winters.',
     zones: '2-11',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'cilantro',
@@ -992,6 +1043,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Bolts quickly in heat. Succession plant every 3 weeks. Let some bolt for coriander seeds.',
     zones: '2-11',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'dill',
@@ -1011,6 +1063,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Self-seeds prolifically. Keep away from fennel — they cross-pollinate.',
     zones: '2-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'sage',
@@ -1030,6 +1083,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'Woody perennial. Prune lightly each spring. Best flavor just before flowering.',
     zones: '4-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'chives',
@@ -1049,6 +1103,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'One of the easiest perennial herbs. Cut to 2 inches and they regrow quickly.',
     zones: '3-9',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'tarragon',
@@ -1068,6 +1123,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'French tarragon has better flavor — only propagated by division, not seed.',
     zones: '4-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'lavender',
@@ -1087,6 +1143,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Needs excellent drainage. Harvest flower spikes just as they begin to open.',
     zones: '5-8',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'lemon-balm',
@@ -1106,6 +1163,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Vigorous grower with a fresh lemon scent. Can become invasive — container growing helps.',
     zones: '3-7',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'lemongrass',
@@ -1125,6 +1183,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'Tropical grass. Grow in containers in cold climates. Harvest outer stalks at soil level.',
     zones: '9-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'chamomile',
@@ -1144,6 +1203,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 3,
     description: 'Self-seeds freely. Harvest flowers when just fully open — they dry beautifully.',
     zones: '2-9',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'stevia',
@@ -1163,6 +1223,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Natural sweetener. Leaves are sweetest just before flowering — pinch buds to extend harvest.',
     zones: '9-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'marjoram',
@@ -1182,6 +1243,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 14,
     description: 'Sweeter and milder than oregano. Treat as annual in cold climates.',
     zones: '6-10',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'thai-basil',
@@ -1201,6 +1263,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'More heat and licorice notes than sweet basil. Tolerates higher temps better.',
     zones: '4-10',
+    planting_seasons: ['spring', 'summer'],
   },
 
   // ── PROTEIN ──────────────────────────────────────────────────────────────────
@@ -1222,6 +1285,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Harvest when pods are plump and bright green, before they yellow. Boil in salted water.',
     zones: '3-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'black-bean',
@@ -1241,6 +1305,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Direct sow after last frost. Harvest dry pods when stalks die back.',
     zones: '3-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'chickpea',
@@ -1260,6 +1325,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Drought-tolerant once established. Pull whole plants when pods rattle.',
     zones: '4-8',
+    planting_seasons: ['spring'],
   },
   {
     id: 'fava-bean',
@@ -1279,6 +1345,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 7,
     description: 'Cool-season bean — plant in fall in mild climates, early spring elsewhere.',
     zones: '2-10',
+    planting_seasons: ['spring', 'fall'],
   },
   {
     id: 'sunflower',
@@ -1298,6 +1365,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Harvest seeds when back of head turns brown. Cover with mesh to protect from birds.',
     zones: '2-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'quinoa',
@@ -1317,6 +1385,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Prefers cool weather. Harvest when seed heads dry and seeds rub off easily. Rinse well before eating.',
     zones: '4-9',
+    planting_seasons: ['spring'],
   },
   {
     id: 'amaranth',
@@ -1336,6 +1405,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Drought-tolerant grain and leaf vegetable. Leaves edible young. Harvest seed heads when dry.',
     zones: '2-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'lentil',
@@ -1355,6 +1425,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Cool-season crop. Low water needs once established. Pull plants when pods rattle.',
     zones: '3-8',
+    planting_seasons: ['spring'],
   },
   {
     id: 'kidney-bean',
@@ -1374,6 +1445,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: null,
     description: 'Direct sow after last frost in warm soil. Harvest when pods are dry and papery.',
     zones: '3-11',
+    planting_seasons: ['spring', 'summer'],
   },
   {
     id: 'lima-bean',
@@ -1393,6 +1465,7 @@ export const FOOD_PLANTS = [
     harvest_interval_days: 4,
     description: 'Needs warm soil and nights above 50°F. Harvest when pods fill out but are still green.',
     zones: '5-11',
+    planting_seasons: ['spring', 'summer'],
   },
 ]
 

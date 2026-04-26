@@ -13,11 +13,45 @@
   z-index: 10;
 }
 
+.discover-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .discover-search-wrap {
   position: relative;
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
+
+.discover-location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.discover-location-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.discover-location-pill--set {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+.discover-location-pill svg { color: currentColor; }
 
 .discover-search-icon {
   position: absolute;
@@ -30,7 +64,7 @@
   width: 100%;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-btn);
+  border-radius: var(--radius-pill);
   color: var(--text);
   font-family: var(--font-body);
   font-size: 0.9rem;
