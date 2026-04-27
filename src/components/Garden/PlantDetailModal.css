@@ -196,12 +196,12 @@
 }
 
 .detail-action-btn--primary {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
 .detail-action-btn--primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
 }

@@ -68,13 +68,19 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
 
         <div className="detail-care-intervals">
           {plant.water_interval_days && (
-            <span><Droplets size={13} /><b>Water</b> <CareTimer plant={plant} latestLogs={plantLogs} field="water_interval_days" type="watered" /></span>
+            <span><Droplets size={13} /><b>Water</b> {plant.is_planted
+              ? <CareTimer plant={plant} latestLogs={plantLogs} field="water_interval_days" type="watered" />
+              : <span className="detail-care-static">every {plant.water_interval_days}d</span>}</span>
           )}
           {plant.fertilize_interval_days && (
-            <span><FlaskConical size={13} /><b>Fertilize</b> <CareTimer plant={plant} latestLogs={plantLogs} field="fertilize_interval_days" type="fertilized" /></span>
+            <span><FlaskConical size={13} /><b>Fertilize</b> {plant.is_planted
+              ? <CareTimer plant={plant} latestLogs={plantLogs} field="fertilize_interval_days" type="fertilized" />
+              : <span className="detail-care-static">every {plant.fertilize_interval_days}d</span>}</span>
           )}
           {plant.prune_interval_days && (
-            <span><Scissors size={13} /><b>Prune</b> <CareTimer plant={plant} latestLogs={plantLogs} field="prune_interval_days" type="pruned" /></span>
+            <span><Scissors size={13} /><b>Prune</b> {plant.is_planted
+              ? <CareTimer plant={plant} latestLogs={plantLogs} field="prune_interval_days" type="pruned" />
+              : <span className="detail-care-static">every {plant.prune_interval_days}d</span>}</span>
           )}
           {plant.days_to_harvest && <span><Wheat size={13} /><b>Harvest</b> in {plant.days_to_harvest}d</span>}
         </div>
