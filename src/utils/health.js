@@ -6,6 +6,7 @@ export const CARE_TASKS = [
 ]
 
 export function computeHealth(plant, latestLogs = {}) {
+  if (!plant.is_planted) return { status: 'healthy', overdueTypes: [], score: 0 }
   const overdueTypes = []
   let score = 0
   for (const { type, field, weight } of CARE_TASKS) {

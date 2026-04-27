@@ -10,7 +10,11 @@ export default function ConfirmDelete({ item, onConfirm, onCancel }) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2 }}>
         <div className="confirm-title">Delete {item.name}?</div>
-        <div className="confirm-sub">This will remove all activity logs for this plant. This cannot be undone.</div>
+        <div className="confirm-sub">
+          {item.is_planted
+            ? 'This will remove the plant from your garden map and delete all activity logs. This cannot be undone.'
+            : 'This will remove the plant from your inventory. This cannot be undone.'}
+        </div>
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onCancel}>Cancel</button>
           <button className="btn-delete" onClick={() => onConfirm(item)}>Delete</button>
