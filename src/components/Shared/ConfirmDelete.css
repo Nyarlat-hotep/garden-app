@@ -3,11 +3,12 @@
 .confirm-sub { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 0.25rem; }
 
 .btn-delete {
-  padding: 0.55rem 1.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
   background: rgba(192, 57, 43, 0.14);
   border: 1px solid rgba(192, 57, 43, 0.4);
   color: var(--status-critical);

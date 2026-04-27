@@ -468,7 +468,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                           hoveredGroupRef.current = null
                           popoverDismissTimerRef.current = null
                           setPopover(null)
-                        }, 220)
+                        }, 50)
                       }
                       return
                     }
@@ -489,10 +489,16 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             })}
           </div>
 
+          <AnimatePresence>
           {popover && !dims.isMobile && (
-            <div
+            <motion.div
+              key="plant-popover"
               className={`plant-popover${popover.below ? ' plant-popover--below' : ''}`}
               style={{ left: popover.x, top: popover.y }}
+              initial={{ opacity: 0, x: '-50%', y: popover.below ? 'calc(0% + 6px)'    : 'calc(-100% + 6px)' }}
+              animate={{ opacity: 1, x: '-50%', y: popover.below ? '0%'                : '-100%' }}
+              exit   ={{ opacity: 0, x: '-50%', y: popover.below ? 'calc(0% + 4px)'    : 'calc(-100% + 4px)' }}
+              transition={{ duration: 0.09, ease: [0.4, 0, 0.2, 1] }}
               onMouseEnter={() => {
                 if (popoverDismissTimerRef.current) {
                   clearTimeout(popoverDismissTimerRef.current)
@@ -542,8 +548,9 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                   </div>
                 </>
               )}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
         </div>
 

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Trash2 } from 'lucide-react'
 import './ConfirmDelete.css'
 
 export default function ConfirmDelete({ item, onConfirm, onCancel }) {
@@ -17,7 +18,7 @@ export default function ConfirmDelete({ item, onConfirm, onCancel }) {
         </div>
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onCancel}>Cancel</button>
-          <button className="btn-delete" onClick={() => onConfirm(item)}>Delete</button>
+          <button className="btn-delete" onClick={() => onConfirm(item)}><Trash2 size={15} /> Delete</button>
         </div>
       </motion.div>
     </div>
