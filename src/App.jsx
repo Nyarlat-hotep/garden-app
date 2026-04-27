@@ -127,6 +127,10 @@ function App() {
   }
 
   const handleDelete = async (plant) => {
+    const cellKeys = Object.entries(gardenCells)
+      .filter(([, c]) => c?.plantId === plant.id)
+      .map(([k]) => k)
+    if (cellKeys.length > 0) paintCells(cellKeys, 'erase')
     await removePlant(plant.id)
     setDeleting(null)
     setSelected(null)

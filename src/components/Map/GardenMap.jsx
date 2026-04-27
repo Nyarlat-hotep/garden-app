@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo, memo } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, Wheat, ChevronDown, Trash2, Hand } from 'lucide-react'
@@ -76,70 +76,6 @@ function emojiForPlant(plant) {
   const match = FOOD_PLANTS.find(fp => fp.common_name.toLowerCase() === plant.name.toLowerCase())
   return match?.emoji ?? '🌱'
 }
-
-const OVERDUE_ICONS = {
-  watered:    { Icon: Droplets,    color: '#5b9bd5' },
-  pruned:     { Icon: Scissors,    color: '#7fb069' },
-  fertilized: { Icon: FlaskConical, color: '#8b5e3c' },
-  harvested:  { Icon: Wheat,       color: '#d4a843' },
-}
-
-// ── Crop panel item ───────────────────────────────────────────────────────────
-
-const CropItem = memo(function CropItem({ plant, health, onSelect }) {
-  const status      = health?.status ?? 'healthy'
-  const overdueTypes = health?.overdueTypes ?? []
-
-  return (
-    <button className="crop-item" onClick={() => onSelect(plant)}>
-      <span className="crop-item-emoji"><Emoji>{emojiForPlant(plant)}</Emoji></span>
-      <div className="crop-item-body">
-        <span className="crop-item-name">{plant.name}</span>
-        {overdueTypes.length > 0 && (
-          <span className="crop-item-overdue">
-            {overdueTypes.map(t => {
-              const cfg = OVERDUE_ICONS[t]
-              if (!cfg) return null
-              const { Icon, color } = cfg
-              return <Icon key={t} size={11} strokeWidth={2} style={{ color }} />
-            })}
-            overdue
-          </span>
-        )}
-      </div>
-      <span className={`crop-status-dot crop-status-dot--${status}`} />
-    </button>
-  )
-})
-
-// ── Panel content (shared by desktop panel + mobile sheet) ───────────────────
-
-const CropList = memo(function CropList({ plants, healthMap, onSelect }) {
-  const critical  = plants.filter(p => healthMap?.get(p.id)?.status === 'critical').length
-  const attention = plants.filter(p => healthMap?.get(p.id)?.status === 'attention').length
-  const overdue   = plants.filter(p => (healthMap?.get(p.id)?.overdueTypes ?? []).length > 0).length
-
-  return (
-    <>
-      {(critical > 0 || attention > 0) && (
-        <div className="crop-panel-stats">
-          {critical  > 0 && <span className="crop-stat crop-stat--critical">{critical} critical</span>}
-          {attention > 0 && <span className="crop-stat crop-stat--attention">{attention} attention</span>}
-          {overdue   > 0 && <span className="crop-stat crop-stat--overdue">{overdue} overdue</span>}
-        </div>
-      )}
-
-      <div className="crop-list">
-        {plants.length === 0
-          ? <p className="crop-list-empty">No crops yet.<br/>Add plants in the Garden tab.</p>
-          : plants.map(p => (
-              <CropItem key={p.id} plant={p} health={healthMap?.get(p.id)} onSelect={onSelect} />
-            ))
-        }
-      </div>
-    </>
-  )
-})
 
 function floodFill(cells, startKey, plantId, cols, rows) {
   const visited = new Set()
@@ -613,7 +549,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
 
         {/* Desktop right panel */}
         <div className="crop-panel">
-          <GardenSidebar plants={plants} onSelectPlant={handleSelectPlant} />
+          <GardenSidebar plants={plants} healthMap={healthMap} onSelectPlant={handleSelectPlant} />
         </div>
 
       </div>
@@ -636,7 +572,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             >
               <div className="crop-sheet-handle" />
-              <GardenSidebar plants={plants} onSelectPlant={handleSelectPlant} />
+              <GardenSidebar plants={plants} healthMap={healthMap} onSelectPlant={handleSelectPlant} />
             </motion.div>
           </>
         )}

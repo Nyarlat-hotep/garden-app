@@ -113,14 +113,45 @@
   font-weight: 500;
 }
 
-.sidebar-plant-status {
+.sidebar-stats {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--status-healthy);
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
 }
 
-.planted-check {
-  stroke-width: 2.5;
+.sidebar-stat {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid;
+  letter-spacing: 0.2px;
 }
+
+.sidebar-stat--critical  { color: #e06b6b; border-color: #e06b6b44; background: #e06b6b11; }
+.sidebar-stat--attention { color: #d4a843; border-color: #d4a84344; background: #d4a84311; }
+.sidebar-stat--overdue   { color: var(--text-dim); border-color: var(--border); background: transparent; }
+
+.sidebar-plant-overdue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.sidebar-plant-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+.sidebar-plant-dot--healthy   { background: #5bbf8a; box-shadow: 0 0 5px #5bbf8a; }
+.sidebar-plant-dot--attention { background: #d4a843; box-shadow: 0 0 5px #d4a843; }
+.sidebar-plant-dot--critical  { background: #e06b6b; box-shadow: 0 0 5px #e06b6b; }
