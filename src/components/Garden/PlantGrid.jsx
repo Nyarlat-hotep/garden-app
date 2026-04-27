@@ -1,8 +1,9 @@
+import { memo, useMemo } from 'react'
 import PlantCard from './PlantCard.jsx'
 import './PlantGrid.css'
 
-export default function PlantGrid({ plants, healthMap, latestLogsMap, onSelect }) {
-  const logsMap = latestLogsMap ? latestLogsMap() : new Map()
+const PlantGrid = memo(function PlantGrid({ plants, healthMap, latestLogsMap, onSelect }) {
+  const logsMap = useMemo(() => latestLogsMap ? latestLogsMap() : new Map(), [latestLogsMap])
 
   if (plants.length === 0) {
     return (
@@ -32,4 +33,6 @@ export default function PlantGrid({ plants, healthMap, latestLogsMap, onSelect }
       })}
     </div>
   )
-}
+})
+
+export default PlantGrid

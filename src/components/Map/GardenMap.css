@@ -172,11 +172,68 @@
   padding: 0 8px;
 }
 
-.grid-wrapper.erase-mode  { cursor: cell; }
-.grid-wrapper.select-mode { cursor: default; }
-.grid-wrapper.pan-mode    { cursor: grab; overflow: auto; }
+.grid-wrapper.erase-mode    { cursor: cell; }
+.grid-wrapper.select-mode   { cursor: default; }
+.grid-wrapper.pan-mode      { cursor: grab; overflow: auto; }
 .grid-wrapper.pan-mode:active { cursor: grabbing; }
-.pan-mode .garden-grid    { touch-action: pan-x pan-y; }
+.grid-wrapper.planting-mode { cursor: crosshair; }
+.pan-mode .garden-grid      { touch-action: pan-x pan-y; }
+.planting-mode .garden-grid { touch-action: none; }
+
+/* ── Planting mode banner (replaces toolbar while placing) ───────────────── */
+
+.planting-mode-banner {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  border-bottom: 1px solid var(--border);
+}
+
+.planting-mode-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.planting-mode-emoji {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.planting-mode-text {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.planting-mode-text strong { font-weight: 700; }
+
+.planting-mode-actions { display: flex; }
+
+.planting-mode-cancel {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-btn);
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.planting-mode-cancel:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.map-toolbar--hidden { display: none; }
 
 .grid-cell.is-selected {
   outline: 2px solid rgba(255,255,255,0.6);

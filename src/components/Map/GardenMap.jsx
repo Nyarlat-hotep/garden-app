@@ -5,6 +5,7 @@ import { MousePointer2, Sprout, Eraser, Droplets, Scissors, Leaf, FlaskConical, 
 import { FOOD_PLANTS } from '../../data/foodPlants.js'
 import Emoji from '../Shared/Emoji.jsx'
 import CareTimer from '../Shared/CareTimer.jsx'
+import GardenSidebar from '../Garden/GardenSidebar.jsx'
 import './GardenMap.css'
 
 // ── Color helpers ────────────────────────────────────────────────────────────
@@ -167,7 +168,7 @@ const CELL_SIZE_MOBILE = 28
 const CANVAS_MIN_COLS  = 80
 const CANVAS_MIN_ROWS  = 55
 
-export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, logsMap, onSelectPlant, onLogActivity }) {
+export default function GardenMap({ cells = {}, paintCells, clearCells, moveCells, plants, saving, healthMap, logsMap, onSelectPlant, onLogActivity, placingPlant, onPlantPlaced, onCancelPlacing }) {
   const [tool, setTool]                       = useState(() => window.innerWidth <= 480 ? 'pan' : 'select')
   const [selectedPlantId, setSelectedPlantId] = useState(null)
   const [popover, setPopover]                 = useState(null)
@@ -269,11 +270,25 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   }, [moveOffset, selection, cells, dims])
 
   const paint = useCallback((key) => {
+    if (placingPlant) {
+      if (pendingCellsRef.current.has(key)) return
+      pendingCellsRef.current.add(key)
+      paintCells([key], 'plant', placingPlant.id)
+      return
+    }
     if (tool === 'plant' && !selectedPlantId) return
     if (pendingCellsRef.current.has(key)) return
     pendingCellsRef.current.add(key)
     paintCells([key], tool, tool === 'plant' ? selectedPlantId : undefined)
-  }, [paintCells, tool, selectedPlantId])
+  }, [paintCells, tool, selectedPlantId, placingPlant])
+
+  const handlePlacementComplete = useCallback(() => {
+    if (placingPlant && pendingCellsRef.current.size > 0 && onPlantPlaced) {
+      onPlantPlaced(placingPlant)
+    }
+    isDrawingRef.current = false
+    pendingCellsRef.current.clear()
+  }, [placingPlant, onPlantPlaced])
 
   const stopInteraction = useCallback(() => {
     if (tool === 'select' || tool === 'erase') {
@@ -323,8 +338,21 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
   return (
     <div className="garden-map-view">
 
+      {/* Planting mode banner */}
+      {placingPlant && (
+        <div className="planting-mode-banner">
+          <div className="planting-mode-info">
+            <span className="planting-mode-emoji"><Emoji>{emojiForPlant(placingPlant)}</Emoji></span>
+            <span className="planting-mode-text">Plant <strong>{placingPlant.name}</strong> — click and drag on the grid to place</span>
+          </div>
+          <div className="planting-mode-actions">
+            <button className="planting-mode-cancel" onClick={() => onCancelPlacing?.()}>Cancel</button>
+          </div>
+        </div>
+      )}
+
       {/* Toolbar */}
-      <div className="map-toolbar">
+      <div className={`map-toolbar${placingPlant ? ' map-toolbar--hidden' : ''}`}>
         <div className="map-tool-btns">
           <button className={`map-tool-btn map-tool-btn--pan ${tool === 'pan' ? 'active' : ''}`} onClick={() => setTool('pan')} title="Pan"><Hand size={15} /><span>Pan</span></button>
           <button className={`map-tool-btn ${tool === 'select' ? 'active' : ''}`} onClick={() => setTool('select')} title="Select and move"><MousePointer2 size={15} /><span>Select</span></button>
@@ -370,8 +398,21 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
 
         {/* Grid */}
         <div ref={gridWrapperRef}
-          className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}${tool === 'select' ? ' select-mode' : ''}${tool === 'pan' ? ' pan-mode' : ''}`}
-          onPointerUp={stopInteraction} onPointerLeave={stopInteraction}
+          className={`grid-wrapper${tool === 'erase' ? ' erase-mode' : ''}${tool === 'select' ? ' select-mode' : ''}${tool === 'pan' ? ' pan-mode' : ''}${placingPlant ? ' planting-mode' : ''}`}
+          onPointerUp={() => {
+            if (placingPlant) {
+              handlePlacementComplete()
+            } else {
+              stopInteraction()
+            }
+          }}
+          onPointerLeave={() => {
+            if (placingPlant) {
+              handlePlacementComplete()
+            } else {
+              stopInteraction()
+            }
+          }}
           onMouseLeave={() => {
             if (popoverDismissTimerRef.current) {
               clearTimeout(popoverDismissTimerRef.current)
@@ -442,6 +483,11 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     setPlantSheet({ plant, sqFt: group.size })
                   }}
                   onPointerDown={(e) => {
+                    if (placingPlant) {
+                      e.preventDefault()
+                      isDrawingRef.current = true; pendingCellsRef.current.clear(); paint(key)
+                      return
+                    }
                     if (tool === 'pan') return
                     e.preventDefault()
                     if (tool === 'select' || tool === 'erase') {
@@ -461,6 +507,10 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
                     }
                   }}
                   onPointerEnter={() => {
+                    if (placingPlant) {
+                      if (!isDrawingRef.current) return; paint(key)
+                      return
+                    }
                     if (tool === 'pan') return
                     if (tool === 'select' || tool === 'erase') {
                       if (selectPhaseRef.current === 'rubber' && rubberStartRef.current) {
@@ -563,7 +613,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
 
         {/* Desktop right panel */}
         <div className="crop-panel">
-          <CropList plants={plants} healthMap={healthMap} onSelect={handleSelectPlant} />
+          <GardenSidebar plants={plants} onSelectPlant={handleSelectPlant} />
         </div>
 
       </div>
@@ -586,7 +636,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
               transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             >
               <div className="crop-sheet-handle" />
-              <CropList plants={plants} healthMap={healthMap} onSelect={handleSelectPlant} />
+              <GardenSidebar plants={plants} onSelectPlant={handleSelectPlant} />
             </motion.div>
           </>
         )}

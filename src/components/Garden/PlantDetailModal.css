@@ -194,3 +194,14 @@
   background: rgba(192, 57, 43, 0.12);
   border-color: var(--status-critical);
 }
+
+.detail-action-btn--primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.detail-action-btn--primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}

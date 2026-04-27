@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, memo, useCallback } from 'react'
 import { Search, Droplets, Sun, Plus, Check, MapPin } from 'lucide-react'
 import { ALL_PLANTS } from '../../data/allPlants'
 import { CATEGORY_COLORS } from '../../utils/format'
@@ -23,7 +23,7 @@ function readSavedLocation() {
   }
 }
 
-export default function DiscoverView({ ownedPlants = [], profile, saveProfile, onAddPlant }) {
+const DiscoverView = memo(function DiscoverView({ ownedPlants = [], profile, saveProfile, onAddPlant }) {
   const [query, setQuery]                   = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeSeason, setActiveSeason]     = useState(() => getCurrentSeason())
@@ -207,18 +207,35 @@ export default function DiscoverView({ ownedPlants = [], profile, saveProfile, o
       )}
     </div>
   )
-}
+})
 
-function PlantCard({ plant, owned, onAdd }) {
+const PlantCard = memo(function PlantCard({ plant, owned, onAdd }) {
   const categoryColor = CATEGORY_COLORS[plant.category] ?? '#7fb069'
   const isFlower = plant.category === 'flower'
   const bloomLabel = isFlower && plant.bloom_seasons?.length
     ? plant.bloom_seasons.map(s => SEASON_LABELS[s] || s).join(', ')
     : null
+
+  const handleClick = useCallback(() => {
+    onAdd({
+      name:                    plant.common_name,
+      variety:                 plant.scientific_name,
+      category:                plant.category,
+      plant_family:            plant.plant_family,
+      days_to_harvest:         plant.days_to_harvest,
+      water_interval_days:     plant.water_interval_days,
+      fertilize_interval_days: plant.fertilize_interval_days,
+      prune_interval_days:     plant.prune_interval_days,
+      harvest_interval_days:   plant.harvest_interval_days,
+    })
+  }, [onAdd, plant.common_name, plant.scientific_name, plant.category, plant.plant_family,
+     plant.days_to_harvest, plant.water_interval_days, plant.fertilize_interval_days,
+     plant.prune_interval_days, plant.harvest_interval_days])
+
   return (
     <div className={`suggestion-card${owned ? ' suggestion-card--owned' : ''}`} style={{ '--category-color': categoryColor }}>
       <div className="plant-card-row">
-        <div className="plant-card-img plant-card-img--empty"><Emoji>{plant.emoji}</Emoji></div>
+        <div className="plant-card-img plant-card-img--empty"><Emoji key={plant.emoji}>{plant.emoji}</Emoji></div>
         <div className="plant-card-info">
           <div className="suggestion-name">{plant.common_name}</div>
           {plant.scientific_name && <div className="suggestion-variety">{plant.scientific_name}</div>}
@@ -243,20 +260,12 @@ function PlantCard({ plant, owned, onAdd }) {
         className="btn-add-suggestion"
         aria-label={owned ? 'Already in garden' : 'Add to garden'}
         disabled={owned}
-        onClick={() => onAdd({
-          name:                    plant.common_name,
-          variety:                 plant.scientific_name,
-          category:                plant.category,
-          plant_family:            plant.plant_family,
-          days_to_harvest:         plant.days_to_harvest,
-          water_interval_days:     plant.water_interval_days,
-          fertilize_interval_days: plant.fertilize_interval_days,
-          prune_interval_days:     plant.prune_interval_days,
-          harvest_interval_days:   plant.harvest_interval_days,
-        })}
+        onClick={handleClick}
       >
         {owned ? <Check size={15} strokeWidth={2.5} /> : <Plus size={15} strokeWidth={2.5} />}
       </button>
     </div>
   )
-}
+})
+
+export default DiscoverView

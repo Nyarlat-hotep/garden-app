@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { computeHealth } from '../utils/health.js'
 import { detectFamily } from '../data/plantFamilies.js'
@@ -40,7 +40,7 @@ export function usePlants(userId, latestLogsMap) {
     })
   }, [plants, searchQuery, categoryFilter])
 
-  async function addPlant(plant) {
+  const addPlant = useCallback(async (plant) => {
     setSaving('saving')
     const row = { ...plant, user_id: userId, plant_family: plant.plant_family || detectFamily(plant.name) }
     const { data, error } = await supabase.from('plants').insert(row).select().single()
@@ -48,9 +48,9 @@ export function usePlants(userId, latestLogsMap) {
     setSaving('idle')
     if (error) throw error
     return data
-  }
+  }, [userId])
 
-  async function editPlant(plant) {
+  const editPlant = useCallback(async (plant) => {
     setSaving('saving')
     const row = { ...plant, plant_family: plant.plant_family || detectFamily(plant.name) }
     const { data, error } = await supabase.from('plants').update(row).eq('id', plant.id).select().single()
@@ -58,14 +58,14 @@ export function usePlants(userId, latestLogsMap) {
     setSaving('idle')
     if (error) throw error
     return data
-  }
+  }, [])
 
-  async function removePlant(id) {
+  const removePlant = useCallback(async (id) => {
     setSaving('saving')
     await supabase.from('plants').delete().eq('id', id)
     setPlants(prev => prev.filter(p => p.id !== id))
     setSaving('idle')
-  }
+  }, [])
 
   return {
     plants, healthMap, saving, filtered,

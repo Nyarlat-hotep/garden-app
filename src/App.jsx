@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, memo } from 'react'
 import { Plus, ClipboardList } from 'lucide-react'
 import { useAuth } from './hooks/useAuth.js'
 import { useProfile } from './hooks/useProfile.js'
@@ -13,6 +13,7 @@ import BottomNav from './components/Layout/BottomNav.jsx'
 import PlantGrid from './components/Garden/PlantGrid.jsx'
 import PlantDetailModal from './components/Garden/PlantDetailModal.jsx'
 import AddPlantModal from './components/Garden/AddPlantModal.jsx'
+import AddToInventoryModal from './components/Garden/AddToInventoryModal.jsx'
 import ActivityFeed from './components/Activity/ActivityFeed.jsx'
 import LogActionModal from './components/Activity/LogActionModal.jsx'
 import GardenMap from './components/Map/GardenMap.jsx'
@@ -32,6 +33,7 @@ function App() {
     categoryFilter, setCategoryFilter,
     addPlant, editPlant, removePlant,
   } = usePlants(user?.id, latestLogsMap)
+  const todayISO = () => new Date().toISOString().slice(0, 10)
 
   const { cells: gardenCells, saving: mapSaving, paintCells, clearCells, moveCells } = useGardenMap(user?.id)
   const { hasOverdue, overdueItems, permission, enableNotifications } = useNotifications(user?.id, healthMap, plants)
@@ -41,6 +43,7 @@ function App() {
   const [selected, setSelected]         = useState(null)
   const [adding, setAdding]             = useState(false)
   const [addingFromDiscover, setAddingFromDiscover] = useState(null)
+  const [placingPlant, setPlacingPlant] = useState(null)
   const [logTarget, setLogTarget]       = useState(null)
   const [logPresetActivity, setLogPresetActivity] = useState(null)
   const [showLog, setShowLog]           = useState(false)
@@ -78,6 +81,24 @@ function App() {
 
   const plantsMap = useMemo(() => new Map(plants.map(p => [p.id, p])), [plants])
 
+  const handleAddFromDiscover = useCallback((prefill) => {
+    setAddingFromDiscover(prefill)
+    setAdding(true)
+  }, [])
+
+  const handlePlantIt = useCallback((plant) => {
+    setSelected(null)
+    setView('map')
+    setPlacingPlant(plant)
+  }, [])
+
+  const handleCancelPlacing = useCallback(() => setPlacingPlant(null), [])
+
+  const handlePlantPlaced = useCallback(async (plant) => {
+    await editPlant({ ...plant, is_planted: true, date_planted: todayISO() })
+    setPlacingPlant(null)
+  }, [editPlant])
+
   if (loading) return null
   if (!user) {
     return showLanding
@@ -86,7 +107,12 @@ function App() {
   }
 
   const handleSavePlant = async (plant) => {
-    await addPlant(plant)
+    await addPlant({ ...plant, is_planted: true })
+    setAdding(false)
+  }
+
+  const handleSaveInventory = async (plant) => {
+    await addPlant({ ...plant, is_planted: false, date_planted: null })
     setAdding(false)
     setAddingFromDiscover(null)
   }
@@ -146,6 +172,9 @@ function App() {
             logsMap={logsMap}
             onSelectPlant={setSelected}
             onLogActivity={(p, type) => { setLogTarget(p.id); setLogPresetActivity(type); setShowLog(true) }}
+            placingPlant={placingPlant}
+            onPlantPlaced={handlePlantPlaced}
+            onCancelPlacing={handleCancelPlacing}
           />
         )}
 
@@ -154,7 +183,7 @@ function App() {
             ownedPlants={plants}
             profile={profile}
             saveProfile={saveProfile}
-            onAddPlant={(prefill) => { setAddingFromDiscover(prefill); setAdding(true) }}
+            onAddPlant={handleAddFromDiscover}
           />
         )}
       </main>
@@ -184,14 +213,23 @@ function App() {
           onEdit={(p) => { setSelected(null); /* TODO: edit modal */ }}
           onDelete={(p) => { setSelected(null); setDeleting(p) }}
           onLogActivity={(p) => { setSelected(null); setLogTarget(p.id); setShowLog(true) }}
+          onPlantIt={handlePlantIt}
         />
       )}
 
-      {adding && (
-        <AddPlantModal
+      {adding && addingFromDiscover && (
+        <AddToInventoryModal
           prefill={addingFromDiscover}
-          onSave={handleSavePlant}
+          onSave={handleSaveInventory}
           onClose={() => { setAdding(false); setAddingFromDiscover(null) }}
+        />
+      )}
+
+      {adding && !addingFromDiscover && (
+        <AddPlantModal
+          prefill={null}
+          onSave={handleSavePlant}
+          onClose={() => setAdding(false)}
         />
       )}
 

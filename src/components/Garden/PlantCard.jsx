@@ -28,7 +28,7 @@ export default function PlantCard({ plant, health, lastWatered, onClick, index }
       <div className="plant-card-image">
         {plant.image_url
           ? <img src={plant.image_url} alt={plant.name} />
-          : <div className="plant-card-no-image"><Emoji>{emojiForPlant(plant.name)}</Emoji></div>
+          : <div className="plant-card-no-image"><Emoji key={plant.name}>{emojiForPlant(plant.name)}</Emoji></div>
         }
       </div>
 

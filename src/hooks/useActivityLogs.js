@@ -28,7 +28,7 @@ export function useActivityLogs(userId) {
     return map
   }, [logs])
 
-  async function addLog(entry) {
+  const addLog = useCallback(async (entry) => {
     setSaving('saving')
     const { data, error } = await supabase
       .from('activity_logs')
@@ -39,14 +39,14 @@ export function useActivityLogs(userId) {
     setSaving('idle')
     if (error) throw error
     return data
-  }
+  }, [])
 
-  async function removeLog(id) {
+  const removeLog = useCallback(async (id) => {
     setSaving('saving')
     await supabase.from('activity_logs').delete().eq('id', id)
     setLogs(prev => prev.filter(l => l.id !== id))
     setSaving('idle')
-  }
+  }, [])
 
   return { logs, latestLogsMap, saving, addLog, removeLog }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase.js'
 
 export function useProfile(userId) {
@@ -14,7 +14,7 @@ export function useProfile(userId) {
       .then(({ data }) => { if (data) setProfile(data) })
   }, [userId])
 
-  async function saveProfile(updates) {
+  const saveProfile = useCallback(async (updates) => {
     const { data, error } = await supabase
       .from('profiles')
       .upsert({ id: userId, ...updates })
@@ -23,7 +23,7 @@ export function useProfile(userId) {
     if (!error && data) setProfile(data)
     if (error) throw error
     return data
-  }
+  }, [userId])
 
   return { profile, saveProfile }
 }

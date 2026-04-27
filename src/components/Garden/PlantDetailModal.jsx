@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion'
-import { X, Edit2, Trash2, ClipboardList, Droplets, FlaskConical, Scissors, Wheat } from 'lucide-react'
+import { X, Edit2, Trash2, ClipboardList, Droplets, FlaskConical, Scissors, Wheat, Sprout } from 'lucide-react'
 import HealthBadge from './HealthBadge.jsx'
 import OverdueIcons from './OverdueIcons.jsx'
 import { formatDate, formatRelative, CATEGORY_LABELS } from '../../utils/format.js'
 import CareTimer from '../Shared/CareTimer.jsx'
 import './PlantDetailModal.css'
 
-export default function PlantDetailModal({ plant, health, plantLogs, onClose, onEdit, onDelete, onLogActivity }) {
+export default function PlantDetailModal({ plant, health, plantLogs, onClose, onEdit, onDelete, onLogActivity, onPlantIt }) {
   if (!plant) return null
 
   return (
@@ -80,15 +80,31 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
         </div>
 
         <div className="detail-actions">
-          <button className="detail-action-btn" onClick={() => onLogActivity(plant)}>
-            <ClipboardList size={15} /> Log activity
-          </button>
-          <button className="detail-action-btn" onClick={() => onEdit(plant)}>
-            <Edit2 size={15} /> Edit
-          </button>
-          <button className="detail-action-btn detail-action-btn--danger" onClick={() => onDelete(plant)}>
-            <Trash2 size={15} /> Delete
-          </button>
+          {!plant.is_planted ? (
+            <>
+              <button className="detail-action-btn detail-action-btn--primary" onClick={() => onPlantIt(plant)}>
+                <Sprout size={15} /> Plant it
+              </button>
+              <button className="detail-action-btn" onClick={() => onEdit(plant)}>
+                <Edit2 size={15} /> Edit
+              </button>
+              <button className="detail-action-btn detail-action-btn--danger" onClick={() => onDelete(plant)}>
+                <Trash2 size={15} /> Delete
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="detail-action-btn" onClick={() => onLogActivity(plant)}>
+                <ClipboardList size={15} /> Log activity
+              </button>
+              <button className="detail-action-btn" onClick={() => onEdit(plant)}>
+                <Edit2 size={15} /> Edit
+              </button>
+              <button className="detail-action-btn detail-action-btn--danger" onClick={() => onDelete(plant)}>
+                <Trash2 size={15} /> Delete
+              </button>
+            </>
+          )}
         </div>
       </motion.div>
     </div>
