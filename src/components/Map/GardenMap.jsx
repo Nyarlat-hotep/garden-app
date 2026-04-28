@@ -325,7 +325,7 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
         {saving === 'saving' && <span className="map-saving-dot">saving…</span>}
         {!hasCells && <span className="map-grid-hint">Select a plant and click to paint</span>}
         {hasCells && (
-          <button className="map-tool-btn map-tool-btn--clear" onClick={() => setConfirmingClear(true)} title="Clear all"><Trash2 size={13} /><span>Clear</span></button>
+          <button className="map-tool-btn map-tool-btn--clear" onClick={() => setConfirmingClear(true)} title="Delete garden"><Trash2 size={13} /><span>Delete garden</span></button>
         )}
       </div>
 
@@ -668,11 +668,11 @@ export default function GardenMap({ cells = {}, paintCells, clearCells, moveCell
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}>
-            <div className="confirm-title">Clear the garden map?</div>
+            <div className="confirm-title">Delete the garden map?</div>
             <div className="confirm-sub">This removes every painted cell. Plants and activity logs are kept. This cannot be undone.</div>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setConfirmingClear(false)}>Cancel</button>
-              <button className="btn-delete" onClick={() => { clearCells(); setConfirmingClear(false) }}>Clear</button>
+              <button className="btn-delete" onClick={() => { clearCells(); setConfirmingClear(false) }}>Delete</button>
             </div>
           </motion.div>
         </div>

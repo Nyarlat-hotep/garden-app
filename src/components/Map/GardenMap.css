@@ -108,10 +108,12 @@
   color: #e06b6b;
   border-color: #e06b6b44;
 }
-.map-tool-btn--clear:hover {
-  border-color: #e06b6b;
-  color: #e06b6b;
-  background: #e06b6b11;
+/* :not(:disabled) raises specificity to match the base hover rule (0,3,0)
+   so the red wins via source order. */
+.map-tool-btn--clear:hover:not(:disabled) {
+  border-color: #a83232;
+  color: #a83232;
+  background: #a8323218;
 }
 
 .map-saving-dot {
