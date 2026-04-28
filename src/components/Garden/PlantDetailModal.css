@@ -1,13 +1,35 @@
+/* Full-page override: when the detail modal is the backdrop's child,
+   neutralize centering + padding so the box can fill the viewport. */
+.modal-backdrop:has(.detail-modal-box) {
+  padding: 0 !important;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
 .detail-modal-box {
-  max-width: 480px;
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  border-radius: 0;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2.5rem 1.5rem calc(2rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  .detail-modal-box {
+    padding: 3rem 4rem;
+  }
 }
 
 .detail-close {
-  position: absolute;
+  position: fixed;
   top: 1rem;
   right: 1rem;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,6 +38,7 @@
   border-color: var(--border);
   color: var(--text-dim);
   padding: 0;
+  z-index: 10;
 }
 
 .detail-header {
