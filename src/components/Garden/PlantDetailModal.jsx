@@ -1,21 +1,44 @@
 import { motion } from 'framer-motion'
-import { X, Edit2, Trash2, ClipboardList, Droplets, FlaskConical, Scissors, Wheat, Sprout } from 'lucide-react'
+import { X, Edit2, Trash2, ClipboardList, Droplets, FlaskConical, Scissors, Wheat, Sprout, Bug, Beaker, Hand, Square, Leaf, AlertTriangle, SprayCan, ExternalLink } from 'lucide-react'
 import HealthBadge from './HealthBadge.jsx'
 import OverdueIcons from './OverdueIcons.jsx'
 import { formatDate, formatRelative, CATEGORY_LABELS } from '../../utils/format.js'
 import CareTimer from '../Shared/CareTimer.jsx'
+import { getRecommendationsForPlant, amazonSearch } from '../../data/productRecommendations.js'
 import './PlantDetailModal.css'
+
+const SHOP_ICONS = {
+  flask:    FlaskConical,
+  bug:      Bug,
+  droplets: Droplets,
+  hand:     Hand,
+  scissors: Scissors,
+  square:   Square,
+  beaker:   Beaker,
+  alert:    AlertTriangle,
+  leaf:     Leaf,
+  spray:    SprayCan,
+}
+
+const CATEGORY_ORDER = ['Care', 'Tools', 'Problem-solving']
 
 export default function PlantDetailModal({ plant, health, plantLogs, onClose, onEdit, onDelete, onLogActivity, onPlantIt }) {
   if (!plant) return null
+
+  const recs = getRecommendationsForPlant(plant)
+  const recsByCategory = recs.reduce((acc, r) => {
+    (acc[r.category] ??= []).push(r)
+    return acc
+  }, {})
 
   return (
     <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
       <motion.div
         className="modal-box detail-modal-box"
-        initial={{ opacity: 0, scale: 0.94, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 24 }}
+        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
       >
         <button className="detail-close" onClick={onClose}><X size={18} /></button>
 
@@ -84,6 +107,43 @@ export default function PlantDetailModal({ plant, health, plantLogs, onClose, on
           )}
           {plant.days_to_harvest && <span><Wheat size={13} /><b>Harvest</b> in {plant.days_to_harvest}d</span>}
         </div>
+
+        {recs.length > 0 && (
+          <section className="detail-shop">
+            <div className="detail-shop-header">
+              <h3 className="detail-shop-title">Recommended for your {plant.name}</h3>
+              <p className="detail-shop-disclaimer">Affiliate links — we may earn a commission</p>
+            </div>
+            {CATEGORY_ORDER.map(cat => {
+              const list = recsByCategory[cat]
+              if (!list?.length) return null
+              return (
+                <div key={cat} className="detail-shop-group">
+                  <div className="detail-shop-group-label">{cat}</div>
+                  <div className="detail-shop-grid">
+                    {list.map(rec => {
+                      const Icon = SHOP_ICONS[rec.icon] ?? Sprout
+                      return (
+                        <a key={rec.id}
+                           className="shop-card"
+                           href={amazonSearch(rec.query)}
+                           target="_blank"
+                           rel="noopener noreferrer sponsored">
+                          <Icon size={20} className="shop-card-icon" />
+                          <div className="shop-card-body">
+                            <div className="shop-card-title">{rec.title}</div>
+                            <div className="shop-card-blurb">{rec.blurb}</div>
+                          </div>
+                          <span className="shop-card-cta">Shop <ExternalLink size={12} /></span>
+                        </a>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </section>
+        )}
 
         <div className="detail-actions">
           {!plant.is_planted ? (
