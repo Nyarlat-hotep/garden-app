@@ -196,7 +196,7 @@
 }
 
 .detail-action-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.6rem 0.9rem;
@@ -206,8 +206,6 @@
   letter-spacing: 0;
   text-transform: none;
   border-radius: var(--radius-btn);
-  flex: 1;
-  justify-content: center;
 }
 
 .detail-action-btn--danger {
