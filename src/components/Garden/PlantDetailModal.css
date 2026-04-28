@@ -6,10 +6,12 @@
   justify-content: stretch;
 }
 
-.detail-modal-box {
-  width: 100vw;
+/* .modal-box.detail-modal-box compound selector — beats single-class
+   .modal-box rules in AddPlantModal.css regardless of import order. */
+.modal-box.detail-modal-box {
+  width: 100%;
   max-width: none;
-  height: 100dvh;
+  height: 100%;
   max-height: none;
   border-radius: 0;
   margin: 0;
@@ -19,7 +21,7 @@
 }
 
 @media (min-width: 768px) {
-  .detail-modal-box {
+  .modal-box.detail-modal-box {
     padding: 3rem 4rem;
   }
 }
