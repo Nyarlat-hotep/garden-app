@@ -43,7 +43,7 @@ function App() {
   const [selected, setSelected]         = useState(null)
   const [adding, setAdding]             = useState(false)
   const [addingFromDiscover, setAddingFromDiscover] = useState(null)
-  const [placingPlant, setPlacingPlant] = useState(null)
+  const [pendingPlant, setPendingPlant] = useState(null)
   const [logTarget, setLogTarget]       = useState(null)
   const [logPresetActivity, setLogPresetActivity] = useState(null)
   const [showLog, setShowLog]           = useState(false)
@@ -89,15 +89,47 @@ function App() {
   const handlePlantIt = useCallback((plant) => {
     setSelected(null)
     setView('map')
-    setPlacingPlant(plant)
+    setPendingPlant(plant)
   }, [])
 
-  const handleCancelPlacing = useCallback(() => setPlacingPlant(null), [])
+  const handlePendingPlantConsumed = useCallback(() => setPendingPlant(null), [])
 
-  const handlePlantPlaced = useCallback(async (plant) => {
-    await editPlant({ ...plant, is_planted: true, date_planted: todayISO() })
-    setPlacingPlant(null)
-  }, [editPlant])
+  const wrappedPaintCells = useCallback((keys, tool, plantId) => {
+    paintCells(keys, tool, plantId)
+    if (tool === 'plant' && plantId) {
+      const plant = plants.find(p => p.id === plantId)
+      if (plant && !plant.is_planted) {
+        editPlant({ ...plant, is_planted: true, date_planted: todayISO() })
+      }
+    } else if (tool === 'erase') {
+      const erasedSet = new Set(keys)
+      const remainingPlantIds = new Set()
+      for (const [k, v] of Object.entries(gardenCells)) {
+        if (!erasedSet.has(k) && v?.plantId) remainingPlantIds.add(v.plantId)
+      }
+      const orphanedPlantIds = new Set()
+      for (const k of erasedSet) {
+        const pid = gardenCells[k]?.plantId
+        if (pid && !remainingPlantIds.has(pid)) orphanedPlantIds.add(pid)
+      }
+      for (const pid of orphanedPlantIds) {
+        const plant = plants.find(p => p.id === pid)
+        if (plant?.is_planted) editPlant({ ...plant, is_planted: false, date_planted: null })
+      }
+    }
+  }, [paintCells, plants, editPlant, gardenCells])
+
+  const wrappedClearCells = useCallback(() => {
+    clearCells()
+    const plantedIds = new Set()
+    for (const v of Object.values(gardenCells)) {
+      if (v?.plantId) plantedIds.add(v.plantId)
+    }
+    for (const pid of plantedIds) {
+      const plant = plants.find(p => p.id === pid)
+      if (plant?.is_planted) editPlant({ ...plant, is_planted: false, date_planted: null })
+    }
+  }, [clearCells, plants, editPlant, gardenCells])
 
   if (loading) return null
   if (!user) {
@@ -167,8 +199,8 @@ function App() {
         {view === 'map' && (
           <GardenMap
             cells={gardenCells}
-            paintCells={paintCells}
-            clearCells={clearCells}
+            paintCells={wrappedPaintCells}
+            clearCells={wrappedClearCells}
             moveCells={moveCells}
             saving={mapSaving}
             plants={plants}
@@ -176,9 +208,8 @@ function App() {
             logsMap={logsMap}
             onSelectPlant={setSelected}
             onLogActivity={(p, type) => { setLogTarget(p.id); setLogPresetActivity(type); setShowLog(true) }}
-            placingPlant={placingPlant}
-            onPlantPlaced={handlePlantPlaced}
-            onCancelPlacing={handleCancelPlacing}
+            pendingPlant={pendingPlant}
+            onPendingPlantConsumed={handlePendingPlantConsumed}
           />
         )}
 
