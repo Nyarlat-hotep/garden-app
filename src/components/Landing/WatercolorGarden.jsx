@@ -130,20 +130,20 @@ const newBlob = (pos, rx, ry, color, layers = 5, edgeAmp = 1.6) => {
 
 const buildGrass = (palette) => {
   const parts = []
-  const blades = 8 + Math.floor(rand(0, 4))
-  const spread = rand(18, 28)
+  const blades = 10 + Math.floor(rand(0, 5))
+  const spread = rand(26, 40)
   for (let i = 0; i < blades; i++) {
-    const offX = (i - blades / 2) * (spread / blades) + rand(-2, 2)
-    const h = rand(40, 75)
-    const tipDrift = rand(-5, 5)
-    parts.push(newStem({ x: offX, y: 0 }, { x: offX + tipDrift, y: -h }, rand(1.1, 1.7), randPick(palette), 4))
+    const offX = (i - blades / 2) * (spread / blades) + rand(-3, 3)
+    const h = rand(70, 130)
+    const tipDrift = rand(-8, 8)
+    parts.push(newStem({ x: offX, y: 0 }, { x: offX + tipDrift, y: -h }, rand(1.3, 2.0), randPick(palette), 4))
   }
   return parts
 }
 
 const buildPoppy = (palette) => {
   const parts = []
-  const stemH = rand(50, 75)
+  const stemH = rand(80, 125)
   const stemColor = randPick(palette)
   parts.push(newStem({ x: 0, y: 0 }, { x: rand(-3, 3), y: -stemH }, 1.2, stemColor, 5))
   // a couple of narrow leaves down low
@@ -176,7 +176,7 @@ const buildPoppy = (palette) => {
 
 const buildConeflower = (palette) => {
   const parts = []
-  const stemH = rand(55, 80)
+  const stemH = rand(90, 135)
   const stemColor = randPick(palette)
   parts.push(newStem({ x: 0, y: 0 }, { x: rand(-2, 2), y: -stemH }, 1.3, stemColor, 5))
   // narrow leaves
@@ -204,7 +204,7 @@ const buildConeflower = (palette) => {
 
 const buildLupine = (palette) => {
   const parts = []
-  const stemH = rand(70, 95)
+  const stemH = rand(115, 160)
   const main = randPick(palette)
   parts.push(newStem({ x: 0, y: 0 }, { x: rand(-3, 3), y: -stemH }, 1.5, main, 6))
   // small leaves down low
@@ -230,7 +230,7 @@ const buildLupine = (palette) => {
 
 const buildDaisy = (palette) => {
   const parts = []
-  const stemH = rand(40, 60)
+  const stemH = rand(65, 95)
   const main = randPick(palette)
   parts.push(newStem({ x: 0, y: 0 }, { x: rand(-2, 2), y: -stemH }, 1.1, main, 4))
   // small leaves
@@ -253,7 +253,7 @@ const buildDaisy = (palette) => {
 
 const buildSunflower = (palette) => {
   const parts = []
-  const stemH = rand(80, 105)
+  const stemH = rand(130, 175)
   const main = randPick(palette)
   parts.push(newStem({ x: 0, y: 0 }, { x: rand(-3, 3), y: -stemH }, 2.4, main, 7))
   // a couple big leaves
@@ -352,8 +352,8 @@ export default function WatercolorGarden() {
         const H = p.height
         const isMobile = W < 640
         const counts = isMobile
-          ? { back: 6, mid: 8, front: 8 }
-          : { back: 14, mid: 18, front: 18 }
+          ? { back: 10, mid: 13, front: 15 }
+          : { back: 24, mid: 30, front: 34 }
         plants = []
 
         for (let i = 0; i < counts.back; i++) {
@@ -364,7 +364,7 @@ export default function WatercolorGarden() {
           plants.push(generatePlant({
             x, baseY, scale,
             palette: GREENS_BACK,
-            swayAmplitude: rand(0.012, 0.022),
+            swayAmplitude: rand(0.03, 0.055),
             swayPhase: rand(0, 1000),
             species: pickWeighted(SPECIES_KEYS, SPECIES_WEIGHTS_BACK),
             layerTone: 'back',
@@ -373,13 +373,13 @@ export default function WatercolorGarden() {
 
         for (let i = 0; i < counts.mid; i++) {
           const slotW = W / counts.mid
-          const x = slotW * i + slotW * 0.5 + rand(-slotW * 0.5, slotW * 0.5)
-          const baseY = H * rand(0.78, 0.92)
-          const scale = rand(0.65, 0.9)
+          const x = slotW * i + slotW * 0.5 + rand(-slotW * 0.6, slotW * 0.6)
+          const baseY = H * rand(0.78, 0.95)
+          const scale = rand(0.7, 1.0)
           plants.push(generatePlant({
             x, baseY, scale,
             palette: [...GREENS_FRONT, ...GREENS_BACK],
-            swayAmplitude: rand(0.018, 0.028),
+            swayAmplitude: rand(0.045, 0.075),
             swayPhase: rand(0, 1000),
             species: pickWeighted(SPECIES_KEYS, SPECIES_WEIGHTS_MID),
             layerTone: 'mid',
@@ -388,20 +388,20 @@ export default function WatercolorGarden() {
 
         for (let i = 0; i < counts.front; i++) {
           const slotW = W / counts.front
-          const x = slotW * i + slotW * 0.5 + rand(-slotW * 0.55, slotW * 0.55)
-          const baseY = H - rand(-3, 6)
-          const scale = rand(0.85, 1.15)
+          const x = slotW * i + slotW * 0.5 + rand(-slotW * 0.65, slotW * 0.65)
+          const baseY = H - rand(-4, 8)
+          const scale = rand(0.95, 1.3)
           plants.push(generatePlant({
             x, baseY, scale,
             palette: GREENS_FRONT,
-            swayAmplitude: rand(0.022, 0.034),
+            swayAmplitude: rand(0.06, 0.105),
             swayPhase: rand(0, 1000),
             species: pickWeighted(SPECIES_KEYS, SPECIES_WEIGHTS_FRONT),
             layerTone: 'front',
           }))
         }
 
-        const viewportFactor = Math.min(1.1, H / 160)
+        const viewportFactor = Math.min(1.6, H / 160)
         for (const pl of plants) pl.scale *= viewportFactor
       }
 
@@ -504,7 +504,7 @@ export default function WatercolorGarden() {
       const TONE_ALPHA = { back: 0.7, mid: 0.88, front: 1.0 }
 
       const drawPlant = (plant, t) => {
-        const sway = (p.noise(plant.swayPhase + t * 0.00018) - 0.5) * 2 * plant.swayAmplitude
+        const sway = (p.noise(plant.swayPhase + t * 0.00028) - 0.5) * 2 * plant.swayAmplitude
         p.push()
         p.translate(plant.x, plant.baseY)
         p.scale(plant.scale)
