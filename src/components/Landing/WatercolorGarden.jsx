@@ -1026,7 +1026,7 @@ export default function WatercolorGarden() {
         }
       }
 
-      const TONE_ALPHA = { back: 0.7, mid: 0.88, front: 1.0 }
+      const TONE_ALPHA = { back: 0.7, mid: 0.95, front: 1.45 }
       const BRIGHTNESS = { back: 0.92, mid: 1.0, front: 1.14 }
 
       const drawPlant = (plant, t) => {
