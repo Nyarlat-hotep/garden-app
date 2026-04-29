@@ -139,6 +139,36 @@ const lobedShape = (length, width, lobes = 5, steps = 28) => {
   return pts
 }
 
+const teardropShape = (length, width, steps = 14) => {
+  // Wide near pivot, narrows to point at far end. Used for strawberries.
+  const pts = []
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps
+    const x = length * t
+    let w
+    if (t < 0.25) {
+      w = width * (0.55 + 0.45 * (t / 0.25))
+    } else {
+      const t2 = (t - 0.25) / 0.75
+      w = width * (1 - t2 * t2 * 0.95)
+    }
+    pts.push({ x, y: -w * 0.5 })
+  }
+  for (let i = steps - 1; i >= 0; i--) {
+    const t = i / steps
+    const x = length * t
+    let w
+    if (t < 0.25) {
+      w = width * (0.55 + 0.45 * (t / 0.25))
+    } else {
+      const t2 = (t - 0.25) / 0.75
+      w = width * (1 - t2 * t2 * 0.95)
+    }
+    pts.push({ x, y: w * 0.5 })
+  }
+  return pts
+}
+
 const bladeShape = (length, width, steps = 8) => {
   // Grass blade: wider at base, pointed at tip. Drawn as filled silhouette.
   const pts = []
@@ -246,7 +276,7 @@ const newBlob = (pos, rx, ry, color, layers = 5, edgeAmp = 1.6) => {
 
 const buildGrassLong = (palette) => {
   const parts = []
-  const blades = 11 + Math.floor(rand(0, 5))
+  const blades = 9 + Math.floor(rand(0, 4))
   const spread = rand(28, 44)
   const clusterCurve = rand(-3.5, 3.5)
   for (let i = 0; i < blades; i++) {
@@ -255,6 +285,23 @@ const buildGrassLong = (palette) => {
     const tipDrift = clusterCurve * 1.5 + rand(-5, 5)
     const curveAmount = clusterCurve + rand(-2, 2)
     parts.push(newCurvedStem({ x: offX, y: 0 }, { x: offX + tipDrift, y: -h }, rand(1.3, 2.0), randPick(palette), curveAmount, 6))
+  }
+  // mix in a few filled lance leaves (broader leafy shapes among the blades)
+  const leafies = 3 + Math.floor(rand(0, 4))
+  for (let i = 0; i < leafies; i++) {
+    const offX = rand(-spread * 0.5, spread * 0.5)
+    const h = rand(35, 75)
+    const wid = rand(2.5, 4.5)
+    const tilt = rand(-0.45, 0.45)
+    const shape = lanceShape(h, wid, 1.4)
+    parts.push(newLeaf({
+      pivot: { x: offX, y: 0 },
+      angle: -Math.PI / 2 + tilt,
+      shape,
+      color: randPick(palette),
+      layers: 3,
+      edgeAmp: 1.0,
+    }))
   }
   return parts
 }
@@ -296,6 +343,23 @@ const buildGrassFan = (palette) => {
     const h = tallest * rand(0.7, 1.0)
     const wid = rand(2.0, 3.2)
     const shape = bladeShape(h, wid)
+    parts.push(newLeaf({
+      pivot: { x: offX, y: 0 },
+      angle: -Math.PI / 2 + tilt,
+      shape,
+      color: randPick(palette),
+      layers: 3,
+      edgeAmp: 1.0,
+    }))
+  }
+  // mix in 2-3 broader lance leaves between blades
+  const leafies = 2 + Math.floor(rand(0, 2))
+  for (let i = 0; i < leafies; i++) {
+    const offX = rand(-spread * 0.5, spread * 0.5)
+    const h = rand(28, 55)
+    const wid = rand(3, 5)
+    const tilt = rand(-0.35, 0.35)
+    const shape = lanceShape(h, wid, 1.2)
     parts.push(newLeaf({
       pivot: { x: offX, y: 0 },
       angle: -Math.PI / 2 + tilt,
@@ -466,8 +530,22 @@ const buildTomato = (palette) => {
     for (let f = 0; f < fruits; f++) {
       const fx = cx + rand(-5, 5)
       const fy = cy + rand(-3, 3)
-      const r = rand(3.8, 5.5)
+      const r = rand(4, 6)
       parts.push(newBlob({ x: fx, y: fy }, r, r * rand(0.9, 1.05), randPick(TOMATO_RED), 5, 1.4))
+      // green calyx — small pointed leaves at top of fruit
+      const calyxColor = randPick(palette)
+      for (let cn = 0; cn < 4; cn++) {
+        const cAng = -Math.PI / 2 + (cn - 1.5) * 0.45
+        const cShape = lanceShape(rand(2.5, 4), 0.8, 1.7)
+        parts.push(newLeaf({
+          pivot: { x: fx, y: fy - r * 0.85 },
+          angle: cAng,
+          shape: cShape,
+          color: calyxColor,
+          layers: 2,
+          edgeAmp: 0.6,
+        }))
+      }
     }
   }
   return parts
@@ -493,10 +571,28 @@ const buildPumpkin = (palette) => {
   // big orange round fruit at base
   const fx = rand(-6, 6)
   const fy = rand(-4, 0)
-  const fR = rand(9, 13)
+  const fR = rand(10, 14)
   parts.push(newBlob({ x: fx, y: fy }, fR, fR * 0.85, randPick(PUMPKIN_ORANGE), 6, 2.0))
-  // small darker dot suggesting ribs
-  parts.push(newBlob({ x: fx, y: fy }, fR * 0.7, fR * 0.6, [180, 95, 25], 3, 1.4))
+  // ribs — curved darker arcs across the fruit
+  const ribCount = 3
+  const ribColor = [165, 90, 30]
+  for (let r = 0; r < ribCount; r++) {
+    const tFrac = (r + 1) / (ribCount + 1)
+    const ribX = fx + (tFrac - 0.5) * fR * 1.3
+    const startY = fy - fR * 0.78
+    const endY = fy + fR * 0.78
+    const ribCurve = (tFrac - 0.5) * fR * 0.6
+    parts.push(newCurvedStem(
+      { x: ribX, y: startY },
+      { x: ribX, y: endY },
+      1.0,
+      ribColor,
+      ribCurve,
+      5,
+    ))
+  }
+  // brown stem nub on top
+  parts.push(newBlob({ x: fx + rand(-1.5, 1.5), y: fy - fR * 0.95 }, 1.4, 2.2, [115, 80, 38], 4, 0.7))
   return parts
 }
 
@@ -516,12 +612,42 @@ const buildStrawberry = (palette) => {
     parts.push(newLeaf({ pivot: { x: tx, y: ty }, angle: ang, shape: leafShape, color: main, layers: 4, edgeAmp: 1.8 }))
     parts.push(newLeaf({ pivot: { x: tx, y: ty }, angle: ang + 0.45, shape: leafShape, color: main, layers: 4, edgeAmp: 1.8 }))
   }
-  // 1-2 berries
+  // 1-2 berries — teardrop shape with calyx and seeds
   const berries = 1 + Math.floor(rand(0, 2))
   for (let b = 0; b < berries; b++) {
     const fx = rand(-8, 8)
     const fy = rand(-8, -2)
-    parts.push(newBlob({ x: fx, y: fy }, rand(3.5, 5), rand(4.5, 6), randPick(STRAWBERRY_RED), 5, 1.4))
+    const bSize = rand(8, 11)
+    const bWid = bSize * rand(0.85, 1.0)
+    const shape = teardropShape(bSize, bWid)
+    const berryColor = randPick(STRAWBERRY_RED)
+    parts.push(newLeaf({
+      pivot: { x: fx, y: fy },
+      angle: Math.PI / 2 + rand(-0.15, 0.15),
+      shape,
+      color: berryColor,
+      layers: 5,
+      edgeAmp: 1.3,
+    }))
+    // seed dots on the berry surface
+    for (let s = 0; s < 6; s++) {
+      const sx = fx + rand(-bWid * 0.35, bWid * 0.35)
+      const sy = fy + rand(bSize * 0.1, bSize * 0.75)
+      parts.push(newBlob({ x: sx, y: sy }, 0.55, 0.55, [200, 175, 80], 2, 0.4))
+    }
+    // green calyx — 5 small pointed shapes radiating from top of berry
+    for (let cn = 0; cn < 5; cn++) {
+      const cAng = -Math.PI / 2 + (cn - 2) * 0.42
+      const cShape = lanceShape(rand(3, 4.5), 0.9, 1.7)
+      parts.push(newLeaf({
+        pivot: { x: fx, y: fy },
+        angle: cAng,
+        shape: cShape,
+        color: main,
+        layers: 2,
+        edgeAmp: 0.6,
+      }))
+    }
   }
   return parts
 }
@@ -828,16 +954,18 @@ export default function WatercolorGarden() {
         p.noStroke()
       }
 
-      const drawLeaf = (leaf, toneAlphaMul) => {
+      const boost = (v, mul) => Math.max(0, Math.min(255, v * mul))
+
+      const drawLeaf = (leaf, toneAlphaMul, brightMul) => {
         p.push()
         p.translate(leaf.pivot.x, leaf.pivot.y)
         p.rotate(leaf.angle)
         const { shape, color, layers } = leaf
         for (const layer of layers) {
           const c = [
-            color[0] + layer.colorDelta[0],
-            color[1] + layer.colorDelta[1],
-            color[2] + layer.colorDelta[2],
+            boost(color[0], brightMul) + layer.colorDelta[0],
+            boost(color[1], brightMul) + layer.colorDelta[1],
+            boost(color[2], brightMul) + layer.colorDelta[2],
           ]
           drawShape(shape, layer.vNoise, layer.offsetX, layer.offsetY, c, layer.alpha * toneAlphaMul)
         }
@@ -845,11 +973,11 @@ export default function WatercolorGarden() {
         p.pop()
       }
 
-      const drawStem = (stem, toneAlphaMul) => {
+      const drawStem = (stem, toneAlphaMul, brightMul) => {
         const { start, end, thickness, color, jitter } = stem
         for (let layer = 0; layer < 3; layer++) {
           p.noFill()
-          p.stroke(color[0], color[1], color[2], (55 + layer * 14) * toneAlphaMul)
+          p.stroke(boost(color[0], brightMul), boost(color[1], brightMul), boost(color[2], brightMul), (55 + layer * 14) * toneAlphaMul)
           p.strokeWeight(thickness + layer * 0.3)
           p.beginShape()
           p.vertex(start.x, start.y)
@@ -865,15 +993,15 @@ export default function WatercolorGarden() {
         p.noStroke()
       }
 
-      const drawBlob = (blob, toneAlphaMul) => {
+      const drawBlob = (blob, toneAlphaMul, brightMul) => {
         p.push()
         p.translate(blob.pos.x, blob.pos.y)
         const { shape, color, layers, pigmentDot } = blob
         for (const layer of layers) {
           const c = [
-            color[0] + layer.colorDelta[0],
-            color[1] + layer.colorDelta[1],
-            color[2] + layer.colorDelta[2],
+            boost(color[0], brightMul) + layer.colorDelta[0],
+            boost(color[1], brightMul) + layer.colorDelta[1],
+            boost(color[2], brightMul) + layer.colorDelta[2],
           ]
           drawShape(shape, layer.vNoise, layer.offsetX, layer.offsetY, c, layer.alpha * toneAlphaMul)
         }
@@ -899,6 +1027,7 @@ export default function WatercolorGarden() {
       }
 
       const TONE_ALPHA = { back: 0.7, mid: 0.88, front: 1.0 }
+      const BRIGHTNESS = { back: 0.92, mid: 1.0, front: 1.14 }
 
       const drawPlant = (plant, t) => {
         const sway = (p.noise(plant.swayPhase + t * 0.00028) - 0.5) * 2 * plant.swayAmplitude
@@ -907,12 +1036,13 @@ export default function WatercolorGarden() {
         p.scale(plant.scale)
         p.rotate(sway)
         const toneMul = TONE_ALPHA[plant.layerTone]
+        const brightMul = BRIGHTNESS[plant.layerTone]
         for (const part of plant.parts) {
-          if (part.type === 'stem') drawStem(part, toneMul)
+          if (part.type === 'stem') drawStem(part, toneMul, brightMul)
         }
         for (const part of plant.parts) {
-          if (part.type === 'leaf') drawLeaf(part, toneMul)
-          else if (part.type === 'blob') drawBlob(part, toneMul)
+          if (part.type === 'leaf') drawLeaf(part, toneMul, brightMul)
+          else if (part.type === 'blob') drawBlob(part, toneMul, brightMul)
         }
         p.pop()
       }
