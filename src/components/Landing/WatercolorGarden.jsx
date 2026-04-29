@@ -262,9 +262,9 @@ const buildGrassLong = (palette) => {
 const buildGrassTuft = (palette) => {
   // Short, tightly clustered pointed blades — filled triangular silhouettes.
   const parts = []
-  const blades = 8 + Math.floor(rand(0, 7))
-  const spread = rand(10, 20)
-  const tallest = rand(28, 50)
+  const blades = 10 + Math.floor(rand(0, 8))
+  const spread = rand(14, 24)
+  const tallest = rand(36, 62)
   for (let i = 0; i < blades; i++) {
     const offX = (i - blades / 2) * (spread / blades) + rand(-1.5, 1.5)
     const h = tallest * rand(0.5, 1.0)
@@ -749,8 +749,8 @@ export default function WatercolorGarden() {
         const H = p.height
         const isMobile = W < 640
         const counts = isMobile
-          ? { back: 12, mid: 16, front: 20 }
-          : { back: 30, mid: 40, front: 50 }
+          ? { back: 18, mid: 24, front: 32 }
+          : { back: 46, mid: 62, front: 78 }
         plants = []
 
         for (let i = 0; i < counts.back; i++) {
