@@ -37,12 +37,6 @@ export default function LandingPage({ onLogin, onSignup, onGoogleLogin }) {
           Track plants, log care activities, and visualize your garden — all in one place.
         </p>
 
-        <ul className="landing-props">
-          <li><Sprout size={18} /><span>Plant tracking</span></li>
-          <li><Map size={18} /><span>Visual garden map</span></li>
-          <li><Bell size={18} /><span>Smart notifications</span></li>
-        </ul>
-
         <div className="landing-auth">
           <div className="landing-tabs">
             <button

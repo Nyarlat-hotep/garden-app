@@ -139,6 +139,24 @@ const lobedShape = (length, width, lobes = 5, steps = 28) => {
   return pts
 }
 
+const bladeShape = (length, width, steps = 8) => {
+  // Grass blade: wider at base, pointed at tip. Drawn as filled silhouette.
+  const pts = []
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps
+    const x = length * t
+    const w = width * (1 - t * 0.92)
+    pts.push({ x, y: -w })
+  }
+  for (let i = steps - 1; i >= 0; i--) {
+    const t = i / steps
+    const x = length * t
+    const w = width * (1 - t * 0.92)
+    pts.push({ x, y: w })
+  }
+  return pts
+}
+
 const bellShape = (height, mouthWidth, steps = 12) => {
   // Trumpet/bell: attachment at (0,0), flared mouth at y=height. Hangs in +y direction.
   const pts = []
@@ -226,11 +244,10 @@ const newBlob = (pos, rx, ry, color, layers = 5, edgeAmp = 1.6) => {
 
 // ---- Species ----
 
-const buildGrass = (palette) => {
+const buildGrassLong = (palette) => {
   const parts = []
   const blades = 11 + Math.floor(rand(0, 5))
   const spread = rand(28, 44)
-  // Cluster prevailing arch direction (suggests wind in this clump).
   const clusterCurve = rand(-3.5, 3.5)
   for (let i = 0; i < blades; i++) {
     const offX = (i - blades / 2) * (spread / blades) + rand(-3, 3)
@@ -240,6 +257,62 @@ const buildGrass = (palette) => {
     parts.push(newCurvedStem({ x: offX, y: 0 }, { x: offX + tipDrift, y: -h }, rand(1.3, 2.0), randPick(palette), curveAmount, 6))
   }
   return parts
+}
+
+const buildGrassTuft = (palette) => {
+  // Short, tightly clustered pointed blades — filled triangular silhouettes.
+  const parts = []
+  const blades = 8 + Math.floor(rand(0, 7))
+  const spread = rand(10, 20)
+  const tallest = rand(28, 50)
+  for (let i = 0; i < blades; i++) {
+    const offX = (i - blades / 2) * (spread / blades) + rand(-1.5, 1.5)
+    const h = tallest * rand(0.5, 1.0)
+    const wid = rand(1.5, 2.4)
+    const tilt = rand(-0.32, 0.32)
+    const shape = bladeShape(h, wid)
+    parts.push(newLeaf({
+      pivot: { x: offX, y: 0 },
+      angle: -Math.PI / 2 + tilt,
+      shape,
+      color: randPick(palette),
+      layers: 3,
+      edgeAmp: 0.9,
+    }))
+  }
+  return parts
+}
+
+const buildGrassFan = (palette) => {
+  // Medium fountain-like clump: wider blades fanning outward.
+  const parts = []
+  const blades = 5 + Math.floor(rand(0, 4))
+  const spread = rand(18, 30)
+  const tallest = rand(45, 75)
+  for (let i = 0; i < blades; i++) {
+    const offX = (i - blades / 2) * (spread / blades) + rand(-2, 2)
+    const t = blades > 1 ? (i + 0.5) / blades : 0.5
+    const tilt = (t - 0.5) * 0.95 + rand(-0.18, 0.18)
+    const h = tallest * rand(0.7, 1.0)
+    const wid = rand(2.0, 3.2)
+    const shape = bladeShape(h, wid)
+    parts.push(newLeaf({
+      pivot: { x: offX, y: 0 },
+      angle: -Math.PI / 2 + tilt,
+      shape,
+      color: randPick(palette),
+      layers: 3,
+      edgeAmp: 1.0,
+    }))
+  }
+  return parts
+}
+
+const buildGrass = (palette) => {
+  const r = Math.random()
+  if (r < 0.32) return buildGrassTuft(palette)
+  if (r < 0.58) return buildGrassFan(palette)
+  return buildGrassLong(palette)
 }
 
 const buildPoppy = (palette) => {
