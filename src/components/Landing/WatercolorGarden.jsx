@@ -71,6 +71,38 @@ const PEPPER_RED = [
   [180, 45, 40],
 ]
 
+const WHEAT_GOLD = [
+  [188, 168, 95],
+  [205, 185, 110],
+  [165, 145, 75],
+]
+
+const FOXGLOVE_PINK = [
+  [225, 165, 195],
+  [205, 145, 175],
+  [240, 185, 210],
+]
+const FOXGLOVE_PURPLE = [
+  [180, 125, 195],
+  [160, 105, 175],
+]
+
+const IRIS_PURPLE = [
+  [125, 90, 165],
+  [105, 75, 145],
+  [145, 110, 185],
+]
+const IRIS_YELLOW = [
+  [225, 175, 65],
+  [205, 155, 50],
+]
+const IRIS_ACCENT = [220, 175, 65]
+
+const BEAN_POD_GREEN = [
+  [110, 145, 70],
+  [125, 160, 85],
+]
+
 const TWO_PI = Math.PI * 2
 
 const rand = (a, b) => a + Math.random() * (b - a)
@@ -103,6 +135,26 @@ const lobedShape = (length, width, lobes = 5, steps = 28) => {
     const x = Math.cos(ang) * length * 0.5 * r + length * 0.5
     const y = Math.sin(ang) * width * 0.5 * r
     pts.push({ x, y })
+  }
+  return pts
+}
+
+const bellShape = (height, mouthWidth, steps = 12) => {
+  // Trumpet/bell: attachment at (0,0), flared mouth at y=height. Hangs in +y direction.
+  const pts = []
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps
+    const profile = Math.pow(t, 1.3)
+    pts.push({ x: mouthWidth * 0.5 * profile, y: height * t })
+  }
+  // flared rim curls outward at the bottom
+  pts.push({ x: mouthWidth * 0.45, y: height * 1.06 })
+  pts.push({ x: 0, y: height * 1.12 })
+  pts.push({ x: -mouthWidth * 0.45, y: height * 1.06 })
+  for (let i = steps; i >= 0; i--) {
+    const t = i / steps
+    const profile = Math.pow(t, 1.3)
+    pts.push({ x: -mouthWidth * 0.5 * profile, y: height * t })
   }
   return pts
 }
@@ -428,6 +480,125 @@ const buildPepper = (palette) => {
   return parts
 }
 
+const buildWheat = (palette) => {
+  const parts = []
+  const stemH = rand(95, 130)
+  const main = randPick(palette)
+  parts.push(newStem({ x: 0, y: 0 }, { x: rand(-2, 2), y: -stemH }, 1.0, main, 5))
+  // narrow basal leaves
+  for (let i = 0; i < 2; i++) {
+    const y = -stemH * (0.18 + i * 0.14)
+    const lShape = lanceShape(rand(15, 22), rand(1.2, 1.8), 1.6)
+    parts.push(newLeaf({ pivot: { x: 0, y }, angle: i % 2 === 0 ? 0.3 : Math.PI - 0.3, shape: lShape, color: main, layers: 3, edgeAmp: 1.2 }))
+  }
+  // herringbone seed pairs along the upper stem
+  const seedStart = -stemH * 0.55
+  const seedEnd = -stemH - 4
+  const pairs = 9 + Math.floor(rand(0, 4))
+  for (let i = 0; i < pairs; i++) {
+    const t = pairs > 1 ? i / (pairs - 1) : 0
+    const y = seedStart + (seedEnd - seedStart) * t
+    const seedShape = lanceShape(rand(5, 8), rand(1.4, 2), 1.5)
+    const goldColor = randPick(WHEAT_GOLD)
+    parts.push(newLeaf({ pivot: { x: 0, y }, angle: -Math.PI / 2 - 0.32, shape: seedShape, color: goldColor, layers: 3, edgeAmp: 1.0 }))
+    parts.push(newLeaf({ pivot: { x: 0, y }, angle: -Math.PI / 2 + 0.32, shape: seedShape, color: goldColor, layers: 3, edgeAmp: 1.0 }))
+  }
+  // tip
+  const tipShape = lanceShape(8, 1.6, 1.6)
+  parts.push(newLeaf({ pivot: { x: 0, y: -stemH }, angle: -Math.PI / 2, shape: tipShape, color: randPick(WHEAT_GOLD), layers: 3, edgeAmp: 1.0 }))
+  return parts
+}
+
+const buildFoxglove = (palette) => {
+  const parts = []
+  const stemH = rand(110, 145)
+  const main = randPick(palette)
+  parts.push(newStem({ x: 0, y: 0 }, { x: rand(-2, 2), y: -stemH }, 1.5, main, 6))
+  // basal leaves
+  for (let i = 0; i < 2; i++) {
+    const y = -stemH * (0.15 + i * 0.1)
+    const lShape = lanceShape(rand(13, 18), rand(4, 6), 0.9)
+    parts.push(newLeaf({ pivot: { x: 0, y }, angle: i % 2 === 0 ? 0.4 : Math.PI - 0.4, shape: lShape, color: main, layers: 3, edgeAmp: 1.4 }))
+  }
+  // bells alternate along upper stem
+  const bellColors = Math.random() < 0.55 ? FOXGLOVE_PINK : FOXGLOVE_PURPLE
+  const bells = 5 + Math.floor(rand(0, 3))
+  const sideBias = Math.random() < 0.5 ? -1 : 1
+  for (let i = 0; i < bells; i++) {
+    const t = i / Math.max(1, bells - 1)
+    const y = -stemH * (0.45 + t * 0.5)
+    const bH = rand(9, 13) * (1 - t * 0.25)
+    const bW = bH * rand(0.7, 0.9)
+    const shape = bellShape(bH, bW)
+    const sd = i % 2 === 0 ? sideBias : -sideBias
+    const tilt = sd * (0.25 + rand(-0.1, 0.1))
+    parts.push(newLeaf({ pivot: { x: sd * 2, y }, angle: tilt, shape, color: randPick(bellColors), layers: 4, edgeAmp: 1.3 }))
+  }
+  return parts
+}
+
+const buildIris = (palette) => {
+  const parts = []
+  const stemH = rand(80, 110)
+  const main = randPick(palette)
+  // fan of 4–6 sword leaves rising from base
+  const swords = 4 + Math.floor(rand(0, 3))
+  for (let i = 0; i < swords; i++) {
+    const t = (i + 0.5) / swords
+    const ang = -Math.PI / 2 + (t - 0.5) * Math.PI * 0.65
+    const len = rand(50, 75)
+    const wid = rand(2.6, 4)
+    const shape = lanceShape(len, wid, 1.4)
+    parts.push(newLeaf({ pivot: { x: rand(-2, 2), y: 0 }, angle: ang, shape, color: main, layers: 3, edgeAmp: 1.3 }))
+  }
+  // central stem
+  parts.push(newStem({ x: 0, y: 0 }, { x: rand(-2, 2), y: -stemH }, 1.4, main, 5))
+  const cy = -stemH
+  const flowerPalette = Math.random() < 0.7 ? IRIS_PURPLE : IRIS_YELLOW
+  // 3 drooping outer petals — wider lance shapes pointing down/out
+  for (let i = 0; i < 3; i++) {
+    const ang = Math.PI / 2 + (i - 1) * 0.55
+    const shape = lanceShape(rand(11, 15), rand(4.5, 6), 0.8)
+    parts.push(newLeaf({ pivot: { x: 0, y: cy }, angle: ang, shape, color: randPick(flowerPalette), layers: 4, edgeAmp: 1.6 }))
+  }
+  // 3 upright inner petals — narrower, pointing up
+  for (let i = 0; i < 3; i++) {
+    const ang = -Math.PI / 2 + (i - 1) * 0.4
+    const shape = lanceShape(rand(7, 10), rand(3, 4), 1.0)
+    parts.push(newLeaf({ pivot: { x: 0, y: cy }, angle: ang, shape, color: randPick(flowerPalette), layers: 4, edgeAmp: 1.4 }))
+  }
+  parts.push(newBlob({ x: 0, y: cy }, 2, 2.5, IRIS_ACCENT, 4, 1.0))
+  return parts
+}
+
+const buildBeanPole = (palette) => {
+  const parts = []
+  const stemH = rand(105, 140)
+  const main = randPick(palette)
+  parts.push(newStem({ x: 0, y: 0 }, { x: rand(-3, 3), y: -stemH }, 1.5, main, 6))
+  // broad oval leaves up the stem
+  const leafNodes = 3 + Math.floor(rand(0, 2))
+  for (let i = 1; i <= leafNodes; i++) {
+    const t = i / (leafNodes + 1)
+    const y = -stemH * t
+    const side = i % 2 === 0 ? -1 : 1
+    const shape = lanceShape(rand(11, 15), rand(5.5, 7.5), 0.85)
+    parts.push(newLeaf({ pivot: { x: 0, y }, angle: side > 0 ? -0.1 : Math.PI + 0.1, shape, color: main, layers: 4, edgeAmp: 1.6 }))
+  }
+  // long thin pods hanging down
+  const pods = 3 + Math.floor(rand(0, 3))
+  for (let i = 0; i < pods; i++) {
+    const t = rand(0.4, 0.85)
+    const y = -stemH * t
+    const x = rand(-7, 7)
+    const podLen = rand(20, 32)
+    const podWid = rand(1.8, 2.6)
+    const shape = lanceShape(podLen, podWid, 0.9)
+    parts.push(newLeaf({ pivot: { x, y }, angle: Math.PI / 2 + rand(-0.18, 0.18), shape, color: randPick(BEAN_POD_GREEN), layers: 4, edgeAmp: 1.3 }))
+  }
+  return parts
+}
+
 const SPECIES_BUILDERS = {
   grass: buildGrass,
   poppy: buildPoppy,
@@ -439,13 +610,17 @@ const SPECIES_BUILDERS = {
   pumpkin: buildPumpkin,
   strawberry: buildStrawberry,
   pepper: buildPepper,
+  wheat: buildWheat,
+  foxglove: buildFoxglove,
+  iris: buildIris,
+  beanpole: buildBeanPole,
 }
 
-const SPECIES_KEYS = ['grass', 'poppy', 'coneflower', 'lupine', 'daisy', 'sunflower', 'tomato', 'pumpkin', 'strawberry', 'pepper']
-// Foreground favors veggies/fruits; background favors grass.
-const SPECIES_WEIGHTS_FRONT = [0.18, 0.10, 0.08, 0.08, 0.08, 0.08, 0.13, 0.10, 0.09, 0.08]
-const SPECIES_WEIGHTS_MID   = [0.26, 0.10, 0.10, 0.12, 0.09, 0.06, 0.09, 0.05, 0.07, 0.06]
-const SPECIES_WEIGHTS_BACK  = [0.50, 0.10, 0.08, 0.10, 0.08, 0.04, 0.04, 0.02, 0.02, 0.02]
+const SPECIES_KEYS = ['grass', 'poppy', 'coneflower', 'lupine', 'daisy', 'sunflower', 'tomato', 'pumpkin', 'strawberry', 'pepper', 'wheat', 'foxglove', 'iris', 'beanpole']
+// Front: emphasize varied silhouettes (spikes, bells, fans, pods) over radial flowers.
+const SPECIES_WEIGHTS_FRONT = [0.13, 0.06, 0.05, 0.07, 0.05, 0.06, 0.10, 0.08, 0.07, 0.07, 0.06, 0.07, 0.06, 0.07]
+const SPECIES_WEIGHTS_MID   = [0.20, 0.07, 0.06, 0.10, 0.06, 0.05, 0.07, 0.04, 0.05, 0.05, 0.07, 0.06, 0.06, 0.06]
+const SPECIES_WEIGHTS_BACK  = [0.40, 0.07, 0.06, 0.08, 0.06, 0.03, 0.03, 0.02, 0.02, 0.02, 0.10, 0.05, 0.03, 0.03]
 
 const pickWeighted = (keys, weights) => {
   const r = Math.random()
