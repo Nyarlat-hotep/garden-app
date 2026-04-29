@@ -1,84 +1,104 @@
-import { Sprout, Map, ClipboardList, Bell } from 'lucide-react'
+import { useState } from 'react'
+import { Sprout, Map, Bell } from 'lucide-react'
+import WatercolorGarden from './WatercolorGarden.jsx'
 import './LandingPage.css'
 
-export default function LandingPage({ onGetStarted }) {
+export default function LandingPage({ onLogin, onSignup, onGoogleLogin }) {
+  const [isLogin, setIsLogin] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      if (isLogin) await onLogin(email, password)
+      else await onSignup(email, password)
+    } catch (err) {
+      setError(err.message || (isLogin ? 'Login failed' : 'Sign up failed'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="landing-page">
-      <header className="landing-header">
-        <div className="landing-logo">🌱</div>
-        <nav className="landing-nav">
-          <button className="nav-cta" onClick={onGetStarted}>Sign In</button>
-        </nav>
-      </header>
+      <div className="landing-content">
+        <div className="landing-brand">
+          <span className="landing-mark">🌱</span>
+          <span className="landing-wordmark">Garden</span>
+        </div>
 
-      <main className="landing-main">
-        <section className="hero">
-          <h1>Your Garden, Simplified</h1>
-          <p className="hero-sub">
-            Track plants, log care activities, and visualize your garden layout—all in one place.
-          </p>
-          <button className="hero-cta" onClick={onGetStarted}>
-            Get Started Free
+        <h1 className="landing-headline">Your Garden, Simplified</h1>
+        <p className="landing-sub">
+          Track plants, log care activities, and visualize your garden — all in one place.
+        </p>
+
+        <ul className="landing-props">
+          <li><Sprout size={18} /><span>Plant tracking</span></li>
+          <li><Map size={18} /><span>Visual garden map</span></li>
+          <li><Bell size={18} /><span>Smart notifications</span></li>
+        </ul>
+
+        <div className="landing-auth">
+          <div className="landing-tabs">
+            <button
+              className={`landing-tab ${isLogin ? 'active' : ''}`}
+              onClick={() => setIsLogin(true)}
+              type="button"
+            >
+              Sign In
+            </button>
+            <button
+              className={`landing-tab ${!isLogin ? 'active' : ''}`}
+              onClick={() => setIsLogin(false)}
+              type="button"
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <form className="landing-form" onSubmit={handleSubmit}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
+              required
+            />
+            {error && <div className="landing-error">{error}</div>}
+            <button type="submit" className="landing-submit" disabled={loading}>
+              {loading ? 'Please wait...' : (isLogin ? 'Sign in' : 'Create account')}
+            </button>
+          </form>
+
+          <div className="landing-divider"><span>or</span></div>
+
+          <button className="landing-google" onClick={onGoogleLogin} type="button">
+            <svg className="landing-google-icon" viewBox="0 0 24 24" width="18" height="18">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
           </button>
-          <p className="hero-note">No credit card required</p>
-        </section>
+        </div>
+      </div>
 
-        <section className="features">
-          <div className="feature">
-            <div className="feature-icon"><Map size={28} /></div>
-            <h2>Visual Garden Map</h2>
-            <p>Paint your garden layout on a grid, drag plants around, and see your entire growing space at a glance.</p>
-          </div>
-
-          <div className="feature">
-            <div className="feature-icon"><Sprout size={28} /></div>
-            <h2>Plant Tracking</h2>
-            <p>Add plants from a curated list of 100+ food crops. Track varieties, families, and days to harvest.</p>
-          </div>
-
-          <div className="feature">
-            <div className="feature-icon"><ClipboardList size={28} /></div>
-            <h2>Activity Logging</h2>
-            <p>Log watering, pruning, fertilizing, and harvesting. See your care history and stay on top of schedules.</p>
-          </div>
-
-          <div className="feature">
-            <div className="feature-icon"><Bell size={28} /></div>
-            <h2>Smart Notifications</h2>
-            <p>Get reminded when plants need care. Browser push notifications keep you on track even when you're away.</p>
-          </div>
-        </section>
-
-        <section className="how-it-works">
-          <h2>How It Works</h2>
-          <div className="steps">
-            <div className="step">
-              <span className="step-num">1</span>
-              <h3>Create your account</h3>
-              <p>Sign up in seconds. Your data is stored securely and privately.</p>
-            </div>
-            <div className="step">
-              <span className="step-num">2</span>
-              <h3>Add your plants</h3>
-              <p>Choose from 100+ pre-loaded food plants or discover new varieties.</p>
-            </div>
-            <div className="step">
-              <span className="step-num">3</span>
-              <h3>Map your garden</h3>
-              <p>Paint your garden layout on the grid and arrange plants visually.</p>
-            </div>
-            <div className="step">
-              <span className="step-num">4</span>
-              <h3>Log activities</h3>
-              <p>Track every watering, pruning, and harvest. Never forget a care task.</p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="landing-footer">
-        <p>Built with care for home gardeners everywhere.</p>
-      </footer>
+      <WatercolorGarden />
     </div>
   )
 }

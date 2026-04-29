@@ -6,7 +6,6 @@ import { usePlants } from './hooks/usePlants.js'
 import { useActivityLogs } from './hooks/useActivityLogs.js'
 import { useGardenMap } from './hooks/useGardenMap.js'
 import { useNotifications } from './hooks/useNotifications.js'
-import LoginOverlay from './components/Auth/LoginOverlay.jsx'
 import LandingPage from './components/Landing/LandingPage.jsx'
 import Navbar from './components/Layout/Navbar.jsx'
 import BottomNav from './components/Layout/BottomNav.jsx'
@@ -38,7 +37,6 @@ function App() {
   const { cells: gardenCells, saving: mapSaving, paintCells, clearCells, moveCells } = useGardenMap(user?.id)
   const { hasOverdue, overdueItems, permission, enableNotifications } = useNotifications(user?.id, healthMap, plants)
 
-  const [showLanding, setShowLanding] = useState(true)
   const [view, setView]                 = useState('map')
   const [selected, setSelected]         = useState(null)
   const [adding, setAdding]             = useState(false)
@@ -133,9 +131,7 @@ function App() {
 
   if (loading) return null
   if (!user) {
-    return showLanding
-      ? <LandingPage onGetStarted={() => setShowLanding(false)} />
-      : <LoginOverlay onLogin={login} onSignup={signup} onBack={() => setShowLanding(true)} onGoogleLogin={loginWithGoogle} />
+    return <LandingPage onLogin={login} onSignup={signup} onGoogleLogin={loginWithGoogle} />
   }
 
   const handleSavePlant = async (plant) => {
