@@ -140,7 +140,10 @@
 }
 
 .btn-save {
-  padding: 0.6rem 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 600;
@@ -156,7 +159,10 @@
 .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-plant-now {
-  padding: 0.6rem 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 600;
@@ -173,7 +179,10 @@
 .btn-plant-now:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-cancel {
-  padding: 0.6rem 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 600;

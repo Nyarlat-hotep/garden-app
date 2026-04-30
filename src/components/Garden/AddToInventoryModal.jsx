@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, X, Archive, Sprout } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import './AddPlantModal.css'
 
@@ -129,9 +129,9 @@ export default function AddToInventoryModal({ onSave, onSaveAndPlant, onClose, p
         </div>
 
         <div className="modal-actions">
-          <button className="btn-cancel" onClick={onClose}>Cancel</button>
-          <button className="btn-save" onClick={handleSave} disabled={!form.name.trim()}>Add to Inventory</button>
-          <button className="btn-plant-now" onClick={handlePlantNow} disabled={!form.name.trim()}>Plant now</button>
+          <button className="btn-cancel" onClick={onClose}><X size={15} /> Cancel</button>
+          <button className="btn-save" onClick={handleSave} disabled={!form.name.trim()}><Archive size={15} /> Add to Inventory</button>
+          <button className="btn-plant-now" onClick={handlePlantNow} disabled={!form.name.trim()}><Sprout size={15} /> Plant now</button>
         </div>
       </motion.div>
     </div>
