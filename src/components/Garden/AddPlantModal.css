@@ -155,6 +155,23 @@
 .btn-save:hover:not(:disabled) { background: rgba(78, 122, 92, 0.22); }
 .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
 
+.btn-plant-now {
+  padding: 0.6rem 1.6rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: white;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-plant-now:hover:not(:disabled) { background: var(--accent-dark); }
+.btn-plant-now:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .btn-cancel {
   padding: 0.6rem 1.6rem;
   font-family: var(--font-body);

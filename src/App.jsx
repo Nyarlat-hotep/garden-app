@@ -145,6 +145,16 @@ function App() {
     setAddingFromDiscover(null)
   }
 
+  const handleSaveInventoryAndPlant = async (plant) => {
+    const saved = await addPlant({ ...plant, is_planted: false, date_planted: null })
+    setAdding(false)
+    setAddingFromDiscover(null)
+    if (saved) {
+      setView('map')
+      setPendingPlant(saved)
+    }
+  }
+
   const handleSaveLog = async (entries) => {
     for (const entry of entries) {
       await addLog({ ...entry, user_id: user.id })
@@ -252,6 +262,7 @@ function App() {
         <AddToInventoryModal
           prefill={addingFromDiscover}
           onSave={handleSaveInventory}
+          onSaveAndPlant={handleSaveInventoryAndPlant}
           onClose={() => { setAdding(false); setAddingFromDiscover(null) }}
         />
       )}

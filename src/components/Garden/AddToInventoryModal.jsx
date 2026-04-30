@@ -13,23 +13,30 @@ const DEFAULT_FORM = {
   days_to_harvest: '',
 }
 
-export default function AddToInventoryModal({ onSave, onClose, prefill }) {
+export default function AddToInventoryModal({ onSave, onSaveAndPlant, onClose, prefill }) {
   const [form, setForm]       = useState(prefill ? { ...DEFAULT_FORM, ...prefill } : DEFAULT_FORM)
   const [showMore, setShowMore] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
+  const buildPayload = () => ({
+    id: uuidv4(),
+    ...form,
+    water_interval_days: form.water_interval_days ? parseInt(form.water_interval_days) : 2,
+    prune_interval_days: form.prune_interval_days ? parseInt(form.prune_interval_days) : null,
+    fertilize_interval_days: form.fertilize_interval_days ? parseInt(form.fertilize_interval_days) : null,
+    harvest_interval_days: form.harvest_interval_days ? parseInt(form.harvest_interval_days) : null,
+    days_to_harvest: form.days_to_harvest ? parseInt(form.days_to_harvest) : null,
+  })
+
   const handleSave = () => {
     if (!form.name.trim()) return
-    onSave({
-      id: uuidv4(),
-      ...form,
-      water_interval_days: form.water_interval_days ? parseInt(form.water_interval_days) : 2,
-      prune_interval_days: form.prune_interval_days ? parseInt(form.prune_interval_days) : null,
-      fertilize_interval_days: form.fertilize_interval_days ? parseInt(form.fertilize_interval_days) : null,
-      harvest_interval_days: form.harvest_interval_days ? parseInt(form.harvest_interval_days) : null,
-      days_to_harvest: form.days_to_harvest ? parseInt(form.days_to_harvest) : null,
-    })
+    onSave(buildPayload())
+  }
+
+  const handlePlantNow = () => {
+    if (!form.name.trim()) return
+    onSaveAndPlant(buildPayload())
   }
 
   return (
@@ -124,6 +131,7 @@ export default function AddToInventoryModal({ onSave, onClose, prefill }) {
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
           <button className="btn-save" onClick={handleSave} disabled={!form.name.trim()}>Add to Inventory</button>
+          <button className="btn-plant-now" onClick={handlePlantNow} disabled={!form.name.trim()}>Plant now</button>
         </div>
       </motion.div>
     </div>
